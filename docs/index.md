@@ -13,3 +13,9 @@ Ethres is builded using Ethereum Blockchain so the same principles are applies:
 2. Peer-to-peer transmision: There is not a central authority. 
 3. Ownership: Papers are tracked by their author.
 4. Inmutability: Data is never deleted, just updated with new versions.
+
+## Architecture
+Ehtres consist of Smart Contracts (SC) for Ethereum Blockchain that implement -Dapp logic to publish, review papers.
+
+![architecture diagram](diagram_architecture.png "Architecture")
+
