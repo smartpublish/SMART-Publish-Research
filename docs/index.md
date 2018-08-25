@@ -14,8 +14,16 @@ Ethres is builded using Ethereum Blockchain so the same principles are applies:
 3. Ownership: Papers are tracked by their author.
 4. Inmutability: Data is never deleted, just updated with new versions.
 
+## Use Case: Publish Paper
+![Publish diagram](use_case_publish_diagram.png "Publish Use Case")
+
+## Flow: Publish Paper
+![Publish flow diagram](publish_flow_diagram.png "Publish Flow")
+
 ## Architecture
 Ehtres consist of Smart Contracts (SC) for Ethereum Blockchain that implement -Dapp logic to publish, review papers.
 
-![architecture diagram](diagram_architecture.png "Architecture")
+![architecture diagram](architecture_diagram.png "Architecture")
 
+## Components
+![components diagram](components_diagram.png "Components")
