@@ -7,25 +7,27 @@ contract Researchers is Versionable {
 
     Researcher[] researchers;
 
-    constructor(address firstVersion) {
-        updateVersion(firstVersion);
+    constructor() {
+        updateVersion(new ResearchersV0());
     }
 
-    function createResearcher(string orcid) external returns(address) {
-        var researcherAddress = currentVersion.delegateCall(bytes4(keccak256("createResearcher(string)")), orcid);
+    function createResearcher() external returns(address) {
+        var researcherAddress = currentVersion.delegateCall(firm("createResearcher()"));
         researchers.push(researcherAddress);
         return researcherAddress;
     }
 }
 
-contract ResearchersV1 {
+contract ResearchersV0 is Pausable {
 
-    function createResearcher(string orcid) returns (address) {
-        //Create a Researcher address
+    function createResearcher() returns (address) {
+        require(!isPaused);
+        return new Researcher();
     }
 }
 
 
-contract Researcher {
+contract Researcher is Ownable {
+
 
 }
