@@ -14,6 +14,7 @@ contract Researchers is Versionable {
 
     modifier unique {
         require(researchers[msg.sender] != address(0));
+        _;
     }
 
     function createResearcher() unique external returns(address) {
