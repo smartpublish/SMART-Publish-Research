@@ -1,33 +1,32 @@
 pragma solidity ^0.4.24;
 
 import "./support/Versionable.sol";
+import "./Researcher.sol";
 
 
 contract Researchers is Versionable {
 
-    Researcher[] researchers;
+    mapping(address => Researcher) researchers;
 
     constructor() {
         updateVersion(new ResearchersV0());
     }
 
-    function createResearcher() external returns(address) {
-        var researcherAddress = currentVersion.delegateCall(firm("createResearcher()"));
-        researchers.push(researcherAddress);
-        return researcherAddress;
+    modifier unique {
+        require(researchers[msg.sender] != address(0));
+    }
+
+    function createResearcher() unique external returns(address) {
+        Researcher researcher = currentVersion.delegateCall(firm("createResearcher()"));
+        researchers[msg.sender] = researcher;
+        return researcher;
     }
 }
 
 contract ResearchersV0 is Pausable {
 
-    function createResearcher() returns (address) {
-        require(!isPaused);
+    function createResearcher() nonPaused returns (address) {
         return new Researcher();
     }
 }
 
-
-contract Researcher is Ownable {
-
-
-}

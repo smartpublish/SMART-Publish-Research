@@ -1,4 +1,5 @@
 pragma solidity ^0.4.24;
+
 import "./Ownable.sol";
 
 contract Pausable is Ownable{
@@ -12,5 +13,13 @@ contract Pausable is Ownable{
     function pause() {
         require(owner == msg.sender);
         isPaused = true;
+    }
+
+    modifier nonPaused {
+        require(!isPaused);
+        // Do not forget the "_;"! It will
+        // be replaced by the actual function
+        // body when the modifier is used.
+        _;
     }
 }
