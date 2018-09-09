@@ -16,4 +16,5 @@ contract Versionable is Ownable {
     function firm(string func) constant returns (bytes4) {
         return bytes4(keccak256(func));
     }
+
 }
