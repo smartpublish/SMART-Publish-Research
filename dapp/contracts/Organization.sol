@@ -2,10 +2,10 @@ pragma solidity ^0.4.24;
 
 import "./AbstractContributor.sol";
 
-contract Researcher is AbstractContributor {
+contract Organization is AbstractContributor {
 
     function newInstance() external returns(IContributor) {
-        return new Researcher();
+        return new Organization();
     }
 
 }
