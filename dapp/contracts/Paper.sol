@@ -1,5 +1,7 @@
 pragma solidity ^0.4.24;
+
 import "./AbstractAsset.sol";
+import "./ILocation.sol";
 
 contract Paper is AbstractAsset {
 
@@ -8,7 +10,10 @@ contract Paper is AbstractAsset {
     // @dev abstract is a reserved keyword
     string private summary;
 
-    constructor(IAddress _addr, string _title, string _abstract) AbstractAsset(_addr) public {
+    constructor() public { }
+
+    function init(ILocation _location, string _title, string _abstract) public {
+        this.setLocation(_location);
         title = _title;
         summary = _abstract;
     }

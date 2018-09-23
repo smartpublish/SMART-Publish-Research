@@ -6,7 +6,7 @@ import "./IContributor.sol";
 
 contract ContributorFactory is Ownable, CloneFactory {
 
-    event ContributorCreated(address newContributorAddress, address libraryAddress);
+    event ContributorCreated(address newContributorAddress, address template);
 
     mapping(string => address) internal usersRegistry;
 
@@ -18,7 +18,6 @@ contract ContributorFactory is Ownable, CloneFactory {
         address template = usersRegistry[objectType];
         address clone = createClone(template);
         IContributor contributor = IContributor(clone);
-        contributor.init();
         emit ContributorCreated(clone, template);
         return contributor;
     }

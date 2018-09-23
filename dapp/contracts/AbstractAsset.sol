@@ -1,22 +1,21 @@
 pragma solidity ^0.4.24;
 
 import "./IAsset.sol";
+import "./ILocation.sol";
 
 // @title Any asset type (eg: a paper, ...)
 contract AbstractAsset is IAsset {
 
     // @dev "Filesystem" address
-    IAddress private addr;
+    ILocation private location;
 
-    constructor(IAddress _addr) public {
-        addr = _addr;
+    constructor() internal { }
+
+    function getLocation() external view returns (ILocation) {
+        return location;
     }
 
-    function getAddress() external view returns (IAddress) {
-        return addr;
-    }
-
-    function setAddress(IAddress location) external {
-        addr = location;
+    function setLocation(ILocation _location) public {
+        location = _location;
     }
 }

@@ -1,8 +1,9 @@
 pragma solidity ^0.4.23;
 
-import "./IAddress.sol";
+import "./ILocation.sol";
 
 interface IAsset {
-    function getAddress() external view returns (IAddress);
-    function setAddress(IAddress location) external;
+    function init(ILocation _location, string _title, string _abstract) public;
+    function getLocation() external view returns (ILocation);
+    function setLocation(ILocation _location) external;
 }
