@@ -4,8 +4,6 @@ import "./AbstractContributor.sol";
 
 contract Organization is AbstractContributor {
 
-    function newInstance() external returns(IContributor) {
-        return new Organization();
-    }
+    function init() public { }
 
 }

@@ -4,6 +4,6 @@ import "./IContributor.sol";
 
 contract AbstractContributor is IContributor {
 
-    function newInstance() external returns(IContributor);
+    function init() public;
 
 }

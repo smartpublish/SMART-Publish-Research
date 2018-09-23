@@ -1,0 +1,19 @@
+{
+  "name": "SMART-Papers",
+  "version": "0.0.1",
+  "description": "Create clone contracts with 96 bytes deployed on chain.",
+  "repository": "github:smartpublish/SMART-Publish-Research",
+  "main": "init.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "author": "SMART Publish",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@optionality.io/clone-factory": "^0.1.6",
+    "openzeppelin-solidity": "^1.12.0"
+  }
+}

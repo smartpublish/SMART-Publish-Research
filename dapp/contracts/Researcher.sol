@@ -1,11 +1,12 @@
 pragma solidity ^0.4.24;
 
+//solhint-disable max-line-length
+//solhint-disable no-inline-assembly
+
 import "./AbstractContributor.sol";
 
 contract Researcher is AbstractContributor {
 
-    function newInstance() external returns(IContributor) {
-        return new Researcher();
-    }
+    function init() public { }
 
 }
