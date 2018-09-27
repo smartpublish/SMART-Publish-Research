@@ -19,3 +19,6 @@ target/
 #Gradle
 .gradle/
 build/
+
+#NPM
+dapp/node_modules/
