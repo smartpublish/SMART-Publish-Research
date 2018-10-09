@@ -4,14 +4,15 @@ var Organization = artifacts.require("Organization");
 
 var AssetFactory = artifacts.require("AssetFactory");
 var Paper = artifacts.require("Paper");
+var PaperWorkflow = artifacts.require("PaperWorkflow");
 
 module.exports = function(deployer) {
-    // Contributors
-    deployer.deploy(ContributorFactory);
-    deployer.deploy(Researcher);
-    deployer.deploy(Organization);
-
-    // Assets
-    deployer.deploy(AssetFactory);
-    deployer.deploy(Paper);
+     // Assets
+    deployer.deploy(AssetFactory).then(function (factory) {
+        return deployer.deploy(Paper).then(function () {
+            // Init Factory
+            factory.register("paper", Paper.address);
+        });
+    });
+    deployer.deploy(PaperWorkflow);
 };

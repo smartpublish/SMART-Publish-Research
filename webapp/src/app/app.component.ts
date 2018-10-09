@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {ContributorService} from "./core/services";
+import { Component, OnInit } from '@angular/core';
+import { ContributorService } from "./core/services";
 
 @Component({
   selector: 'app-root',

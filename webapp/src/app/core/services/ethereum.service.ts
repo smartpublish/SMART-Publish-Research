@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
 import * as Web3 from 'web3';
-import * as TruffleContract from 'truffle-contract';
 
-declare let require: any;
 declare let window: any;
 
 @Injectable({
   providedIn: 'root'
 })
 export class EthereumService {
-  private web3Provider: null;
-  private contracts: {};
 
+  readonly web3Provider: null;
 
   constructor() {
     if (typeof window.web3 !== 'undefined') {
@@ -40,35 +37,4 @@ export class EthereumService {
     });
   }
 
-  transferEther(
-    _transferFrom,
-    _transferTo,
-    _amount,
-    _remarks,
-    _tokenAbi
-  ) {
-    let that = this;
-
-    return new Promise((resolve, reject) => {
-      let contract = TruffleContract(_tokenAbi);
-      contract.setProvider(that.web3Provider);
-
-      contract.deployed().then(function(instance) {
-          return instance.transferFund(
-            _transferTo,
-            {
-              from:_transferFrom,
-              value:window.web3.toWei(_amount, "ether")
-            });
-        }).then(function(status) {
-          if(status) {
-            return resolve({status:true});
-          }
-        }).catch(function(error){
-          console.log(error);
-
-          return reject("Error in transferEther service call");
-        });
-    });
-  }
 }

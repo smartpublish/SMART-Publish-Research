@@ -5,32 +5,26 @@ import "./ILocation.sol";
 
 contract Paper is AbstractAsset {
 
-    string private title;
-
+    // @dev public generates getters automatically
+    string public title;
     // @dev abstract is a reserved keyword
-    string private summary;
+    string public summary;
 
-    constructor() public { }
-
-    function init(ILocation _location, string _title, string _abstract) public {
-        this.setLocation(_location);
-        title = _title;
-        summary = _abstract;
+    constructor() public {
     }
 
-    function getTitle() external view returns(string) {
-        return title;
+    function init(ILocation _location, string _title, string _abstract) external {
+        location = _location;
+        title = _title;
+        summary = _abstract;
     }
 
     function setTitle(string _title) external {
         title = _title;
     }
 
-    function getAbstract() external view returns(string) {
-        return summary;
-    }
-
     function setAbstract(string _abstract) external {
         summary = _abstract;
     }
+
 }

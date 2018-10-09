@@ -7,7 +7,8 @@ import { LayoutModule } from './layout/layout.module';
     CommonModule,
     LayoutModule
   ],
-  declarations: [],
-  exports: [LayoutModule]
+  exports: [
+    LayoutModule
+  ]
 })
 export class SharedModule { }

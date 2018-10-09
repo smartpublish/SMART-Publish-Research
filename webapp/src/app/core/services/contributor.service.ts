@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
 import { IContributor } from '../models/contributor.model';
-import * as Web3 from 'web3';
-import * as TruffleContract from 'truffle-contract';
+// import * as Web3 from 'web3';
+// import * as TruffleContract from 'truffle-contract';
 import {EthereumService} from "./ethereum.service";
 
 declare let require: any;

@@ -1,0 +1,20 @@
+<h4>{{title}}</h4>
+<h6>{{description}}</h6>
+<div class="card-deck">
+  <div *ngFor="let item of items; let i = index" class="card" style="width: 18rem;">
+    <div class="card-body">
+      <div class="card-body">
+        <h5 class="card-title">{{item["title"]}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{item["subtitle"]}}</h6>
+        <p class="card-text">{{item["description"]}}</p>
+        <a href="#" class="card-link">Read</a>
+        <a href="#" class="card-link">Review</a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12 py-3 text-center">
+    <a href="" class="btn btn-outline-primary">Browse all</a>
+  </div>
+</div>

@@ -6,20 +6,27 @@ import "./IAsset.sol";
 
 contract AssetFactory is Ownable, CloneFactory {
 
-    event AssetCreated(address newAssetAddress, address template);
+    mapping(string => address) internal assetTypeRegistry;
+    mapping(address => address[]) internal assetByCreator;
 
-    mapping(string => address) internal assetRegistry;
+    event AssetCreated(address assetAddress);
 
     function register(string objectType, address object) external  {
-        assetRegistry[objectType] = object;
+        assetTypeRegistry[objectType] = object;
     }
 
     function create(string objectType) external returns(IAsset) {
-        address template = assetRegistry[objectType];
+        // Create a new asset instance
+        address template = assetTypeRegistry[objectType];
         address clone = createClone(template);
         IAsset asset = IAsset(clone);
-        emit AssetCreated(clone, template);
+        assetByCreator[msg.sender].push(asset) - 1;
+        emit AssetCreated(clone);
         return asset;
+    }
+
+    function findAsset(address user) view public returns (address[]){
+        return assetByCreator[user];
     }
 
     constructor () public { }

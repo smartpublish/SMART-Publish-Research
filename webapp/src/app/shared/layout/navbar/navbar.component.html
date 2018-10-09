@@ -5,9 +5,9 @@
   </button>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
-      <a class="nav-item nav-link" href="#">Publish</a>
-      <a class="nav-item nav-link" href="#">Review</a>
-      <a class="nav-item nav-link" href="#">Impact Factor</a>
+      <a class="nav-item nav-link" [routerLink]="['/publish']" routerLinkActive="active">Publish</a>
+      <a class="nav-item nav-link" [routerLink]="['/review']">Review</a>
+      <a class="nav-item nav-link" [routerLink]="['/impact']">Impact Factor</a>
     </div>
   </div>
 </nav>
