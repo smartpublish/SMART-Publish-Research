@@ -1,34 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { PublicationService } from "@app/modules/publication/services/publication.service";
-import {Subscription} from "rxjs";
+import { Subscription } from "rxjs";
+
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
-  // Test data
-  publishedPapers: any[] = [
-    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum...."},
-    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum...."},
-    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum...."},
-    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum...."}
-  ];
+  publishedPapers: any[] = [];
+  pendingPapers: any[] = [];
 
-  pendingPaper: any[] = [];
-
-  // TODO Refactor
+  publishedPaperSubscription: Subscription;
   pendingPaperSubscription: Subscription;
 
   constructor(private publicationService: PublicationService) { }
 
   ngOnInit() {
-    // this.publishedPapers = this.paperService.getNewPublished();
-    this.pendingPaperSubscription = this.publicationService.getAllPapers("Submitted").subscribe(paper => {
-      console.log(paper);
+    this.publishedPaperSubscription = this.publicationService.getAllPapers("Published").subscribe(paper => {
+      this.pendingPapers.push(this.paperToCard(paper));
     });
+    this.pendingPaperSubscription = this.publicationService.getAllPapers("Submitted").subscribe(paper => {
+      this.pendingPapers.push(this.paperToCard(paper));
+    });
+  }
+
+  ngOnDestroy() {
+    this.publishedPaperSubscription.unsubscribe();
+    this.pendingPaperSubscription.unsubscribe();
+  }
+
+  // Refactor
+  private paperToCard(paper):any {
+    console.log(paper);
+    return {
+      'title': paper['title'],
+      'subtitle': paper['ethAddress'],
+      'description': paper['abstract'],
+      'read-link': paper['file']
+    }
   }
 
 }

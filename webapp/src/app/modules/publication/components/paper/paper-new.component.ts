@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Form, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ContributorService } from "@app/core/services";
 import { PublicationService } from "@app/modules/publication/services/publication.service";
 import { Paper } from "@app/modules/publication/models/paper.model";
@@ -16,7 +16,8 @@ export class PaperNewComponent implements OnInit {
   ethAccount: FormControl = new FormControl('', Validators.required);
   title: FormControl = new FormControl('', Validators.required);
   abstract: FormControl = new FormControl('', Validators.required);
-  locationFile: FormControl = new FormControl('', Validators.required); // TODO Refactory by uploader file
+
+  file: File;
 
   constructor(
     private contributorService: ContributorService,
@@ -28,19 +29,25 @@ export class PaperNewComponent implements OnInit {
       title: this.title,
       abstract: this.abstract,
       ethAccount: this.ethAccount,
-      locationFile: this.locationFile
+      file: ['', Validators.required]
       // TODO Contributors, Organizations
     });
   }
 
+  onFileChange($event) {
+    this.file = $event.target.files[0];
+  }
+
   onSubmit() {
-    let paper: Paper = new Paper(this.title.value, this.abstract.value, this.locationFile.value);
-    console.log(this.publicationService);
+    let paper: Paper = new Paper(this.title.value, this.abstract.value, this.file);
+    console.log(paper);
+
     let that = this;
-    this.publicationService.submit(paper).then(function (result) {
+    this.publicationService.submit(paper).then((result) => {
       console.log(result);
       that.alertService.success("Your paper is registered! Just wait for reviewers");
-    }).catch(function (error) {
+    }).catch((error) => {
+      console.error(error);
       that.alertService.error(error);
     });
   }

@@ -7,13 +7,13 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class ShowcaseComponent implements OnInit {
 
-  @Input() title = 'Showcase'
-  @Input() description = 'Showcase description'
+  @Input() title = 'Showcase';
+  @Input() description = 'Showcase description';
   @Input() items: any[] = [
-    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum...."},
-    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum...."},
-    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum...."},
-    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum...."}
+    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum....", "read-link":"#"},
+    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum....", "read-link":"#"},
+    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum....", "read-link":"#"},
+    {"title":"Paper 1", "subtitle":"This is a paper", "description": "Lore ipsum ipsum ipsum....", "read-link":"#"}
   ];
 
   constructor() { }

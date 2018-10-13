@@ -10,10 +10,14 @@ contract Paper is AbstractAsset {
     // @dev abstract is a reserved keyword
     string public summary;
 
+    // TODO Refactor: This should be a list of different filesystems (IPFS, SWARM, ...)
+    // @dev fileSystemsLocation for this asset
+    string public location;
+
     constructor() public {
     }
 
-    function init(ILocation _location, string _title, string _abstract) external {
+    function init(string _location, string _title, string _abstract) external {
         location = _location;
         title = _title;
         summary = _abstract;
@@ -25,6 +29,10 @@ contract Paper is AbstractAsset {
 
     function setAbstract(string _abstract) external {
         summary = _abstract;
+    }
+
+    function setLocation(string _location) external {
+        location = _location;
     }
 
 }

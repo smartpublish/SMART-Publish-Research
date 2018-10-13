@@ -3,32 +3,30 @@ import { EthereumService } from "@app/core/services/ethereum.service";
 import { Paper } from "@app/modules/publication/models/paper.model";
 import * as TruffleContract from "truffle-contract";
 import { Observable } from "rxjs";
+import { IpfsService } from "@app/core/services/ipfs.service";
 
 declare let require: any;
 
 let tokenAbiPaperWF = require('@contracts/PaperWorkflow.json');
 let tokenAbiPaper = require('@contracts/Paper.json');
 
-// TODO refactor: copy contracts on webapp on production and use this path on development
-
 @Injectable({
   providedIn: 'root'
 })
-export class PublicationService extends EthereumService {
+export class PublicationService {
 
   readonly PAPERWF_SC = TruffleContract(tokenAbiPaperWF);
   readonly PAPER_SC = TruffleContract(tokenAbiPaper);
 
-  static ngInjectableDef = undefined;
-  // TODO Workaoround inheritance on services, check: https://stackoverflow.com/questions/50263722/angular-6-services-and-class-inheritance
+  constructor(
+    private ethereumService: EthereumService,
+    private ipfsService: IpfsService) {
 
-  constructor() {
-    super();
-    this.PAPERWF_SC.setProvider(this.web3Provider);
-    this.PAPER_SC.setProvider(this.web3Provider);
+    this.PAPERWF_SC.setProvider(ethereumService.web3Provider);
+    this.PAPER_SC.setProvider(ethereumService.web3Provider);
 
     // Init defaults
-    this.getAccountInfo().then((acctInfo : any) => {
+    this.ethereumService.getAccountInfo().then((acctInfo : any) => {
       this.PAPERWF_SC.defaults({
         from: acctInfo.fromAccount
       });
@@ -39,8 +37,6 @@ export class PublicationService extends EthereumService {
   }
 
   getAllPapers(state: string): Observable<any[]> {
-    let that = this;
-    let data: any = {};
     return Observable.create(observer => {
       this.PAPERWF_SC.deployed().then(instance => {
         return instance.findPapers.call(state);
@@ -64,21 +60,57 @@ export class PublicationService extends EthereumService {
   }
 
   submit(paper: Paper) {
+    return this.submitToIpfs(paper).then((ipfsObject) => {
+      if(ipfsObject) {
+        paper.location = ipfsObject['link'];
+        console.log(paper);
+        return this.submitToEthereum(paper)
+      }
+    }).then((status) => {
+      console.log(status)
+    }).catch((error) => {
+      console.error(error);
+    });
+  }
+
+  private submitToIpfs(paper: Paper):Promise<any> {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+        }, 10000);
+
+        var reader = new FileReader();
+        reader.onload = (e) => {
+          this.ipfsService.upload(reader.result)
+            .then((ipfsObject) => {
+              try {
+                resolve({
+                  hash: ipfsObject,
+                  link: 'https://ipfs.io/ipfs/' + ipfsObject
+                });
+              } catch(e) {
+                console.error(e);
+              }
+            });
+        };
+        reader.readAsArrayBuffer(paper.file);
+      })
+  }
+
+  private submitToEthereum(paper: Paper):Promise<any> {
     return new Promise((resolve, reject) => {
       this.PAPERWF_SC.deployed().then(instance => {
         console.log(paper);
-        return instance.submit('Internal location', paper.title, paper.abstract);
-      }).then(function(status) {
+      return instance.submit(paper.location, paper.title, paper.abstract);
+      }).then((status) => {
         console.log(status);
         if(status) {
           return resolve({status:true});
         }
-      }).catch(function(error){
+      }).catch((error) => {
         console.log(error);
         return reject("Error in transferEther service call");
       });
     });
-
   }
 
 }

@@ -15,11 +15,13 @@ class AbstractAsset implements IAsset {
 export class Paper extends AbstractAsset {
   title: string;
   abstract: string;
+  file: File;
 
-  constructor(title: string, abstract: string, location?: string, ethAddress?: number){
+  constructor(title: string, abstract: string, file?: File, location?: string, ethAddress?: number){
     super(location, ethAddress);
     this.title = title;
     this.abstract = abstract;
+    this.file = file;
   }
 
 }

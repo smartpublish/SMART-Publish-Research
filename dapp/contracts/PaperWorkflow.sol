@@ -19,8 +19,8 @@ contract PaperWorkflow is AssetFactory {
         // Paper paper = Paper(this.create("paper"));
         Paper paper = new Paper();
 
-        ILocation ipfsLocation = new IPFSLocation(_location);
-        paper.init(ipfsLocation,_title,_summary);
+        // ILocation ipfsLocation = new IPFSLocation(_location);
+        paper.init(_location,_title,_summary);
 
         papersByState[STATE_SUMBITTED].push(paper) - 1;
 

@@ -7,11 +7,8 @@ import "./ILocation.sol";
 contract AbstractAsset is IAsset {
 
     // @dev "Filesystem" address
-    ILocation public location;
+    // ILocation public location;
 
     constructor() internal { }
 
-    function setLocation(ILocation _location) public {
-        location = _location;
-    }
 }
