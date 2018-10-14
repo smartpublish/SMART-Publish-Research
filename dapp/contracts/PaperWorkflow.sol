@@ -2,8 +2,6 @@ pragma solidity ^0.4.24;
 
 import "./Paper.sol";
 import "./AssetFactory.sol";
-import "./IPFSLocation.sol";
-import "./ILocation.sol";
 
 contract PaperWorkflow is AssetFactory {
 
@@ -15,12 +13,11 @@ contract PaperWorkflow is AssetFactory {
 
     event PaperSubmitted(address paperAddress, string state);
 
-    function submit(string _location, string _title, string _summary) public returns(Paper) {
+    function submit(string _title, string _summary, string _fileSystemName, string _publicLocation, string _summaryHashAlgorithm, string _summaryHash) public returns(Paper) {
         // Paper paper = Paper(this.create("paper"));
         Paper paper = new Paper();
 
-        // ILocation ipfsLocation = new IPFSLocation(_location);
-        paper.init(_location,_title,_summary);
+        paper.init(_title,_summary,_fileSystemName, _publicLocation, _summaryHashAlgorithm, _summaryHash);
 
         papersByState[STATE_SUMBITTED].push(paper) - 1;
 

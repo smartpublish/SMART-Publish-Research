@@ -20,10 +20,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.publishedPaperSubscription = this.publicationService.getAllPapers("Published").subscribe(paper => {
-      this.pendingPapers.push(this.paperToCard(paper));
+      this.pendingPapers.push(HomeComponent.paperToCard(paper));
     });
     this.pendingPaperSubscription = this.publicationService.getAllPapers("Submitted").subscribe(paper => {
-      this.pendingPapers.push(this.paperToCard(paper));
+      this.pendingPapers.push(HomeComponent.paperToCard(paper));
     });
   }
 
@@ -32,14 +32,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.pendingPaperSubscription.unsubscribe();
   }
 
-  // Refactor
-  private paperToCard(paper):any {
+  // TODO Refactor
+  private static paperToCard(paper):any {
     console.log(paper);
     return {
       'title': paper['title'],
       'subtitle': paper['ethAddress'],
       'description': paper['abstract'],
-      'read-link': paper['file']
+      'read-link': paper['publicLocation']
     }
   }
 

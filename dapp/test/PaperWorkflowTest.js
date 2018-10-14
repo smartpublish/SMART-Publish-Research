@@ -6,12 +6,26 @@ var Paper = artifacts.require("Paper");
 contract('PaperWorkflow', function() {
     it("should submit a new Paper", function () {
         return PaperWorkflow.deployed().then(function (instance) {
-            return instance.submit('Awesome Title paper','Best abstract','File location');
+            return instance.submit(
+                'Awesome Title paper',
+                'Best abstract',
+                'IPFS',
+                'https://ipfs.io/test',
+                'blake2b',
+                'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B'
+            );
         });
     });
     it("should fire event when you submit a new Paper", function () {
         return PaperWorkflow.deployed().then(function (instance) {
-            return instance.submit('File location','Awesome Title paper','Best abstract');
+            return instance.submit(
+                'Awesome Title paper',
+                'Best abstract',
+                'IPFS',
+                'https://ipfs.io/test',
+                'blake2b',
+                'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B'
+            );
         }).then(function (tx) {
             truffleAssert.eventEmitted(tx, 'PaperSubmitted', function (e) {
                 return e.paperAddress !== undefined;
@@ -23,7 +37,14 @@ contract('PaperWorkflow', function() {
 
         return PaperWorkflow.deployed().then(function (instance) {
             paperWF = instance;
-            return paperWF.submit('File location','Awesome Title paper','Best abstract');
+            return paperWF.submit(
+                'Awesome Title paper',
+                'Best abstract',
+                'IPFS',
+                'https://ipfs.io/test',
+                'blake2b',
+                'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B'
+            );
         }).then(function (Tx) {
             submitTx = Tx;
             return paperWF.findPapers.call("Submitted")
@@ -40,7 +61,14 @@ contract('PaperWorkflow', function() {
 
         return PaperWorkflow.deployed().then(function (instance) {
             paperWF = instance;
-            return paperWF.submit('File location','Awesome Title paper','Best abstract');
+            return paperWF.submit(
+                'Awesome Title paper',
+                'Best abstract',
+                'IPFS',
+                'https://ipfs.io/test',
+                'blake2b',
+                'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B'
+            );
         }).then(function () {
             return paperWF.findPapers.call("Submitted");
         }).then(function (papersAdresses) {

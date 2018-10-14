@@ -48,10 +48,17 @@ export class PublicationService {
             return Promise.all([
               instance.title.call(),
               instance.summary.call(),
-              instance.location.call()
+              instance.getFile.call(0)
             ]);
           }).then(values => {
-            let paper:Paper = new Paper(values[0], values[1], values[2], address);
+            console.log(values);
+            let paper:Paper = new Paper(
+              values[0],
+              values[1],
+              null,
+              values[2][1],
+              values[2][0],
+              address);
             observer.next(paper);
           }).catch(err => console.log(err));
         });
@@ -62,14 +69,11 @@ export class PublicationService {
   submit(paper: Paper) {
     return this.submitToIpfs(paper).then((ipfsObject) => {
       if(ipfsObject) {
-        paper.location = ipfsObject['link'];
+        paper.publicLocation = ipfsObject['link'];
+        paper.fileSystemName = 'IPFS';
         console.log(paper);
         return this.submitToEthereum(paper)
       }
-    }).then((status) => {
-      console.log(status)
-    }).catch((error) => {
-      console.error(error);
     });
   }
 
@@ -78,9 +82,9 @@ export class PublicationService {
         setTimeout(() => {
         }, 10000);
 
-        var reader = new FileReader();
-        reader.onload = (e) => {
-          this.ipfsService.upload(reader.result)
+        let reader = new FileReader();
+        reader.onload = (event) => {
+          this.ipfsService.upload(event.target.result)
             .then((ipfsObject) => {
               try {
                 resolve({
@@ -88,7 +92,7 @@ export class PublicationService {
                   link: 'https://ipfs.io/ipfs/' + ipfsObject
                 });
               } catch(e) {
-                console.error(e);
+                reject(e);
               }
             });
         };
@@ -100,14 +104,21 @@ export class PublicationService {
     return new Promise((resolve, reject) => {
       this.PAPERWF_SC.deployed().then(instance => {
         console.log(paper);
-      return instance.submit(paper.location, paper.title, paper.abstract);
+      return instance.submit(
+        paper.title,
+        paper.abstract,
+        paper.fileSystemName,
+        paper.publicLocation,
+        paper.summaryHashAlgorithm,
+        paper.summaryHash
+        );
       }).then((status) => {
         console.log(status);
         if(status) {
-          return resolve({status:true});
+          return resolve({ status:true });
         }
       }).catch((error) => {
-        console.log(error);
+        console.error(error);
         return reject("Error in transferEther service call");
       });
     });

@@ -1,7 +1,3 @@
-var ContributorFactory = artifacts.require("ContributorFactory");
-var Researcher = artifacts.require("Researcher");
-var Organization = artifacts.require("Organization");
-
 var AssetFactory = artifacts.require("AssetFactory");
 var Paper = artifacts.require("Paper");
 var PaperWorkflow = artifacts.require("PaperWorkflow");
