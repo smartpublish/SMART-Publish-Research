@@ -1,5 +1,19 @@
-<app-showcase [title]="'Published'" [description]="'Last science papers published. Yay!'" [items]="publishedPapers" ></app-showcase>
-<app-showcase [title]="'Pending'" [description]="'Last science pending to review. Be the first one!'" [items]="pendingPapers" ></app-showcase>
+<app-cardlist
+  [title]="'Published'"
+  [description]="'Last science papers published. Yay!'"
+  [items]="publishedPapers"
+  (clickActionCard)="clickActionCardHandlePublished($event)"></app-cardlist>
+<app-cardlist
+  [title]="'On Review'"
+  [description]="'Last papers on review. On publish way!'"
+  [items]="onReviewPapers"
+  (clickActionCard)="clickActionCardHandleOnReview($event)"></app-cardlist>
+<app-cardlist
+  [title]="'Submitted'"
+  [description]="'Last papers submitted for reviewing. Be the first one to check them!'"
+  [items]="submittedPapers"
+  (clickActionCard)="clickActionCardHandleSubmitted($event)"></app-cardlist>
+
 <!-- Modal Paper
 <app-modal>
   <app-paper></app-paper>

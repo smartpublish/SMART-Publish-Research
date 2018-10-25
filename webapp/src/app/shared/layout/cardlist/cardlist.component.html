@@ -7,8 +7,8 @@
         <h5 class="card-title">{{item['title']}}</h5>
         <h6 class="card-subtitle mb-2 text-muted">{{item['subtitle']}}</h6>
         <p class="card-text">{{item['description']}}</p>
-        <a href="{{item['read-link']}}" target="_blank" class="card-link">Read</a>
-        <a href="#" class="card-link">Review</a>
+        <a href="#" (click)="onClickAction(1, item)" class="card-link">{{item['action_1_name']}}</a>
+        <a href="#" (click)="onClickAction(2, item)" class="card-link">{{item['action_2_name']}}</a>
       </div>
     </div>
   </div>

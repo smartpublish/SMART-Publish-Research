@@ -4,10 +4,12 @@ import { Paper } from "@app/modules/publication/models/paper.model";
 import * as TruffleContract from "truffle-contract";
 import { Observable } from "rxjs";
 import { IpfsService } from "@app/core/services/ipfs.service";
+import { AlertService } from "@app/core/services/alert.service";
 
 declare let require: any;
 
-let tokenAbiPaperWF = require('@contracts/PaperWorkflow.json');
+let tokenAbiPeerReviewWorkflow = require('@contracts/PeerReviewWorkflow.json');
+let tokenAbiAssetFactory = require('@contracts/AssetFactory.json');
 let tokenAbiPaper = require('@contracts/Paper.json');
 
 @Injectable({
@@ -15,31 +17,41 @@ let tokenAbiPaper = require('@contracts/Paper.json');
 })
 export class PublicationService {
 
-  readonly PAPERWF_SC = TruffleContract(tokenAbiPaperWF);
+  readonly WF_SC = TruffleContract(tokenAbiPeerReviewWorkflow);
+  readonly ASSET_FACTORY_SC = TruffleContract(tokenAbiAssetFactory);
   readonly PAPER_SC = TruffleContract(tokenAbiPaper);
 
   constructor(
     private ethereumService: EthereumService,
-    private ipfsService: IpfsService) {
+    private ipfsService: IpfsService,
+    private alertService: AlertService
+  ) {
 
-    this.PAPERWF_SC.setProvider(ethereumService.web3Provider);
+    this.WF_SC.setProvider(ethereumService.web3Provider);
+    this.ASSET_FACTORY_SC.setProvider(ethereumService.web3Provider);
     this.PAPER_SC.setProvider(ethereumService.web3Provider);
 
     // Init defaults
     this.ethereumService.getAccountInfo().then((acctInfo : any) => {
-      this.PAPERWF_SC.defaults({
+      this.WF_SC.defaults({
+        from: acctInfo.fromAccount
+      });
+      this.ASSET_FACTORY_SC.defaults({
         from: acctInfo.fromAccount
       });
       this.PAPER_SC.defaults({
         from: acctInfo.fromAccount
       })
+    }).catch((e) => {
+      this.alertService.error(e);
     });
   }
 
   getAllPapers(state: string): Observable<any[]> {
     return Observable.create(observer => {
-      this.PAPERWF_SC.deployed().then(instance => {
-        return instance.findPapers.call(state);
+      this.WF_SC.deployed().then(instance => {
+        // TODO Filter by asset type
+        return instance.findAssetsByState.call(state);
       }).then(addresses => {
         console.log(addresses);
         addresses.forEach((address) => {
@@ -102,15 +114,16 @@ export class PublicationService {
 
   private submitToEthereum(paper: Paper):Promise<any> {
     return new Promise((resolve, reject) => {
-      this.PAPERWF_SC.deployed().then(instance => {
+      this.ASSET_FACTORY_SC.deployed().then(instance => {
         console.log(paper);
-      return instance.submit(
+      return instance.createPaper(
         paper.title,
         paper.abstract,
         paper.fileSystemName,
         paper.publicLocation,
         paper.summaryHashAlgorithm,
-        paper.summaryHash
+        paper.summaryHash,
+        this.WF_SC.address // Creates Paper with PeerReviewWorkflow by default
         );
       }).then((status) => {
         console.log(status);
@@ -124,4 +137,35 @@ export class PublicationService {
     });
   }
 
+  review(paper: Paper):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.WF_SC.deployed().then(instance => {
+        return instance.review(paper.ethAddress);
+      }).then((status) => {
+        console.log(status);
+        if(status) {
+          return resolve({ status:true });
+        }
+      }).catch((error) => {
+        console.error(error);
+        return reject("Error in transferEther service call");
+      });
+    });
+  }
+
+  accept(paper: Paper):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.WF_SC.deployed().then(instance => {
+        return instance.accept(paper.ethAddress);
+      }).then((status) => {
+        console.log(status);
+        if(status) {
+          return resolve({ status:true });
+        }
+      }).catch((error) => {
+        console.error(error);
+        return reject("Error in transferEther service call");
+      });
+    });
+  }
 }

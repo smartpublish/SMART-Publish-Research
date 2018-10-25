@@ -59,8 +59,8 @@ class AssetFile implements IAsset {
 }
 
 export class Paper extends AssetFile {
-  title: string;
-  abstract: string;
+  public title: string;
+  public abstract: string;
 
   constructor(
     title: string,
