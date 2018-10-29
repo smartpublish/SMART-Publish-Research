@@ -96,7 +96,7 @@ export class PublicationService {
 
         let reader = new FileReader();
         reader.onload = (event) => {
-          this.ipfsService.upload(event.target.result)
+          this.ipfsService.upload(event.target['result'])
             .then((ipfsObject) => {
               try {
                 resolve({

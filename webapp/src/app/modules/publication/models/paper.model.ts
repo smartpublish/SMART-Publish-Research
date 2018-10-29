@@ -32,7 +32,7 @@ class AssetFile implements IAsset {
 
       let fileReader = new FileReader();
       fileReader.onload = (event) => {
-        let arrayBuffer = event.target.result;
+        let arrayBuffer = event.target['result'];
 
         const myReadableStreamBuffer = new StreamBuffers.ReadableStreamBuffer({
           chunkSize: 25000
