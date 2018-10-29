@@ -1,7 +1,7 @@
 <h4>{{title}}</h4>
 <h6>{{description}}</h6>
-<div class="card-deck">
-  <div *ngFor="let item of items" class="card" style="width: 18rem;">
+<div *ngIf="items$ | async" class="card-deck">
+  <div *ngFor="let item of items$ | async" class="card" style="width: 18rem;">
     <div class="card-body">
       <div class="card-body">
         <h5 class="card-title">{{item['title']}}</h5>

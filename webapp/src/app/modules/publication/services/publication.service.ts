@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { EthereumService } from "@app/core/services/ethereum.service";
 import { Paper } from "@app/modules/publication/models/paper.model";
 import * as TruffleContract from "truffle-contract";
-import { Observable } from "rxjs";
+import { Observable, merge  } from "rxjs";
 import { IpfsService } from "@app/core/services/ipfs.service";
 import { AlertService } from "@app/core/services/alert.service";
 
@@ -20,6 +20,9 @@ export class PublicationService {
   readonly WF_SC = TruffleContract(tokenAbiPeerReviewWorkflow);
   readonly ASSET_FACTORY_SC = TruffleContract(tokenAbiAssetFactory);
   readonly PAPER_SC = TruffleContract(tokenAbiPaper);
+
+  WF_SC_INSTANCE;
+  ASSET_FACTORY_SC_INSTANCE;
 
   constructor(
     private ethereumService: EthereumService,
@@ -41,39 +44,66 @@ export class PublicationService {
       });
       this.PAPER_SC.defaults({
         from: acctInfo.fromAccount
-      })
+      });
+
+      this.ASSET_FACTORY_SC.deployed().then(instance => this.ASSET_FACTORY_SC_INSTANCE = instance);
+      this.WF_SC.deployed().then(instance => this.WF_SC_INSTANCE = instance);
     }).catch((e) => {
       this.alertService.error(e);
     });
   }
 
-  getAllPapers(state: string): Observable<any[]> {
+  getPaper(address: string): Promise<Paper> {
+    return new Promise<Paper>((resolve, reject) =>{
+      this.PAPER_SC.at(address).then(instance => {
+        return Promise.all([
+          instance.title.call(),
+          instance.summary.call(),
+          instance.getFile.call(0)
+        ]);
+      }).then(values => {
+         let paper:Paper = new Paper(
+          values[0],
+          values[1],
+          null,
+          values[2][1],
+          values[2][0],
+          address);
+
+         resolve(paper);
+      }).catch(err => reject(err));
+    });
+  }
+
+  getStateChangedPapers(): Observable<AssetStateChanged> {
+    return Observable.create(observer => {
+      this.WF_SC.deployed().then(instance => {
+        // TODO Filter by asset type
+        const event = instance.AssetStateChanged({});
+        event.on('data', (data) => {
+          console.log(data);
+          this.getPaper(data['args']['assetAddress']).then(paper => {
+            let e  = {
+              assetAddress: data['args']['assetAddress'],
+              state: data['args']['state'],
+              oldState: data['args']['oldState'],
+              transition :data['args']['transition'],
+              asset: paper
+            } as AssetStateChanged;
+            observer.next(e);
+          });
+        });
+      })
+    });
+  }
+
+  getAllPapersOnState(state: string): Observable<Paper> {
     return Observable.create(observer => {
       this.WF_SC.deployed().then(instance => {
         // TODO Filter by asset type
         return instance.findAssetsByState.call(state);
       }).then(addresses => {
-        console.log(addresses);
-        addresses.forEach((address) => {
-          console.log(address);
-          this.PAPER_SC.at(address).then(instance => {
-            return Promise.all([
-              instance.title.call(),
-              instance.summary.call(),
-              instance.getFile.call(0)
-            ]);
-          }).then(values => {
-            console.log(values);
-            let paper:Paper = new Paper(
-              values[0],
-              values[1],
-              null,
-              values[2][1],
-              values[2][0],
-              address);
-            observer.next(paper);
-          }).catch(err => console.log(err));
-        });
+        addresses.forEach((address) => this.getPaper(address).then((paper) => observer.next(paper)));
       });
     });
   }
@@ -123,7 +153,7 @@ export class PublicationService {
         paper.publicLocation,
         paper.summaryHashAlgorithm,
         paper.summaryHash,
-        this.WF_SC.address // Creates Paper with PeerReviewWorkflow by default
+        this.WF_SC_INSTANCE.address // Creates Paper with PeerReviewWorkflow by default
         );
       }).then((status) => {
         console.log(status);
@@ -168,4 +198,12 @@ export class PublicationService {
       });
     });
   }
+}
+
+export interface AssetStateChanged {
+  assetAddress:string,
+  state:string,
+  oldState:string,
+  transition:string
+  asset:any;
 }

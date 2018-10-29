@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { PublicationService } from "@app/modules/publication/services/publication.service";
-import { Subscription } from "rxjs";
-import {DataCard} from "@app/shared/layout/cardlist/cardlist.component";
-import {Paper} from "@app/modules/publication/models/paper.model";
-
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { AssetStateChanged, PublicationService } from "@app/modules/publication/services/publication.service";
+import {BehaviorSubject, Subscription} from "rxjs";
+import { CardlistComponent, DataCard } from "@app/shared/layout/cardlist/cardlist.component";
+import { Paper } from "@app/modules/publication/models/paper.model";
+import { map } from 'rxjs/operators';
+import {Data} from "@angular/router";
 
 @Component({
   selector: 'app-home',
@@ -12,32 +13,83 @@ import {Paper} from "@app/modules/publication/models/paper.model";
 })
 export class HomeComponent implements OnInit, OnDestroy {
 
-  publishedPapers: any[] = [];
-  onReviewPapers: any[] = [];
-  submittedPapers: any[] = [];
+  papersByState = {};
 
-  publishedPapersSubscription: Subscription;
-  onReviewPapersSubscription: Subscription;
-  submittedPapersSubscription: Subscription;
+  papersSubmittedSubscription:Subscription;
+  papersOnReviewSubscription:Subscription;
+  papersPublishedSubscription:Subscription;
 
-  constructor(private publicationService: PublicationService) { }
+  stateChangedSubscription:Subscription;
+
+  papersCardByState$ = {};
+
+  constructor(private publicationService: PublicationService) {
+    this.papersByState['Submitted'] = [];
+    this.papersByState['OnReview'] = [];
+    this.papersByState['Published'] = [];
+
+    this.papersCardByState$['Submitted'] = new BehaviorSubject<Array<DataCard>>([]);
+    this.papersCardByState$['OnReview'] = new BehaviorSubject<Array<DataCard>>([]);
+    this.papersCardByState$['Published'] = new BehaviorSubject<Array<DataCard>>([]);
+  }
 
   ngOnInit() {
-    this.publishedPapersSubscription = this.publicationService.getAllPapers("Published").subscribe(paper => {
-      this.publishedPapers.push(this.paperToCard(paper,'Read', ''));
+    this.papersSubmittedSubscription = this.publicationService.getAllPapersOnState("Submitted").pipe(
+      map(paper => HomeComponent.paperToCard(paper,'Read', 'Review'))
+    ).subscribe(card => {
+      this.papersByState['Submitted'].push(card);
+      this.papersCardByState$['Submitted'].next(this.papersByState['Submitted']);
     });
-    this.onReviewPapersSubscription = this.publicationService.getAllPapers("OnReview").subscribe(paper => {
-      this.onReviewPapers.push(this.paperToCard(paper,'Read', 'Accept'));
+
+    this.papersOnReviewSubscription = this.publicationService.getAllPapersOnState("OnReview").pipe(
+      map(paper => HomeComponent.paperToCard(paper,'Read', 'Accept'))
+    ).subscribe(card => {
+      this.papersByState['OnReview'].push(card);
+      this.papersCardByState$['OnReview'].next(this.papersByState['OnReview']);
     });
-    this.submittedPapersSubscription = this.publicationService.getAllPapers("Submitted").subscribe(paper => {
-      this.submittedPapers.push(this.paperToCard(paper,'Read', 'Review'));
+
+    this.papersPublishedSubscription = this.publicationService.getAllPapersOnState("Published").pipe(
+      map(paper => HomeComponent.paperToCard(paper,'Read', ''))
+    ).subscribe(card => {
+      this.papersByState['Published'].push(card);
+      this.papersCardByState$['Published'].next(this.papersByState['Published']);
     });
+
+    this.stateChangedSubscription = this.publicationService.getStateChangedPapers()
+      .subscribe((event:AssetStateChanged) => {
+        console.log(event);
+        console.log(this.papersByState);
+        console.log(this.papersByState[event.oldState]);
+        this.deleteItemFromArray(this.papersByState[event.oldState],'subtitle', event.assetAddress);
+        console.log(this.papersByState[event.oldState]);
+        console.log(this.papersByState[event.state]);
+        if('OnReview' === event.state) {
+          let card = HomeComponent.paperToCard(event.asset,'Read', 'Accept');
+          this.papersByState[event['state']] = [card].concat(this.papersByState[event['state']]);
+          this.papersCardByState$[event['state']].next(card);
+        } else if('Published' === event.state) {
+          let card = HomeComponent.paperToCard(event.asset,'Read', '');
+          this.papersByState[event['state']] = [card].concat(this.papersByState[event['state']]);
+          this.papersCardByState$[event['state']].next(card);
+        }
+        console.log(this.papersByState[event.state]);
+      }
+    );
+  }
+
+  private deleteItemFromArray(array:any[], property:any, value:any):any[] {
+      const index: number = array.map(e => { return e[property]; }).indexOf(value);
+      if (index !== -1) {
+        array.splice(index, 1);
+      }
+      return array;
   }
 
   ngOnDestroy() {
-    this.publishedPapersSubscription.unsubscribe();
-    this.onReviewPapersSubscription.unsubscribe();
-    this.submittedPapersSubscription.unsubscribe();
+    this.papersSubmittedSubscription.unsubscribe();
+    this.papersOnReviewSubscription.unsubscribe();
+    this.papersPublishedSubscription.unsubscribe();
+    this.stateChangedSubscription.unsubscribe();
   }
 
   clickActionCardHandleSubmitted(event) {
@@ -66,8 +118,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   // TODO Refactor
-  private paperToCard(paper, action_1_name, action_2_name): DataCard {
-    console.log(paper);
+  private static paperToCard(paper, action_1_name, action_2_name): DataCard {
     return {
       model: paper,
       title: paper['title'],
