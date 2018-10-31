@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { PublishComponent } from "./pages/publish/publish.component";
+import { SubmitComponent } from "./pages/submit/submit.component";
+import { DetailComponent } from './pages/detail/detail.component';
 
 export const routes: Routes = [
-  { path: 'publish', component: PublishComponent }
+  { path: 'submit', component: SubmitComponent },
+  { path: 'detail/:ethAddr', component: DetailComponent }
 ];
 
 @NgModule({

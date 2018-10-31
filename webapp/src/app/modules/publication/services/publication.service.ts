@@ -66,8 +66,10 @@ export class PublicationService {
           values[0],
           values[1],
           null,
-          values[2][1],
           values[2][0],
+          values[2][1],
+          values[2][2],
+          values[2][3],
           address);
 
          resolve(paper);

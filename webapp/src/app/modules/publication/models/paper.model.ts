@@ -15,16 +15,20 @@ class AssetFile implements IAsset {
   summaryHashAlgorithm: string;
   summaryHash: string;
 
-  constructor(file?: File, fileSystemName?: string, publicLocation?: string, ethAddress?: string) {
+  constructor(file?: File, fileSystemName?: string, publicLocation?: string, summaryHashAlgorithm?: string,
+    summaryHash?: string,  ethAddress?: string) {
+    
+    this.fileSystemName = fileSystemName;
+    this.publicLocation = publicLocation;
+    this.summaryHashAlgorithm = summaryHashAlgorithm;
+    this.summaryHash = summaryHash;
+    this.ethAddress = ethAddress;
+
     if(file) {
       this.file = file;
       this.fileName = file.name;
       this.calculateSummaryHash();
     }
-
-    this.fileSystemName = fileSystemName;
-    this.publicLocation = publicLocation;
-    this.ethAddress = ethAddress;
   }
 
   private calculateSummaryHash():void {
@@ -68,9 +72,11 @@ export class Paper extends AssetFile {
     file?: File,
     fileSystemName?: string,
     publicLocation?: string,
+    summaryHashAlgorithm?: string,
+    summaryHash?: string,
     ethAddress?: string){
 
-    super(file, publicLocation, fileSystemName, ethAddress);
+    super(file, fileSystemName, publicLocation, summaryHashAlgorithm, summaryHash, ethAddress);
     this.title = title;
     this.abstract = abstract;
   }
