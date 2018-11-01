@@ -6,7 +6,7 @@ export interface IAsset {
 }
 
 class AssetFile implements IAsset {
-  ethAddress: number;
+  ethAddress: string;
   fileName: string;
   file: File;
   fileSystemName: string;
@@ -14,7 +14,7 @@ class AssetFile implements IAsset {
   summaryHashAlgorithm: string;
   summaryHash: string;
 
-  constructor(file?: File, fileSystemName?: string, publicLocation?: string, ethAddress?: number) {
+  constructor(file?: File, fileSystemName?: string, publicLocation?: string, ethAddress?: string) {
     if(file) {
       this.file = file;
       this.fileName = file.name;
@@ -31,8 +31,8 @@ class AssetFile implements IAsset {
 }
 
 export class Paper extends AssetFile {
-  title: string;
-  abstract: string;
+  public title: string;
+  public abstract: string;
 
   constructor(
     title: string,
@@ -40,7 +40,7 @@ export class Paper extends AssetFile {
     file?: File,
     fileSystemName?: string,
     publicLocation?: string,
-    ethAddress?: number){
+    ethAddress?: string){
 
     super(file, publicLocation, fileSystemName, ethAddress);
     this.title = title;

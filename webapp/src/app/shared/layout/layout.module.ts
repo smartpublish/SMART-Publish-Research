@@ -5,15 +5,15 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
 import { ModalComponent } from "@app/shared/layout/modal/modal.component";
 import { ModalModule } from 'ngx-bootstrap';
-import { ShowcaseComponent } from './showcase/showcase.component';
-import {RouterModule} from "@angular/router";
+import { CardlistComponent } from './cardlist/cardlist.component';
+import { RouterModule } from "@angular/router";
 
 @NgModule({
     declarations: [
       FooterComponent,
       ModalComponent,
       NavbarComponent,
-      ShowcaseComponent
+      CardlistComponent
     ],
     imports: [
       CommonModule,
@@ -24,7 +24,7 @@ import {RouterModule} from "@angular/router";
       FooterComponent,
       ModalComponent,
       NavbarComponent,
-      ShowcaseComponent
+      CardlistComponent
     ],
     providers: [],
 })

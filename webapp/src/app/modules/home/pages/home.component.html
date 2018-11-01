@@ -1,5 +1,19 @@
-<app-showcase [title]="'Published'" [description]="'Last science papers published. Yay!'" [items]="publishedPapers" ></app-showcase>
-<app-showcase [title]="'Pending'" [description]="'Last science pending to review. Be the first one!'" [items]="pendingPapers" ></app-showcase>
+<app-cardlist #published
+  [title]="'Published'"
+  [description]="'Last science papers published. Yay!'"
+  [items$]="papersCardByState$['Published'].asObservable()"
+  (clickActionCard)="clickActionCardHandlePublished($event)"></app-cardlist>
+<app-cardlist #onReview
+  [title]="'On Review'"
+  [description]="'Last papers on review. On publish way!'"
+  [items$]="papersCardByState$['OnReview'].asObservable()"
+  (clickActionCard)="clickActionCardHandleOnReview($event)"></app-cardlist>
+<app-cardlist #submitted
+  [title]="'Submitted'"
+  [description]="'Last papers submitted for reviewing. Be the first one to check them!'"
+  [items$]="papersCardByState$['Submitted'].asObservable()"
+  (clickActionCard)="clickActionCardHandleSubmitted($event)"></app-cardlist>
+
 <!-- Modal Paper
 <app-modal>
   <app-paper></app-paper>
