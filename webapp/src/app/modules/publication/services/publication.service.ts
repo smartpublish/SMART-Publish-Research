@@ -115,7 +115,6 @@ export class PublicationService {
       if(ipfsObject) {
         paper.publicLocation = ipfsObject['link'];
         paper.fileSystemName = 'IPFS';
-        console.log(paper);
         return this.submitToEthereum(paper)
       }
     });
@@ -147,7 +146,6 @@ export class PublicationService {
   private submitToEthereum(paper: Paper):Promise<any> {
     return new Promise((resolve, reject) => {
       this.ASSET_FACTORY_SC.deployed().then(instance => {
-        console.log(paper);
       return instance.createPaper(
         paper.title,
         paper.abstract,
@@ -157,14 +155,18 @@ export class PublicationService {
         paper.summaryHash,
         this.WF_SC_INSTANCE.address // Creates Paper with PeerReviewWorkflow by default
         );
-      }).then((status) => {
-        console.log(status);
-        if(status) {
-          return resolve({ status:true });
+      }).then((result) => {
+        console.log(result);
+        let paperCreatedEvent = result.logs.filter(
+          log => log['event'] === 'AssetCreated' && log.args['assetType'] === 'paper' && log.args['assetAddress']
+        );
+        if(paperCreatedEvent && paperCreatedEvent.length == 1) {
+          paper.ethAddress = paperCreatedEvent[0].args['assetAddress'];
+          return resolve(paper);
         }
       }).catch((error) => {
         console.error(error);
-        return reject("Error in transferEther service call");
+        return reject("Error creating the Paper on Ethereum or procesing the response");
       });
     });
   }

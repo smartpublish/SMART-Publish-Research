@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from "@angular/router";
 import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
 import { ContributorService } from "@app/core/services";
 import { PublicationService } from "@app/modules/publication/services/publication.service";
@@ -23,6 +24,7 @@ export class PaperNewComponent implements OnInit {
     private contributorService: ContributorService,
     private publicationService: PublicationService,
     private alertService: AlertService,
+    private router: Router,
     private fb: FormBuilder) {
 
     this.form = fb.group({
@@ -40,15 +42,12 @@ export class PaperNewComponent implements OnInit {
 
   onSubmit() {
     let paper: Paper = new Paper(this.title.value, this.abstract.value, this.file);
-    console.log(paper);
 
-    let that = this;
-    this.publicationService.submit(paper).then((result) => {
-      console.log(result);
-      that.alertService.success("Your paper is registered! Just wait for reviewers");
+    this.publicationService.submit(paper).then((paper:Paper) => {
+      this.router.navigate(['/detail', paper.ethAddress]);
+      this.alertService.success("Congratulation! Your paper was submitted correctly. Just wait for reviewers");
     }).catch((error) => {
-      console.error(error);
-      that.alertService.error(error);
+      this.alertService.error(error);
     });
   }
 

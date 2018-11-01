@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Location } from '@angular/common';
 import { Paper } from '../../models/paper.model';
 import { PublicationService } from '../../services/publication.service';
 
@@ -15,7 +14,6 @@ export class PaperDetailComponent implements OnInit {
 
   constructor(
     private route:ActivatedRoute,
-    private location: Location,
     private publicationService: PublicationService) { }
 
   ngOnInit() {
