@@ -2,16 +2,19 @@
   [title]="'Published'"
   [description]="'Last science papers published. Yay!'"
   [items$]="papersCardByState$['Published'].asObservable()"
+  (clickCard)="clickCardHandle($event)"
   (clickActionCard)="clickActionCardHandlePublished($event)"></app-cardlist>
 <app-cardlist #onReview
   [title]="'On Review'"
   [description]="'Last papers on review. On publish way!'"
   [items$]="papersCardByState$['OnReview'].asObservable()"
+  (clickCard)="clickCardHandle($event)"
   (clickActionCard)="clickActionCardHandleOnReview($event)"></app-cardlist>
 <app-cardlist #submitted
   [title]="'Submitted'"
   [description]="'Last papers submitted for reviewing. Be the first one to check them!'"
   [items$]="papersCardByState$['Submitted'].asObservable()"
+  (clickCard)="clickCardHandle($event)"
   (clickActionCard)="clickActionCardHandleSubmitted($event)"></app-cardlist>
 
 <!-- Modal Paper

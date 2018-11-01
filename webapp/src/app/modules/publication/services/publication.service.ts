@@ -165,7 +165,6 @@ export class PublicationService {
           return resolve(paper);
         }
       }).catch((error) => {
-        console.error(error);
         return reject("Error creating the Paper on Ethereum or procesing the response");
       });
     });

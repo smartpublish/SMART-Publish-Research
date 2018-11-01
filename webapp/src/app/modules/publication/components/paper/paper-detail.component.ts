@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Paper } from '../../models/paper.model';
 import { PublicationService } from '../../services/publication.service';
+import { AlertService } from '@app/core/services/alert.service';
 
 @Component({
   selector: 'app-paper-detail',
@@ -14,7 +15,9 @@ export class PaperDetailComponent implements OnInit {
 
   constructor(
     private route:ActivatedRoute,
-    private publicationService: PublicationService) { }
+    private publicationService: PublicationService,
+    private alertService: AlertService,
+    private router: Router) { }
 
   ngOnInit() {
     this.getPaper();
@@ -22,7 +25,10 @@ export class PaperDetailComponent implements OnInit {
 
   getPaper() {
     const ethAddr:string = this.route.snapshot.paramMap.get('ethAddr');
-    this.publicationService.getPaper(ethAddr).then(paper => this.paper = paper);
+    this.publicationService.getPaper(ethAddr).then(paper => this.paper = paper).catch(error => {
+      this.alertService.error('Paper does not exist or could no be fetched');
+      this.router.navigate(['**']);
+    });
   }
 
 }

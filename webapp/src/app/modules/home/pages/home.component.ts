@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
 import { AssetStateChanged, PublicationService } from "@app/modules/publication/services/publication.service";
-import {BehaviorSubject, Subscription} from "rxjs";
-import { CardlistComponent, DataCard } from "@app/shared/layout/cardlist/cardlist.component";
+import { BehaviorSubject, Subscription} from "rxjs";
+import { DataCard } from "@app/shared/layout/cardlist/cardlist.component";
 import { Paper } from "@app/modules/publication/models/paper.model";
 import { map } from 'rxjs/operators';
-import {Data} from "@angular/router";
 
 @Component({
   selector: 'app-home',
@@ -23,7 +23,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   papersCardByState$ = {};
 
-  constructor(private publicationService: PublicationService) {
+  constructor(
+    private publicationService: PublicationService,
+    private router: Router) {
+
     this.papersByState['Submitted'] = [];
     this.papersByState['OnReview'] = [];
     this.papersByState['Published'] = [];
@@ -90,6 +93,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.papersOnReviewSubscription.unsubscribe();
     this.papersPublishedSubscription.unsubscribe();
     this.stateChangedSubscription.unsubscribe();
+  }
+
+  clickCardHandle(card:DataCard) {
+    let paper:Paper = card.model;
+    this.router.navigate(['/detail', paper.ethAddress]);
   }
 
   clickActionCardHandleSubmitted(event) {
