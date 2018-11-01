@@ -39,11 +39,8 @@ export class PaperNewComponent implements OnInit {
   }
 
   onSubmit() {
-    let paper: Paper = new Paper(this.title.value, this.abstract.value, this.file);
-    console.log(paper);
-
     let that = this;
-    this.publicationService.submit(paper).then((result) => {
+    this.publicationService.submit(this.title.value, this.abstract.value, this.file).then((result) => {
       console.log(result);
       that.alertService.success("Your paper is registered! Just wait for reviewers");
     }).catch((error) => {

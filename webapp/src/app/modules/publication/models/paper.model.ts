@@ -1,50 +1,65 @@
-import {hash} from "@app/support/Hash";
-
-
 export interface IAsset {
 
 }
 
 class AssetFile implements IAsset {
-  ethAddress: string;
-  fileName: string;
-  file: File;
-  fileSystemName: string;
-  publicLocation: string;
-  summaryHashAlgorithm: string;
-  summaryHash: string;
+  public readonly ethAddress: string;
+  public readonly fileName: string;
+  public readonly fileSystemName: string;
+  public readonly publicLocation: string;
+  public readonly summaryHashAlgorithm: string;
+  public readonly summaryHash: string;
 
-  constructor(file?: File, fileSystemName?: string, publicLocation?: string, ethAddress?: string) {
-    if(file) {
-      this.file = file;
-      this.fileName = file.name;
-      var hash = hash(file);
-      this.summaryHashAlgorithm = hash.hashAlgorithm;
-      this.summaryHash = hash.hash;
-    }
+  constructor(
+    ethAddress: string,
+    fileName: string,
+    fileSystemName: string,
+    publicLocation: string,
+    hashAlgorithm: string,
+    hash: string) {
 
+    this.ethAddress = ethAddress;
+    this.fileName = fileName;
     this.fileSystemName = fileSystemName;
     this.publicLocation = publicLocation;
-    this.ethAddress = ethAddress;
+    this.summaryHashAlgorithm = hashAlgorithm;
+    this.summaryHash = hash;
   }
 
 }
 
 export class Paper extends AssetFile {
-  public title: string;
-  public abstract: string;
+  public readonly title: string;
+  public readonly abstract: string;
 
   constructor(
     title: string,
     abstract: string,
-    file?: File,
-    fileSystemName?: string,
-    publicLocation?: string,
-    ethAddress?: string){
+    ethAddress: string,
+    fileName: string,
+    fileSystemName: string,
+    publicLocation: string,
+    hashAlgorithm: string,
+    hash: string) {
 
-    super(file, publicLocation, fileSystemName, ethAddress);
+    super(ethAddress, fileName, fileSystemName, publicLocation, hashAlgorithm, hash);
     this.title = title;
     this.abstract = abstract;
   }
 
+  copy(
+    fileSystemName?: string,
+    publicLocation?: string,
+): Paper {
+    return new Paper(
+      this.title,
+       this.abstract,
+       this.ethAddress,
+       this.fileName,
+      fileSystemName ? fileSystemName : this.fileSystemName,
+      publicLocation ? publicLocation : this.publicLocation,
+      this.summaryHashAlgorithm,
+       this.summaryHash
+    )
+  }
 }
