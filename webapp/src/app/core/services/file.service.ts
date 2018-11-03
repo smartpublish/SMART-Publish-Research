@@ -1,8 +1,10 @@
 import {Injectable} from "@angular/core";
 import StreamBuffers from 'stream-buffers';
 
-@Injectable({providedIn: 'root'})
-export class FilesService {
+@Injectable({
+  providedIn: 'root'
+})
+export class FileService {
 
   read<R>(file: File, chunkSize: number, onChunk: (data) => {}, onFinish: () => R): R {
     let returnValue: R = null;
@@ -13,7 +15,7 @@ export class FilesService {
       myReadableStreamBuffer.on('readable', (data) => {
         let chunk;
         while ((chunk = myReadableStreamBuffer.read()) !== null) {
-          onChunk(data)
+          onChunk(chunk)
         }
       });
 
@@ -22,7 +24,7 @@ export class FilesService {
         returnValue = onFinish()
       });
 
-      myReadableStreamBuffer.put(event.target.result);
+      myReadableStreamBuffer.put(event.target['result']);
       myReadableStreamBuffer.stop();
     };
 

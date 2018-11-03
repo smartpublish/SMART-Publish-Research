@@ -50,16 +50,16 @@ export class Paper extends AssetFile {
   copy(
     fileSystemName?: string,
     publicLocation?: string,
-): Paper {
+  ): Paper {
     return new Paper(
       this.title,
-       this.abstract,
-       this.ethAddress,
-       this.fileName,
-      fileSystemName ? fileSystemName : this.fileSystemName,
-      publicLocation ? publicLocation : this.publicLocation,
+      this.abstract,
+      this.ethAddress,
+      this.fileName,
+      fileSystemName? fileSystemName : this.fileSystemName,
+      publicLocation? publicLocation : this.publicLocation,
       this.summaryHashAlgorithm,
-       this.summaryHash
+      this.summaryHash
     )
   }
 }

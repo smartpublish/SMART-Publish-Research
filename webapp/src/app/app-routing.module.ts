@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { NotFoundComponent } from "./core/components/not-found/not-found.component";
 
-const routes: Routes = [
-  // Fallback when no prior routes is matched
-  { path: '**', redirectTo: '', pathMatch: 'full' }
+export const routes: Routes = [
+  // TODO Refactor: NotFoundComponent is from Core but its route evaulation is before
+  // of feature module, so always is NotFound. In order to last evaluation is here
+  { path: '**', pathMatch: 'full', component: NotFoundComponent }
 ];
 
 @NgModule({

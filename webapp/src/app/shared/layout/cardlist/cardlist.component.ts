@@ -13,6 +13,7 @@ export class CardlistComponent implements OnInit, OnDestroy {
   @Input() items$: Observable<DataCard[]>;
 
   @Output() clickActionCard: EventEmitter<any> = new EventEmitter();
+  @Output() clickCard: EventEmitter<any> = new EventEmitter();
 
   constructor() {
   }
@@ -23,7 +24,13 @@ export class CardlistComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
   }
 
-  onClickAction(number:number, item:DataCard) {
+  onClickCard(item:DataCard, $event) {
+    $event.stopPropagation();
+    this.clickCard.emit(item);
+  }
+
+  onClickAction(number:number, item:DataCard, $event) {
+    $event.stopPropagation();
     this.clickActionCard.emit({
       "action_number": number,
       "item": item.model

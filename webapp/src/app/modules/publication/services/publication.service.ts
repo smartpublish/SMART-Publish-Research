@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {EthereumService} from "@app/core/services/ethereum.service";
 import {Paper} from "@app/modules/publication/models/paper.model";
 import * as TruffleContract from "truffle-contract";
-import {Observable, merge} from "rxjs";
+import {Observable} from "rxjs";
 import {IpfsService} from "@app/core/services/ipfs.service";
 import {AlertService} from "@app/core/services/alert.service";
 import {HashService} from "@app/core/services/hash.service";
@@ -55,25 +55,30 @@ export class PublicationService {
   }
 
   getPaper(address: string): Promise<Paper> {
+    let that = this;
     return new Promise<Paper>((resolve, reject) => {
-      this.PAPER_SC.at(address).then(instance => {
+      that.PAPER_SC.at(address).then(instance => {
         return Promise.all([
           instance.title.call(),
           instance.summary.call(),
-          instance.fileSystemName.call(),
-          instance.publicLocation.call(),
-          instance.summaryHashAlgorithm.call(),
-          instance.summaryHash.call(),
+          instance.getFile.call(0)
         ]);
       }).then(values => {
         let paper: Paper = new Paper(
           values[0],
           values[1],
           address,
-          '', values[2], values[3], values[4], values[5]);
+          null,
+          values[2][0],
+          values[2][1],
+          values[2][2],
+          values[2][3]
+          );
 
         resolve(paper);
-      }).catch(err => reject(err));
+      }).catch(err => {
+        reject(err)
+      });
     });
   }
 
@@ -100,8 +105,9 @@ export class PublicationService {
   }
 
   getAllPapersOnState(state: string): Observable<Paper> {
+    let that = this;
     return Observable.create(observer => {
-      this.WF_SC.deployed().then(instance => {
+      that.WF_SC.deployed().then(instance => {
         // TODO Filter by asset type
         return instance.findAssetsByState.call(state);
       }).then(addresses => {
@@ -110,9 +116,9 @@ export class PublicationService {
     });
   }
 
-  submit(title: string, abstract: string, file: File) {
+  submit(title: string, abstract: string, file: File): Promise<Paper> {
     return this.submitToIpfs(title, abstract, file)
-      .then(this.submitToEthereum);
+      .then((paper) => { return this.submitToEthereum(paper) });
   }
 
   private submitToIpfs(title:string, abstract: string, file: File): Promise<Paper> {
@@ -122,52 +128,65 @@ export class PublicationService {
 
       let reader = new FileReader();
       reader.onload = (event) => {
-        this.ipfsService.upload(event.target['result'])
-          .then((ipfsObject) => {
-            try {
-
-              let h = this.hashService.hash(file);
-              let paper =  new Paper(
-                title,
-                abstract,
-                "",
-                file.name, //TODO check this, ipfsObject (ipfs hash) is not better?
-                'IPFS',
-                'https://ipfs.io/ipfs/' + ipfsObject,
-                h.hashAlgorithm,
-                h.hash);
-
-              resolve(paper);
-            } catch (e) {
-              reject(e);
-            }
-          });
+        Promise.all([
+          this.ipfsService.upload(event.target['result']),
+          this.hashService.hash(file)
+        ]).then(values => {
+          let ipfsObject = values[0];
+          let h = values[1];
+          
+          let paper = new Paper(
+            title,
+            abstract,
+            null,
+            file.name, //TODO check this, ipfsObject (ipfs hash) is not better?
+            'IPFS',
+            'https://ipfs.io/ipfs/' + ipfsObject,
+            h.hashAlgorithm,
+            h.hash);
+            
+          resolve(paper);
+        }).catch(error => {
+          reject(error);
+        });
       };
+
       reader.readAsArrayBuffer(file);
     })
   }
 
   private submitToEthereum(paper: Paper): Promise<any> {
+    let that = this;
     return new Promise((resolve, reject) => {
-      this.ASSET_FACTORY_SC.deployed().then(instance => {
-        console.log(paper);
-        return instance.createPaper(
-          paper.title,
-          paper.abstract,
-          paper.fileSystemName,
-          paper.publicLocation,
-          paper.summaryHashAlgorithm,
-          paper.summaryHash,
-          this.WF_SC_INSTANCE.address // Creates Paper with PeerReviewWorkflow by default
+      that.ASSET_FACTORY_SC.deployed().then(instance => {
+      return instance.createPaper(
+        paper.title,
+        paper.abstract,
+        paper.fileSystemName,
+        paper.publicLocation,
+        paper.summaryHashAlgorithm,
+        paper.summaryHash,
+        that.WF_SC_INSTANCE.address // Creates Paper with PeerReviewWorkflow by default
         );
-      }).then((status) => {
-        console.log(status);
-        if (status) {
-          return resolve({status: true});
+      }).then((result) => {
+        console.log(result);
+        let paperCreatedEvent = result.logs.filter(
+          log => log['event'] === 'AssetCreated' && log.args['assetType'] === 'paper' && log.args['assetAddress']
+        );
+        if(paperCreatedEvent && paperCreatedEvent.length == 1) {
+          return resolve(new Paper(
+            paper.title,
+            paper.abstract,
+            paperCreatedEvent[0].args['assetAddress'],
+            paper.fileName,
+            paper.fileSystemName,
+            paper.publicLocation,
+            paper.summaryHashAlgorithm,
+            paper.summaryHash
+          ));
         }
       }).catch((error) => {
-        console.error(error);
-        return reject("Error in transferEther service call");
+        return reject("Error creating the Paper on Ethereum or procesing the response");
       });
     });
   }

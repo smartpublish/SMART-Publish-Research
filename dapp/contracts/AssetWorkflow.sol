@@ -23,7 +23,7 @@ contract AssetWorkflow {
     State[] private states;
     Transition[] private transitions;
 
-    event AssetStateChanged(address assetAddress, string state);
+    event AssetStateChanged(address assetAddress, string state, string oldState, string transition);
 
     function addState(string _name) internal {
         // Avoid empty states or creation states ''
@@ -123,7 +123,7 @@ contract AssetWorkflow {
         assetsByState[currentTransition.targetState.name].push(_asset);
 
         // Notify
-        emit AssetStateChanged(_asset, currentTransition.targetState.name);
+        emit AssetStateChanged(_asset, currentTransition.targetState.name, currentTransition.sourceState.name, currentTransition.name);
     }
 
     function start(IAsset _asset) public;
