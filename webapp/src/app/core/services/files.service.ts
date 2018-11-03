@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import StreamBuffers from 'stream-buffers';
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class FilesService {
 
   read<R>(file: File, chunkSize: number, onChunk: (data) => {}, onFinish: () => R): R {

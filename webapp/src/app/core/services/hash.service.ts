@@ -8,7 +8,7 @@ export type Hash = {
   hash: string
 }
 
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class HashService {
 
   private files: FilesService;
