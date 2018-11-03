@@ -1,78 +1,65 @@
-import blake2b from 'blake2b';
-import { Buffer } from 'buffer';
-import StreamBuffers from 'stream-buffers';
-
 export interface IAsset {
 
 }
 
 class AssetFile implements IAsset {
-  ethAddress: string;
-  fileName: string;
-  file: File;
-  fileSystemName: string;
-  publicLocation: string;
-  summaryHashAlgorithm: string;
-  summaryHash: string;
+  public readonly ethAddress: string;
+  public readonly fileName: string;
+  public readonly fileSystemName: string;
+  public readonly publicLocation: string;
+  public readonly summaryHashAlgorithm: string;
+  public readonly summaryHash: string;
 
-  constructor(file?: File, fileSystemName?: string, publicLocation?: string, ethAddress?: string) {
-    if(file) {
-      this.file = file;
-      this.fileName = file.name;
-      this.calculateSummaryHash();
-    }
+  constructor(
+    ethAddress: string,
+    fileName: string,
+    fileSystemName: string,
+    publicLocation: string,
+    hashAlgorithm: string,
+    hash: string) {
 
+    this.ethAddress = ethAddress;
+    this.fileName = fileName;
     this.fileSystemName = fileSystemName;
     this.publicLocation = publicLocation;
-    this.ethAddress = ethAddress;
+    this.summaryHashAlgorithm = hashAlgorithm;
+    this.summaryHash = hash;
   }
 
-  private calculateSummaryHash():void {
-      let instance = blake2b(blake2b.BYTES_MAX);
-
-      let fileReader = new FileReader();
-      fileReader.onload = (event) => {
-        let arrayBuffer = event.target['result'];
-
-        const myReadableStreamBuffer = new StreamBuffers.ReadableStreamBuffer({
-          chunkSize: 25000
-        });
-
-        myReadableStreamBuffer.on('readable', (data) => {
-          let chunk;
-          while((chunk = myReadableStreamBuffer.read()) !== null) {
-            instance.update(chunk);
-          }
-        });
-
-        myReadableStreamBuffer.on('end', () => {
-          this.summaryHash = instance.digest(Buffer.alloc(blake2b.BYTES_MAX)).toString('hex');
-          this.summaryHashAlgorithm = 'blake2b';
-        });
-
-        myReadableStreamBuffer.put(arrayBuffer);
-        myReadableStreamBuffer.stop();
-      };
-
-      fileReader.readAsArrayBuffer(this.file);
-  }
 }
 
 export class Paper extends AssetFile {
-  public title: string;
-  public abstract: string;
+  public readonly title: string;
+  public readonly abstract: string;
 
   constructor(
     title: string,
     abstract: string,
-    file?: File,
-    fileSystemName?: string,
-    publicLocation?: string,
-    ethAddress?: string){
+    ethAddress: string,
+    fileName: string,
+    fileSystemName: string,
+    publicLocation: string,
+    hashAlgorithm: string,
+    hash: string) {
 
-    super(file, publicLocation, fileSystemName, ethAddress);
+    super(ethAddress, fileName, fileSystemName, publicLocation, hashAlgorithm, hash);
     this.title = title;
     this.abstract = abstract;
   }
 
+  copy(
+    fileSystemName?: string,
+    publicLocation?: string,
+): Paper {
+    return new Paper(
+      this.title,
+       this.abstract,
+       this.ethAddress,
+       this.fileName,
+      fileSystemName ? fileSystemName : this.fileSystemName,
+      publicLocation ? publicLocation : this.publicLocation,
+      this.summaryHashAlgorithm,
+       this.summaryHash
+    )
+  }
 }
