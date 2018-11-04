@@ -18,7 +18,7 @@ let tokenAbiPaper = require('@contracts/Paper.json');
 })
 export class PublicationService {
 
-  readonly WF_SC = TruffleContract(tokenAbiPeerReviewWorkflow);
+  readonly WF_SC = TruffleContract(tokenAbiPeerReviewWorkflow); // TODO A Paper may be associated to a different workflows. Just now this by default but should be dynamic.
   readonly ASSET_FACTORY_SC = TruffleContract(tokenAbiAssetFactory);
   readonly PAPER_SC = TruffleContract(tokenAbiPaper);
 
@@ -115,6 +115,23 @@ export class PublicationService {
       });
     });
   }
+
+  getWorkflowsState(address: string): Promise<WorkflowState[]> {
+    let that = this;
+    return new Promise<WorkflowState[]>((resolve, reject) => {
+      // TODO A Paper may be associated to a differente workflows. Just now this by default.
+      that.WF_SC.deployed().then(workflow => {
+        return Promise.all([
+          workflow.name.call(),
+          workflow.findStateByAsset.call(address)
+        ]);
+      }).then(values => {
+        let workflowsState: WorkflowState[] = [];
+        workflowsState.push({name: values[0], state: values[1]} as WorkflowState)
+        resolve(workflowsState);
+      });
+    });
+  };
 
   submit(title: string, abstract: string, file: File): Promise<Paper> {
     return this.submitToIpfs(title, abstract, file)
@@ -230,4 +247,9 @@ export interface AssetStateChanged {
   oldState: string,
   transition: string
   asset: any;
+}
+
+export interface WorkflowState {
+  name: string,
+  state: string
 }

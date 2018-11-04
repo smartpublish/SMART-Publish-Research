@@ -18,6 +18,8 @@ contract PeerReviewWorkflow is AssetWorkflow {
     uint constant REVIEWS_OK_TO_PUBLISH = 3;
 
     constructor() public {
+        name = 'Peer Review';
+
         addTransition(TRANSITION_SUBMIT,'',STATE_SUMBITTED);
         addTransition(TRANSITION_REVIEW,STATE_SUMBITTED,STATE_ONREVIEW);
         addTransition(TRANSITION_PUBLISH,STATE_ONREVIEW,STATE_PUBLISHED);
