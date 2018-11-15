@@ -120,22 +120,34 @@ export class PublicationService {
     let that = this;
     return new Promise<WorkflowState[]>((resolve, reject) => {
       // TODO A Paper may be associated to a differente workflows. Just now this by default.
+      let wf;
+      let workflowsState: WorkflowState[] = [];
       that.WF_SC.deployed().then(workflow => {
+        wf = workflow;
         return Promise.all([
-          workflow.name.call(),
-          workflow.findStateByAsset.call(address)
+          wf.name.call(),
+          wf.findStateByAsset.call(address)
         ]);
       }).then(values => {
-        let workflowsState: WorkflowState[] = [];
         workflowsState.push({name: values[0], state: values[1]} as WorkflowState)
+        return wf.getTransitionsCount();
+      }).then(count => {
+        let promises: any = [];
+        for(let i = 0; i < count; i++) {
+          promises.push(wf.getTransition(i));
+        }
+        return Promise.all(promises);
+      }).then(values => {
+        let transitionsFiltered = values.filter(transition => transition[1] === workflowsState[0]['state'] && transition[0].toLowerCase() !== 'publish');
+        workflowsState[0].transitions = [];
+        transitionsFiltered.forEach(transition => workflowsState[0].transitions.push({name: transition[0], sourceState: transition[1], targetState: transition[2]}))
         resolve(workflowsState);
       });
     });
   };
 
   submit(title: string, abstract: string, file: File): Promise<Paper> {
-    return this.submitToIpfs(title, abstract, file)
-      .then((paper) => { return this.submitToEthereum(paper) });
+    return this.submitToIpfs(title, abstract, file).then((paper) => this.submitToEthereum(paper));
   }
 
   private submitToIpfs(title:string, abstract: string, file: File): Promise<Paper> {
@@ -209,35 +221,15 @@ export class PublicationService {
   }
 
   review(paper: Paper): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.WF_SC.deployed().then(instance => {
-        return instance.review(paper.ethAddress);
-      }).then((status) => {
-        console.log(status);
-        if (status) {
-          return resolve({status: true});
-        }
-      }).catch((error) => {
-        console.error(error);
-        return reject("Error in transferEther service call");
-      });
-    });
+    return new Promise(() => this.WF_SC.deployed().then(instance => instance.review(paper.ethAddress)));
   }
 
   accept(paper: Paper): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.WF_SC.deployed().then(instance => {
-        return instance.accept(paper.ethAddress);
-      }).then((status) => {
-        console.log(status);
-        if (status) {
-          return resolve({status: true});
-        }
-      }).catch((error) => {
-        console.error(error);
-        return reject("Error in transferEther service call");
-      });
-    });
+    return new Promise(() => this.WF_SC.deployed().then(instance => instance.accept(paper.ethAddress)));
+  }
+
+  reject(paper: Paper): Promise<any> {
+    return new Promise(() => this.WF_SC.deployed().then(instance => instance.reject(paper.ethAddress)));
   }
 }
 
@@ -252,4 +244,11 @@ export interface AssetStateChanged {
 export interface WorkflowState {
   name: string,
   state: string
+  transitions: WorkflowTransition[];
+}
+
+export interface WorkflowTransition {
+  name: string,
+  sourceState: string,
+  targetState: string
 }

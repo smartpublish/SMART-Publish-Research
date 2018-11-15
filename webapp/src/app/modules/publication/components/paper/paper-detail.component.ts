@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Paper } from '../../models/paper.model';
-import { PublicationService, WorkflowState } from '../../services/publication.service';
+import { PublicationService, WorkflowState, WorkflowTransition } from '../../services/publication.service';
 import { AlertService } from '@app/core/services/alert.service';
 
 @Component({
@@ -39,5 +39,15 @@ export class PaperDetailComponent implements OnInit {
     });
   }
 
+  onWorkflowTranstion(transition:any, $event:any) {
+    // TODO Improve to make it dynamic values.
+    $event.stopPropagation();
+    switch(transition.name.toLowerCase()) {
+      case 'accept': this.publicationService.accept(this.paper).then(() => this.getWorkflowsInfo(this.paper.ethAddress)); break;
+      case 'review': this.publicationService.review(this.paper).then(() => this.getWorkflowsInfo(this.paper.ethAddress)); break;
+      case 'reject': this.publicationService.reject(this.paper).then(() => this.getWorkflowsInfo(this.paper.ethAddress)); break;
+      default: this.alertService.error('Transition: ' + transition.name + ' is not valid.');
+    }
+  }
 }
 

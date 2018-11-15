@@ -21,6 +21,9 @@
             <dl *ngFor="let workflowState of workflowsState" class="item-property">
                 <dt>Workflow</dt>
                 <dd><p>{{workflowState.name}}: <span class="badge badge-pill badge-secondary">{{workflowState.state}}</span></p></dd>
+                <dd *ngFor="let transition of workflowState.transitions">
+                  <button type="button" (click)="onWorkflowTranstion(transition, $event)" class="btn btn-info">{{transition.name}}</button>
+                </dd>
             </dl>
           </div>
         </div>

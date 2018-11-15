@@ -11,6 +11,7 @@ contract PeerReviewWorkflow is AssetWorkflow {
 
     string constant TRANSITION_SUBMIT = 'Submit';
     string constant TRANSITION_REVIEW = 'Review';
+    string constant TRANSITION_ACCEPT = 'Accept';
     string constant TRANSITION_PUBLISH = 'Publish';
     string constant TRANSITION_REJECT = 'Reject';
 
@@ -22,6 +23,7 @@ contract PeerReviewWorkflow is AssetWorkflow {
 
         addTransition(TRANSITION_SUBMIT,'',STATE_SUMBITTED);
         addTransition(TRANSITION_REVIEW,STATE_SUMBITTED,STATE_ONREVIEW);
+        addTransition(TRANSITION_ACCEPT,STATE_ONREVIEW,STATE_ONREVIEW);
         addTransition(TRANSITION_PUBLISH,STATE_ONREVIEW,STATE_PUBLISHED);
         addTransition(TRANSITION_REJECT,STATE_ONREVIEW,STATE_REJECTED);
     }
