@@ -1,13 +1,14 @@
-import { Injectable } from '@angular/core';
+import { Injectable, ApplicationRef } from '@angular/core';
 import { Router, NavigationStart } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 
 @Injectable()
 export class AlertService {
-private subject = new Subject<any>();
-private keepAfterNavigationChange = false;
+    private subject = new Subject<any>();
+    private keepAfterNavigationChange = false;
 
-constructor(private router: Router) {
+    constructor(private router: Router,
+        private ref: ApplicationRef) {
         // clear alert message on route change
         router.events.subscribe(event => {
             if (event instanceof NavigationStart) {
@@ -25,11 +26,13 @@ constructor(private router: Router) {
     success(message: string, keepAfterNavigationChange = false) {
         this.keepAfterNavigationChange = keepAfterNavigationChange;
         this.subject.next({ type: 'success', text: message });
+        this.ref.tick();
     }
 
     error(message: string, keepAfterNavigationChange = false) {
         this.keepAfterNavigationChange = keepAfterNavigationChange;
         this.subject.next({ type: 'error', text: message });
+        this.ref.tick();
     }
 
     getMessage(): Observable<any> {

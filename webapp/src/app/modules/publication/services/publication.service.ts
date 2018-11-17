@@ -55,9 +55,8 @@ export class PublicationService {
   }
 
   getPaper(address: string): Promise<Paper> {
-    let that = this;
     return new Promise<Paper>((resolve, reject) => {
-      that.PAPER_SC.at(address).then(instance => {
+      this.PAPER_SC.at(address).then(instance => {
         return Promise.all([
           instance.title.call(),
           instance.summary.call(),
@@ -105,9 +104,8 @@ export class PublicationService {
   }
 
   getAllPapersOnState(state: string): Observable<Paper> {
-    let that = this;
     return Observable.create(observer => {
-      that.WF_SC.deployed().then(instance => {
+      this.WF_SC.deployed().then(instance => {
         // TODO Filter by asset type
         return instance.findAssetsByState.call(state);
       }).then(addresses => {
@@ -117,12 +115,11 @@ export class PublicationService {
   }
 
   getWorkflowsState(address: string): Promise<WorkflowState[]> {
-    let that = this;
     return new Promise<WorkflowState[]>((resolve, reject) => {
       // TODO A Paper may be associated to a differente workflows. Just now this by default.
       let wf;
       let workflowsState: WorkflowState[] = [];
-      that.WF_SC.deployed().then(workflow => {
+      this.WF_SC.deployed().then(workflow => {
         wf = workflow;
         return Promise.all([
           wf.name.call(),
@@ -185,9 +182,8 @@ export class PublicationService {
   }
 
   private submitToEthereum(paper: Paper): Promise<any> {
-    let that = this;
     return new Promise((resolve, reject) => {
-      that.ASSET_FACTORY_SC.deployed().then(instance => {
+      this.ASSET_FACTORY_SC.deployed().then(instance => {
       return instance.createPaper(
         paper.title,
         paper.abstract,
@@ -195,7 +191,7 @@ export class PublicationService {
         paper.publicLocation,
         paper.summaryHashAlgorithm,
         paper.summaryHash,
-        that.WF_SC_INSTANCE.address // Creates Paper with PeerReviewWorkflow by default
+        this.WF_SC_INSTANCE.address // Creates Paper with PeerReviewWorkflow by default
         );
       }).then((result) => {
         console.log(result);
@@ -215,21 +211,22 @@ export class PublicationService {
           ));
         }
       }).catch((error) => {
+        console.error(error);
         return reject("Error creating the Paper on Ethereum or procesing the response");
       });
     });
   }
 
   review(paper: Paper): Promise<any> {
-    return new Promise(() => this.WF_SC.deployed().then(instance => instance.review(paper.ethAddress)));
+    return this.WF_SC.deployed().then(instance => instance.review(paper.ethAddress));
   }
 
   accept(paper: Paper): Promise<any> {
-    return new Promise(() => this.WF_SC.deployed().then(instance => instance.accept(paper.ethAddress)));
+    return this.WF_SC.deployed().then(instance => instance.accept(paper.ethAddress));
   }
 
   reject(paper: Paper): Promise<any> {
-    return new Promise(() => this.WF_SC.deployed().then(instance => instance.reject(paper.ethAddress)));
+    return this.WF_SC.deployed().then(instance => instance.reject(paper.ethAddress));
   }
 }
 
