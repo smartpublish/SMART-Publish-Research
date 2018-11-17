@@ -1,54 +1,45 @@
 <div *ngIf="(paper)" class="card">
-	<div class="row">
-		<aside class="col-sm-5 border-right">
-      <article class="gallery-wrap"> 
-        <div class="img-big-wrap">
-          <div><a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Ethereum_logo_2014.svg"></a></div>
-        </div>
-      </article>
-    </aside>
-    <aside class="col-sm-7">
-      <article class="card-body p-5">
-        <div class="row">
-          <div class="col-sm-7">
-              <h3 class="title mb-3">{{paper.title}}</h3>
-              <dl class="item-property">
-                <dt>Abstract</dt>
-                <dd><p>{{paper.abstract}}</p></dd>
-              </dl>
-          </div>
-          <div class="col-sm-3">
-            <dl *ngFor="let workflowState of workflowsState" class="item-property">
-                <dt>Workflow</dt>
-                <dd><p>{{workflowState.name}}: <span class="badge badge-pill badge-secondary">{{workflowState.state}}</span></p></dd>
-                <dd *ngFor="let transition of workflowState.transitions">
-                  <button type="button" (click)="onWorkflowTranstion(transition, $event)" class="btn btn-info">{{transition.name}}</button>
-                </dd>
-            </dl>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12">
-              <dl class="item-property">
-                <dt>File System Name</dt>
-                <dd>{{paper.fileSystemName}}</dd>
-              </dl>
-              <dl class="item-property">
-                <dt>Public location</dt>
-                <dd><a href="{{paper.publicLocation}}" target='_blank'>{{paper.publicLocation}}</a></dd>
-              </dl> 
-              <dl class="item-property">
-                <dt>Summary Hash Algortihm</dt>
-                <dd>{{paper.summaryHashAlgorithm}}</dd>
-              </dl>
-              <dl class="item-property">
-                <dt>Summary Hash</dt>
-                <dd>{{paper.summaryHash}}</dd>
-              </dl>
-              <a href="{{paper.publicLocation}}" target="_blank" class="btn btn-lg btn-primary"> Read </a>
-          </div>
-        </div>
-      </article>
-		</aside>
-	</div>
+  <article class="card-body p-5">
+    <div class="row">
+      <div class="col-sm-7">
+          <h3 class="title mb-3">{{paper.title}}</h3>
+          <dl class="item-property">
+            <dt>Abstract</dt>
+            <dd><p>{{paper.abstract}}</p></dd>
+          </dl>
+      </div>
+      <div class="col-sm-3">
+        <dl *ngFor="let workflowState of workflowsState" class="item-property">
+            <dt>Workflow</dt>
+            <dd>
+              <h6>{{workflowState.name}}     <span class="badge badge-pill badge-secondary">{{workflowState.state}}</span></h6>
+              <ul class="list-inline">
+                <li *ngFor="let transition of workflowState.transitions" class="list-inline-item"><button type="button" (click)="onWorkflowTranstion(transition, $event)" class="btn btn-info">{{transition.name}}</button></li>
+              </ul>
+            </dd>
+        </dl>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+          <dl class="item-property">
+            <dt>File System Name</dt>
+            <dd>{{paper.fileSystemName}}</dd>
+          </dl>
+          <dl class="item-property">
+            <dt>Public location</dt>
+            <dd><a href="{{paper.publicLocation}}" target='_blank'>{{paper.publicLocation}}</a></dd>
+          </dl> 
+          <dl class="item-property">
+            <dt>Summary Hash Algortihm</dt>
+            <dd>{{paper.summaryHashAlgorithm}}</dd>
+          </dl>
+          <dl class="item-property">
+            <dt>Summary Hash</dt>
+            <dd>{{paper.summaryHash}}</dd>
+          </dl>
+          <a href="{{paper.publicLocation}}" target="_blank" class="btn btn-lg btn-primary"> Read </a>
+      </div>
+    </div>
+  </article>
 </div>

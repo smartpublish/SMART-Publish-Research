@@ -81,26 +81,32 @@ export class PublicationService {
     });
   }
 
+  stateChanged:Observable<AssetStateChanged>;
+  
   getStateChangedPapers(): Observable<AssetStateChanged> {
-    return Observable.create(observer => {
-      this.WF_SC.deployed().then(instance => {
-        // TODO Filter by asset type
-        const event = instance.AssetStateChanged({});
-        event.on('data', (data) => {
-          console.log(data);
-          this.getPaper(data['args']['assetAddress']).then(paper => {
-            let e = {
-              assetAddress: data['args']['assetAddress'],
-              state: data['args']['state'],
-              oldState: data['args']['oldState'],
-              transition: data['args']['transition'],
-              asset: paper
-            } as AssetStateChanged;
-            observer.next(e);
+    if(!this.stateChanged) {
+      this.stateChanged = Observable.create(observer => {
+        this.WF_SC.deployed().then(instance => {
+          // TODO Filter by asset type
+          const event = instance.AssetStateChanged({});
+          event.on('data', (data) => {
+            console.log(data);
+            this.getPaper(data['args']['assetAddress']).then(paper => {
+              let e = {
+                assetAddress: data['args']['assetAddress'],
+                state: data['args']['state'],
+                oldState: data['args']['oldState'],
+                transition: data['args']['transition'],
+                asset: paper
+              } as AssetStateChanged;
+              observer.next(e);
+            });
           });
-        });
-      })
-    });
+        })
+      });
+    }
+    
+    return this.stateChanged;
   }
 
   getAllPapersOnState(state: string): Observable<Paper> {

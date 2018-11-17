@@ -52,9 +52,8 @@ export class PaperDetailComponent implements OnInit, OnDestroy {
 
   getWorkflowsInfo(address: string):Promise<WorkflowState[]> {
     let promise = this.publicationService.getWorkflowsState(address)
-    promise.then(workflowsState => {
-      this.workflowsState = workflowsState
-    }).catch(error => this.alertService.error('Workflow does not exist or data could no be fetched'));
+    promise.then(workflowsState => this.workflowsState = workflowsState)
+    .catch(error => this.alertService.error('Workflow does not exist or data could no be fetched'));
     return promise;
   }
 
