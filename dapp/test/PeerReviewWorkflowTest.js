@@ -4,6 +4,15 @@ var PeerReviewWorkflow = artifacts.require('PeerReviewWorkflow');
 var Paper = artifacts.require('Paper');
 
 contract('PeerReviewWorkflowTest', function() {
+    it("should has a workflow name", function () {
+        var workflow;
+        return PeerReviewWorkflow.deployed().then(function (instance) {
+            return instance.name.call();
+        }).then(function(name) {
+            assert.strictEqual(name, 'Peer Review', 'Workflow name does not match')
+        });
+    });
+
     it("should initialize states", function () {
         var workflow;
         return PeerReviewWorkflow.deployed().then(function (instance) {
@@ -131,10 +140,24 @@ contract('PeerReviewWorkflowTest', function() {
 
     it("should fail on not applicable transitions", function () {
         return PeerReviewWorkflow.deployed().then(function (workflow) {
-            truffleAssert.reverts(
+            return truffleAssert.fails(
                 workflow.accept(asset.address),
-                'The current state not allow to run the transition'
+                truffleAssert.ErrorType.REVERT,
+                'The current state not allow to Accept.'
             );
         });
     });
+
+    it("should find an asset by state", function () {
+        var workflow;
+        return PeerReviewWorkflow.deployed().then(function (instance) {
+            workflow = instance;
+            return workflow.submit(asset.address);
+        }).then(function (tx) {
+            return workflow.findStateByAsset.call(asset.address);
+        }).then(function(state) {
+            assert.strictEqual(state, 'Submitted', "Asset's state does not match or not found");
+        });
+    });
+
 });

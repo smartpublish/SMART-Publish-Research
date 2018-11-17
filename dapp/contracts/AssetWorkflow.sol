@@ -4,6 +4,8 @@ import "./IAsset.sol";
 
 contract AssetWorkflow {
 
+    string public name;
+
     struct State {
         bool exist; // Just to check on array if exists
         string name;
@@ -49,10 +51,7 @@ contract AssetWorkflow {
     }
 
     function addTransition(string _name, string _sourceState, string _targetState) public {
-        // Avoid empty transitions
-        if(bytes(_name).length < 1) {
-            return;
-        }
+        require(bytes(_name).length > 1, 'Transition must have a name');
 
         addState(_sourceState);
         addState(_targetState);
@@ -79,28 +78,37 @@ contract AssetWorkflow {
         return assetsByState[state];
     }
 
+    function findStateByAsset(IAsset _asset) public view returns (string) {
+        uint length = states.length;
+        for(uint i = 0; i < length; i++) {
+            if(isOn(states[i].name, _asset)) {
+                return states[i].name;
+            }
+        }
+    }
+
     function removeAssetFromState(State _state, IAsset _asset) private {
         if(bytes(_state.name).length > 0) {
             IAsset[] memory assets = assetsByState[_state.name];
-            int i = getAssetsByStatePosition(_state, _asset);
+            int i = getPossitionOnAssetByState(_state, _asset);
             if(assets[0] == _asset && i == 0) {
                 delete assetsByState[_state.name];
             } else if (i > 0) {
                 delete assetsByState[_state.name][uint(i)];
             } else {
-                revert('The asset is not on state');
+                revert('The asset is not on that state');
             }
         }
     }
 
     function isOn(string _stateName, IAsset _asset) internal view returns (bool) {
-        return getAssetsByStatePosition(statesByName[_stateName], _asset) > -1;
+        return getPossitionOnAssetByState(statesByName[_stateName], _asset) > -1;
     }
 
-    function getAssetsByStatePosition(State _state, IAsset _asset) internal view returns(int) {
+    function getPossitionOnAssetByState(State _state, IAsset _asset) internal view returns(int) {
         IAsset[] memory assets = assetsByState[_state.name];
         uint length = assets.length;
-        for(uint i = 0; i < length; i++ ) {
+        for(uint i = 0; i < length; i++) {
             if(assets[i] == _asset) {
                 return int(i);
             }
@@ -111,10 +119,12 @@ contract AssetWorkflow {
     function run(string _transitionName, IAsset _asset) internal {
         Transition memory currentTransition = transitionsByName[_transitionName];
 
-        // Check if transition exists
-        if(!currentTransition.exist) {
-            revert('Transition does not exist');
-        }
+        require(currentTransition.exist, 'Transition does not exist');
+        require(
+            isOn(currentTransition.sourceState.name, _asset) || // Transition source state matches with asset current state
+            (bytes(currentTransition.sourceState.name).length < 1 && bytes(findStateByAsset(_asset)).length < 1), // First time on this workflow
+            'The current state not allow that transition.'
+        );
 
         // Remove from current state if has previous one
         removeAssetFromState(currentTransition.sourceState, _asset);
