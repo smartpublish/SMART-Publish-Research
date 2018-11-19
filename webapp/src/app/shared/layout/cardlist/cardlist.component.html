@@ -1,15 +1,13 @@
 <h4>{{title}}</h4>
 <h6>{{description}}</h6>
-<div *ngIf="items$ | async" class="card-columns">
-  <div *ngFor="let item of items$ | async" class="card" style="width: 18rem;">
+<div *ngIf="items" class="card-columns">
+  <div href="#" *ngFor="let item of items" class="card clickable" style="width: 18rem;">
     <div (click)="onClickCard(item, $event)" class="card-body">
-      <div class="card-body">
-        <h5 class="card-title">{{item['title']}}</h5>
-        <h6 class="card-subtitle mb-2 text-muted">{{item['subtitle']}}</h6>
-        <p class="card-text">{{item['description']}}</p>
-        <a href="#" (click)="onClickAction(1, item, $event)" class="card-link">{{item['action_1_name']}}</a>
-        <a href="#" (click)="onClickAction(2, item, $event)" class="card-link">{{item['action_2_name']}}</a>
-      </div>
+      <h5 class="card-title">{{item['title']}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">{{item['subtitle']}}</h6>
+      <p class="card-text">{{item['description']}}</p>
+      <a href="#" (click)="onClickAction(1, item, $event)" class="card-link">{{item['action_1_name']}}</a>
+      <a href="#" (click)="onClickAction(2, item, $event)" class="card-link">{{item['action_2_name']}}</a>
     </div>
   </div>
 </div>
