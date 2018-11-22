@@ -1,12 +1,10 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
-import "@optionality.io/clone-factory/contracts/CloneFactory.sol";
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./IAsset.sol";
 import "./AssetWorkflow.sol";
 import "./Paper.sol";
 
-contract AssetFactory is Ownable, CloneFactory {
+contract AssetFactory {
 
     mapping(string => address) internal assetTypeRegistry;
 
@@ -21,17 +19,17 @@ contract AssetFactory is Ownable, CloneFactory {
 
     constructor () public { }
 
-    function register(string objectType, address object) external  {
+    function register(string calldata objectType, address object) external  {
         assetTypeRegistry[objectType] = object;
     }
 
     function createPaper(
-        string _title,
-        string _summary,
-        string _fileSystemName,
-        string _publicLocation,
-        string _summaryHashAlgorithm,
-        string _summaryHash,
+        string memory _title,
+        string memory _summary,
+        string memory _fileSystemName,
+        string memory _publicLocation,
+        string memory _summaryHashAlgorithm,
+        string memory _summaryHash,
         AssetWorkflow _workflow) public returns(Paper) {
 
         Paper paper = new Paper();
@@ -50,7 +48,7 @@ contract AssetFactory is Ownable, CloneFactory {
         assetByCreator[msg.sender].push(AssetMetadata(paper, assetWorkflows)) - 1;
         _workflow.start(paper);
 
-        emit AssetCreated(paper, 'paper');
+        emit AssetCreated(address(paper), 'paper');
         return paper;
     }
 
