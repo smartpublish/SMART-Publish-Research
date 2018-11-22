@@ -41,7 +41,7 @@ contract('PeerReviewWorkflowTest', function() {
             workflow = instance;
             return workflow.getTransitionsCount.call();
         }).then(function (count) {
-            assert.strictEqual(parseInt(count, 10), 4, 'Transitions count does not match');
+            assert.strictEqual(parseInt(count, 10), 5, 'Transitions count does not match');
             return workflow.getTransition.call(0);
         }).then(function (transition) {
             assert.strictEqual(transition[0], 'Submit', 'Submit transition does not exists');
@@ -50,8 +50,11 @@ contract('PeerReviewWorkflowTest', function() {
             assert.strictEqual(transition[0], 'Review', 'Review transition does not exists');
             return workflow.getTransition.call(2);
         }).then(function (transition) {
-            assert.strictEqual(transition[0], 'Publish', 'Publish transition does not exists');
+            assert.strictEqual(transition[0], 'Accept', 'Accept transition does not exists');
             return workflow.getTransition.call(3);
+        }).then(function (transition) {
+            assert.strictEqual(transition[0], 'Publish', 'Publish transition does not exists');
+            return workflow.getTransition.call(4);
         }).then(function (transition) {
             assert.strictEqual(transition[0], 'Reject', 'Reject transition does not exists');
         });

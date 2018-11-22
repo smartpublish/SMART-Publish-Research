@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import "./AssetWorkflow.sol";
 
@@ -39,15 +39,15 @@ contract PeerReviewWorkflow is AssetWorkflow {
     function accept(IAsset _asset) public {
         require(isOn(STATE_ONREVIEW, _asset), 'The current state not allow to Accept.');
 
-        uint sucessful = successfulReviewsByAsset[_asset] + 1;
-        successfulReviewsByAsset[_asset] = sucessful;
+        uint sucessful = successfulReviewsByAsset[address(_asset)] + 1;
+        successfulReviewsByAsset[address(_asset)] = sucessful;
         if(sucessful == REVIEWS_OK_TO_PUBLISH) {
             publish(_asset);
         }
     }
 
     function getAcceptedCount(IAsset _asset) public view returns (uint) {
-        return successfulReviewsByAsset[_asset];
+        return successfulReviewsByAsset[address(_asset)];
     }
 
     function publish(IAsset _asset) internal {

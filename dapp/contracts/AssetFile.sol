@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import "./IAsset.sol";
 
@@ -16,7 +16,9 @@ contract AssetFile is IAsset {
 
     File[] files;
 
-    function addFile(string _fileSystemName, string _publicLocation, string _summaryHashAlgorithm, string _summaryHash) public returns(uint) {
+    function addFile(string memory _fileSystemName, string memory _publicLocation,
+        string memory _summaryHashAlgorithm, string memory _summaryHash) public returns(uint) {
+
         files.length++;
         files[files.length - 1].fileSystemName = _fileSystemName;
         files[files.length - 1].publicLocation = _publicLocation;
@@ -25,11 +27,11 @@ contract AssetFile is IAsset {
         return files.length;
     }
 
-    function getFileCount() public constant returns(uint) {
+    function getFileCount() public view returns(uint) {
         return files.length;
     }
 
-    function getFile(uint index) public constant returns(string, string, string, string) {
+    function getFile(uint index) public view returns(string memory, string memory, string memory, string memory) {
         File memory file = files[index];
         return (file.fileSystemName, file.publicLocation, file.summaryHashAlgorithm, file.summaryHash);
     }

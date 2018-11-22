@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.5.0;
 
 import "./AssetFile.sol";
 
@@ -20,29 +20,31 @@ contract Paper is AssetFile {
     constructor() public {
     }
 
-    function init(string _title, string _abstract, string _fileSystemName, string _publicLocation, string _summaryHashAlgorithm, string _summaryHash) external {
+    function init(string calldata _title, string calldata _abstract, string calldata _fileSystemName,
+        string calldata _publicLocation, string calldata _summaryHashAlgorithm, string calldata _summaryHash) external {
+        
         title = _title;
         summary = _abstract;
         addFile(_fileSystemName, _publicLocation, _summaryHashAlgorithm, _summaryHash);
     }
 
-    function setTitle(string _title) external {
+    function setTitle(string calldata _title) external {
         title = _title;
     }
 
-    function setAbstract(string _abstract) external {
+    function setAbstract(string calldata _abstract) external {
         summary = _abstract;
     }
 
-    function addComment(string message) public {
+    function addComment(string calldata message) external {
         comments.push(Comment(message, msg.sender, now));
     }
 
-    function getCommentsCount() public constant returns(uint) {
+    function getCommentsCount() public view returns(uint) {
         return comments.length;
     }
 
-    function getComments(uint index) public constant returns(string, address, uint256) {
+    function getComments(uint index) public view returns(string memory, address, uint256) {
         Comment memory comment = comments[index];
         return (comment.message, comment.author, comment.timestamp);
     }
