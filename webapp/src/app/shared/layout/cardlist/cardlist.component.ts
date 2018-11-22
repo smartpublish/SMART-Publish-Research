@@ -1,27 +1,45 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, DoCheck, IterableDiffers, OnChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, DoCheck, IterableDiffers, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
 import {Observable, Subject, Subscription} from "rxjs";
 
 @Component({
   selector: 'app-cardlist',
   templateUrl: './cardlist.component.html',
-  styleUrls: ['./cardlist.component.scss']
+  styleUrls: ['./cardlist.component.scss'],
 })
 export class CardlistComponent implements OnInit, OnDestroy {
 
   @Input() title;
   @Input() description;
-  @Input() items$: Observable<DataCard[]>;
+  item$: Observable<DataCard>;
+  @Input() set items$(observable:Observable<DataCard>) {
+    this.item$ = observable;
+    this.items = [];
+    
+    if(this.itemsSubscription) {
+      this.itemsSubscription.unsubscribe();
+    }
+
+    this.itemsSubscription = this.item$.subscribe((item:DataCard) => {
+      this.items.push(item);
+      this.cd.detectChanges();
+    });
+    
+    this.cd.detectChanges();
+  }
+
+  items:DataCard[] = [];
+  itemsSubscription:Subscription;
 
   @Output() clickActionCard: EventEmitter<any> = new EventEmitter();
   @Output() clickCard: EventEmitter<any> = new EventEmitter();
 
-  constructor() {
-  }
+  constructor(private cd: ChangeDetectorRef) { }
 
   ngOnInit() {
   }
 
   ngOnDestroy() {
+    this.itemsSubscription.unsubscribe();
   }
 
   onClickCard(item:DataCard, $event) {

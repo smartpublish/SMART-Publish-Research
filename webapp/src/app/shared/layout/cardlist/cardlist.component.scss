@@ -9,3 +9,7 @@ html,body,section{
 .card-body {
   -webkit-animation-delay:1s
 }
+
+.clickable:hover{
+  cursor: pointer;
+}
