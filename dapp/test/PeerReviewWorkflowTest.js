@@ -163,4 +163,49 @@ contract('PeerReviewWorkflowTest', function() {
         });
     });
 
+    it("should add comments to an asset", function () {
+        var workflow;
+        return PeerReviewWorkflow.deployed().then(function (instance) {
+            workflow = instance;
+            return workflow.submit(asset.address);
+        }).then(function (tx) {
+            return workflow.getCommentsCount.call(asset.address);
+        }).then(function (count) {
+            assert.strictEqual(parseInt(count, 10), 0, 'Comments count is not 0 at start');
+            return Promise.all([
+                workflow.addComment(asset.address, 'This is my first comment'),
+                workflow.addComment(asset.address, 'This is a second comment')
+            ]);
+        }).then(function(values) {
+            var comment1Tx = values[0];
+            var comment2Tx = values[1];
+            truffleAssert.eventEmitted(comment1Tx, 'AssetCommentAdded', function (e) {
+                return e.assetAddress === asset.address 
+                && e.state === 'Submitted' 
+                && e.message === 'This is my first comment'
+                && e.author != undefined
+                && e.timestamp != undefined;
+            });
+            truffleAssert.eventEmitted(comment2Tx, 'AssetCommentAdded', function (e) {
+                return e.assetAddress === asset.address 
+                && e.state === 'Submitted' 
+                && e.message === 'This is a second comment'
+                && e.author != undefined
+                && e.timestamp != undefined;
+            });
+           return workflow.getCommentsCount.call(asset.address); 
+        }).then(function(count){
+            assert.strictEqual(parseInt(count, 10), 2, 'Comments count is not 2 after 2 comments were added');
+            return Promise.all([
+                workflow.getComment.call(asset.address,0),
+                workflow.getComment.call(asset.address,1),
+            ]);
+        }).then(function(values) {
+            var comment1 = values[0];
+            var comment2 = values[1];
+            assert.strictEqual(comment1[0], 'This is my first comment','Messages comments for comment1 not match');
+            assert.strictEqual(comment2[0], 'This is a second comment','Messages comments for comment1 not match');
+        });
+    });
+
 });

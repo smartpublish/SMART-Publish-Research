@@ -1,0 +1,7 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="form-group">
+    <textarea class="form-control" id="message" name="message" rows="5" formControlName="message" class="form-control" aria-describedby="messageHelp" placeholder="Enter a comment" required></textarea>
+    <small id="messageHelp" class="form-text text-muted">Comment will be saved on Blockchain</small>
+  </div>
+  <button type="submit" class="btn btn-success" [disabled]="!form.valid">Send</button>
+</form>
