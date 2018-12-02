@@ -8,7 +8,7 @@ node_js:
 cache:
   directories:
     - node_modules
-    
+
 env:
   - CXX=g++-4.8
 
@@ -24,6 +24,7 @@ before_install:
   - cd dapp
   - export CXX="g++-4.8"
   - npm install -g npm@latest
+  - npm install -g truffle@beta
   - npm install -g ganache-cli truffle
 
 install:
