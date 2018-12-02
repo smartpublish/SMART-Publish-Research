@@ -80,7 +80,7 @@ contract('PeerReviewWorkflowTest', function() {
             return workflow.findAssetsByState.call('Submitted');
         }).then(function (assetArray){
             assert.strictEqual(assetArray.length, 1, 'Assets on state Submitted must be 1');
-            return workflow.review(asset.address);
+            return workflow.review(asset.address, 'This is a comment for Review');
         }).then(function (reviewTx) {
             truffleAssert.eventEmitted(reviewTx, 'AssetStateChanged', function (e) {
                 return e.assetAddress === asset.address && e.state === 'OnReview';
@@ -92,7 +92,7 @@ contract('PeerReviewWorkflowTest', function() {
         }).then(function(assetArraysByState){
             assert.strictEqual(assetArraysByState[0].length, 0, 'Assets on state Submitted must be 0');
             assert.strictEqual(assetArraysByState[1].length, 1, 'Assets on state OnReview must be 1');
-            return workflow.accept(asset.address); // First time accept
+            return workflow.accept(asset.address, 'First comment on Accept'); // First time accept
         }).then(function(acceptTx){
             truffleAssert.eventNotEmitted(acceptTx, 'AssetStateChanged');
             return Promise.all([
@@ -104,7 +104,7 @@ contract('PeerReviewWorkflowTest', function() {
             assert.strictEqual(values[0].length, 0, 'Assets on state Published must be 0');
             assert.strictEqual(values[1].length, 1, 'Assets on state OnReview must be 1');
             assert.strictEqual(parseInt(values[2], 10), 1, 'Asset accept count is not 1');
-            return workflow.accept(asset.address); // Second time accept
+            return workflow.accept(asset.address, 'Second comment on Accept'); // Second time accept
         }).then(function(acceptTx) {
             truffleAssert.eventNotEmitted(acceptTx, 'AssetStateChanged');
             return Promise.all([
@@ -116,7 +116,7 @@ contract('PeerReviewWorkflowTest', function() {
             assert.strictEqual(values[0].length, 0, 'Assets on state Published must be 0');
             assert.strictEqual(values[1].length, 1, 'Assets on state OnReview must be 1');
             assert.strictEqual(parseInt(values[2], 10), 2, 'Asset accept count is not 2');
-            return workflow.accept(asset.address); // Third time accept > Published
+            return workflow.accept(asset.address, 'Third comment on Accept'); // Third time accept > Published
         }).then(function(acceptTx) {
             truffleAssert.eventEmitted(acceptTx, 'AssetStateChanged', function (e) {
                 return e.assetAddress === asset.address && e.state === 'Published';
@@ -144,7 +144,7 @@ contract('PeerReviewWorkflowTest', function() {
     it("should fail on not applicable transitions", function () {
         return PeerReviewWorkflow.deployed().then(function (workflow) {
             return truffleAssert.fails(
-                workflow.accept(asset.address),
+                workflow.accept(asset.address, 'This is a comment'),
                 truffleAssert.ErrorType.REVERT,
                 'The current state not allow to Accept.'
             );

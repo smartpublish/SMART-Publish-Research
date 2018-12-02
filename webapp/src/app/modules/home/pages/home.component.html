@@ -3,16 +3,16 @@
   [description]="'Last science papers published. Yay!'"
   [items$]="papersCardByState$['Published']"
   (clickCard)="clickCardHandle($event)"
-  (clickActionCard)="clickActionCardHandlePublished($event)"></app-cardlist>
+  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>
 <app-cardlist #onReview
   [title]="'On Review'"
   [description]="'Last papers on review. On publish way!'"
   [items$]="papersCardByState$['OnReview']"
   (clickCard)="clickCardHandle($event)"
-  (clickActionCard)="clickActionCardHandleOnReview($event)"></app-cardlist>
+  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>
 <app-cardlist #submitted
   [title]="'Submitted'"
   [description]="'Last papers submitted for reviewing. Be the first one to check them!'"
   [items$]="papersCardByState$['Submitted']"
   (clickCard)="clickCardHandle($event)"
-  (clickActionCard)="clickActionCardHandleSubmitted($event)"></app-cardlist>
+  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>

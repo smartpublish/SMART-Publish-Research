@@ -10,15 +10,7 @@
             </dl>
         </div>
         <div class="col-sm-3">
-          <dl *ngFor="let workflowState of workflowsState" class="item-property">
-              <dt>Workflow</dt>
-              <dd>
-                <h6>{{workflowState.name}}     <span class="badge badge-pill badge-secondary">{{workflowState.state}}</span></h6>
-                <ul class="list-inline">
-                  <li *ngFor="let transition of workflowState.transitions" class="list-inline-item"><button type="button" (click)="onWorkflowTranstion(transition, $event)" class="btn btn-info">{{transition.name}}</button></li>
-                </ul>
-              </dd>
-          </dl>
+          <app-workflows [paper]="paper"></app-workflows>
         </div>
       </div>
       <div class="row">

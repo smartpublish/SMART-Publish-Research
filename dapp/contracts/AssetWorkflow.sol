@@ -146,7 +146,7 @@ contract AssetWorkflow is IWorkflow {
         emit AssetStateChanged(address(_asset), currentTransition.targetState.name, currentTransition.sourceState.name, currentTransition.name);
     }
 
-    function addComment(IAsset _asset, string calldata message) external {
+    function addComment(IAsset _asset, string memory message) public {
         State memory state = statesByName[findStateByAsset(_asset)];
         Comment memory comment = Comment(message, msg.sender, now, state);
         commentsByAsset[address(_asset)].push(comment);

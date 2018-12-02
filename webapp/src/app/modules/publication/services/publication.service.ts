@@ -185,7 +185,7 @@ export class PublicationService {
     });
   }
 
-  getWorkflowsState(address: string): Promise<WorkflowState[]> {
+  getWorkflowsState(paper:Paper): Promise<WorkflowState[]> {
     return new Promise<WorkflowState[]>((resolve, reject) => {
       // TODO A Paper may be associated to a differente workflows. Just now this by default.
       let wf;
@@ -194,24 +194,41 @@ export class PublicationService {
         wf = workflow;
         return Promise.all([
           wf.name.call(),
-          wf.findStateByAsset.call(address),
-          wf.getTransitionsCount.call()
+          wf.findStateByAsset.call(paper.ethAddress)
         ]);
       }).then(values => {
         workflowsState.push({name: values[0], state: values[1]} as WorkflowState)
+        resolve(workflowsState);
+      });
+    });
+  };
+
+  getWorkflowTransitions(paper: Paper): Promise<WorkflowTransition[]> {
+    return new Promise<WorkflowTransition[]>((resolve, reject) => {
+      let wf;
+      let workflowTransitions: WorkflowTransition[] = [];
+      let workflowsState: WorkflowState[] = [];
+      Promise.all([
+        this.getWorkflowsState(paper),
+        this.WF_SC.deployed()
+      ]).then(values => {
+        workflowsState = values[0];
+        wf = values[1];
+        return wf.getTransitionsCount.call();
+      }).then(count => {
+        let length = parseInt(count,10);
         let promises: any = [];
-        for(let i = 0; i < values[2]; i++) {
+        for(let i = 0; i < length; i++) {
           promises.push(wf.getTransition(i));
         }
         return Promise.all(promises);
       }).then(values => {
         let transitionsFiltered = values.filter(transition => transition[1] === workflowsState[0]['state'] && transition[0].toLowerCase() !== 'publish');
-        workflowsState[0].transitions = [];
-        transitionsFiltered.forEach(transition => workflowsState[0].transitions.push({name: transition[0], sourceState: transition[1], targetState: transition[2]}))
-        resolve(workflowsState);
-      });
+        transitionsFiltered.forEach(transition => workflowTransitions.push({name: transition[0], sourceState: transition[1], targetState: transition[2]}))
+        resolve(workflowTransitions);
+      })
     });
-  };
+  }
 
   submit(title: string, abstract: string, file: File): Promise<Paper> {
     return this.submitToIpfs(title, abstract, file).then((paper) => this.submitToEthereum(paper));
@@ -287,16 +304,16 @@ export class PublicationService {
     });
   }
 
-  review(paper: Paper): Promise<any> {
-    return this.WF_SC.deployed().then(instance => instance.review(paper.ethAddress));
+  review(paper: Paper, comment: string): Promise<any> {
+    return this.WF_SC.deployed().then(instance => instance.review(paper.ethAddress, comment));
   }
 
-  accept(paper: Paper): Promise<any> {
-    return this.WF_SC.deployed().then(instance => instance.accept(paper.ethAddress));
+  accept(paper: Paper, comment: string): Promise<any> {
+    return this.WF_SC.deployed().then(instance => instance.accept(paper.ethAddress, comment));
   }
 
-  reject(paper: Paper): Promise<any> {
-    return this.WF_SC.deployed().then(instance => instance.reject(paper.ethAddress));
+  reject(paper: Paper, comment: string): Promise<any> {
+    return this.WF_SC.deployed().then(instance => instance.reject(paper.ethAddress, comment));
   }
 
   addComment(paper: Paper, message: string): Promise<void> {
@@ -331,4 +348,9 @@ export interface WorkflowTransition {
   name: string,
   sourceState: string,
   targetState: string
+}
+
+export interface Workflow {
+  workflowAddress: string,
+  name: string
 }

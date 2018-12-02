@@ -9,7 +9,8 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 })
 export class ModalComponent implements OnInit {
 
-  @Input() title = `Information`;
+  @Input() title;
+  @Input() openButtonName;
 
   modalRef: BsModalRef;
   constructor(private modalService: BsModalService) {}

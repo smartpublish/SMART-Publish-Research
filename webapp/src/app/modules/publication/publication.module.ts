@@ -10,6 +10,8 @@ import { CommentNewComponent } from './components/paper/comments/comment-new/com
 import { CommentListComponent } from './components/paper/comments/comment-list/comment-list.component';
 import { CommentsComponent } from './components/paper/comments/comments.component';
 import { SharedModule } from '@app/shared/shared.module';
+import { WorkflowsComponent } from './components/paper/workflows/workflows.component';
+import { WorkflowTransitionComponent } from './components/paper/workflows/workflow-transition/workflow-transition.component';
 
 @NgModule({
   imports: [
@@ -25,7 +27,9 @@ import { SharedModule } from '@app/shared/shared.module';
     DetailComponent,
     CommentNewComponent,
     CommentListComponent,
-    CommentsComponent
+    CommentsComponent,
+    WorkflowsComponent,
+    WorkflowTransitionComponent
   ],
   exports: [
     SubmitComponent
