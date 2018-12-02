@@ -18,7 +18,7 @@ contract Contributors {
     function createContributor() external returns (Contributor) {
         Contributor contributor = new Contributor(oracle);
         address owner = contributor.owner();
-        require(contributorsByOwner[owner] == Contributor(address(0)), "Owner contains contributor");
+        require(contributorsByOwner[owner] == Contributor(address(0)), "Owner already contains a contributor");
         contributorsByOwner[owner] = contributor;
         existence[address(contributor)] = true;
         emit ContributorCreated(owner, contributor);
