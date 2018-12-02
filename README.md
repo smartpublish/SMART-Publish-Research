@@ -1,5 +1,3 @@
-<img src="https://truffleframework.com/img/truffle-logo-dark.svg" width="200">
-
 ![Publish diagram](webapp/src/assets/images/brand/logo.png "Truffle logo")
 
 [![Build Status](https://travis-ci.com/smartpublish/SMART-Publish-Research.svg?branch=master)](https://travis-ci.com/smartpublish/SMART-Publish-Research)
