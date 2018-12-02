@@ -4,19 +4,23 @@ import "./Contributor.sol";
 
 contract Contributors {
 
+    ContributorOracle private oracle;
     mapping(address => Contributor) internal contributorsByOwner;
+    mapping(address => bool) internal existence;
     mapping(string => Contributor[]) internal contributorsByORCID;
 
     event ContributorCreated(address owner, Contributor contributor);
 
-    constructor () public { }
+    constructor () public { 
+        oracle = new ContributorOracle();
+    }
 
-    function createContributor(Contributor contributor) external  {
+    function createContributor() external returns (Contributor) {
+        Contributor contributor = new Contributor(oracle);
         address owner = contributor.owner();
-        string memory ORCID = contributor.ORCID();
         require(contributorsByOwner[owner] == Contributor(address(0)), "Owner contains contributor");
         contributorsByOwner[owner] = contributor;
-        contributorsByORCID[ORCID].push(contributor);
+        existence[address(contributor)] = true;
         emit ContributorCreated(owner, contributor);
     }
 
