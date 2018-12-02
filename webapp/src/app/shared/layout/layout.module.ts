@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { NavbarComponent } from './navbar/navbar.component';
 import { FooterComponent } from './footer/footer.component';
 import { ModalComponent } from "@app/shared/layout/modal/modal.component";
-import { ModalModule } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { CardlistComponent } from './cardlist/cardlist.component';
 import { RouterModule } from "@angular/router";
 

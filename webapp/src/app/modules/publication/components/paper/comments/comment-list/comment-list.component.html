@@ -1,0 +1,12 @@
+<ul class="list-group list-group-flush mt-3">
+  <li class="list-group-item list-group-item-action flex-column align-items-start" *ngFor="let comment of comments$ | async">
+    <div class="d-flex w-100 flex-row-reverse">
+      <small>{{comment.timestamp * 1000 | timeAgo}}</small>
+    </div>
+    <p class="mt-2 mb-2">{{comment.message}}</p>
+    <div class="d-flex w-100 justify-content-between">
+      <small class="text-muted" class="mb-1">Author: {{comment.author}}</small>
+      <small class="text-muted">Commented for <span class="font-italic">{{comment.workflow.name}}</span> on <span class="font-italic">{{comment.workflow.state}}</span> state</small>
+    </div>
+  </li>
+</ul>

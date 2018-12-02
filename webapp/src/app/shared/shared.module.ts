@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutModule } from './layout/layout.module';
+import { TimeAgoPipe } from 'time-ago-pipe';
 
 @NgModule({
   imports: [
@@ -8,9 +9,11 @@ import { LayoutModule } from './layout/layout.module';
     LayoutModule
   ],
   declarations: [
+    TimeAgoPipe
   ],
   exports: [
-    LayoutModule
+    LayoutModule,
+    TimeAgoPipe
   ],
 
 })

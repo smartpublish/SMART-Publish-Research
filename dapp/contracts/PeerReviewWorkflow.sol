@@ -32,13 +32,15 @@ contract PeerReviewWorkflow is AssetWorkflow {
         run(TRANSITION_SUBMIT, _asset);
     }
 
-    function review(IAsset _asset) public {
+    function review(IAsset _asset, string memory _comment) public {
+        addComment(_asset, _comment);
         run(TRANSITION_REVIEW, _asset);
     }
 
-    function accept(IAsset _asset) public {
+    function accept(IAsset _asset, string memory _comment) public {
         require(isOn(STATE_ONREVIEW, _asset), 'The current state not allow to Accept.');
 
+        addComment(_asset, _comment);
         uint sucessful = successfulReviewsByAsset[address(_asset)] + 1;
         successfulReviewsByAsset[address(_asset)] = sucessful;
         if(sucessful == REVIEWS_OK_TO_PUBLISH) {
@@ -54,7 +56,8 @@ contract PeerReviewWorkflow is AssetWorkflow {
         run(TRANSITION_PUBLISH, _asset);
     }
 
-    function reject(IAsset _asset) public {
+    function reject(IAsset _asset, string memory _comment) public {
+        addComment(_asset, _comment);
         run(TRANSITION_REJECT, _asset);
     }
 

@@ -9,14 +9,6 @@ contract Paper is AssetFile {
     // @dev abstract is a reserved keyword
     string public summary;
 
-    struct Comment {
-        string message;
-        address author;
-        uint256 timestamp;
-    }
-
-    Comment[] private comments;
-
     constructor() public {
     }
 
@@ -34,19 +26,6 @@ contract Paper is AssetFile {
 
     function setAbstract(string calldata _abstract) external {
         summary = _abstract;
-    }
-
-    function addComment(string calldata message) external {
-        comments.push(Comment(message, msg.sender, now));
-    }
-
-    function getCommentsCount() public view returns(uint) {
-        return comments.length;
-    }
-
-    function getComments(uint index) public view returns(string memory, address, uint256) {
-        Comment memory comment = comments[index];
-        return (comment.message, comment.author, comment.timestamp);
     }
 
 }

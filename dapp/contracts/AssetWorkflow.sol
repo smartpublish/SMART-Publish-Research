@@ -1,8 +1,9 @@
 pragma solidity ^0.5.0;
 
 import "./IAsset.sol";
+import "./IWorkflow.sol";
 
-contract AssetWorkflow {
+contract AssetWorkflow is IWorkflow {
 
     string public name;
 
@@ -18,14 +19,23 @@ contract AssetWorkflow {
         State targetState;
     }
 
+    struct Comment {
+        string message;
+        address author;
+        uint256 timestamp;
+        State state;
+    }
+
     mapping (string => State) private statesByName;
     mapping (string => Transition) private transitionsByName;
     mapping (string => IAsset[]) private assetsByState;
+    mapping (address => Comment[]) private commentsByAsset;
 
     State[] private states;
     Transition[] private transitions;
 
     event AssetStateChanged(address assetAddress, string state, string oldState, string transition);
+    event AssetCommentAdded(address assetAddress, string message, address author, uint256 timestamp, string state);
 
     function addState(string memory _name) internal {
         // Avoid empty states or creation states ''
@@ -134,6 +144,22 @@ contract AssetWorkflow {
 
         // Notify
         emit AssetStateChanged(address(_asset), currentTransition.targetState.name, currentTransition.sourceState.name, currentTransition.name);
+    }
+
+    function addComment(IAsset _asset, string memory message) public {
+        State memory state = statesByName[findStateByAsset(_asset)];
+        Comment memory comment = Comment(message, msg.sender, now, state);
+        commentsByAsset[address(_asset)].push(comment);
+        emit AssetCommentAdded(address(_asset), comment.message, comment.author, comment.timestamp, comment.state.name);
+    }
+
+    function getCommentsCount(IAsset _asset) public view returns(uint) {
+        return commentsByAsset[address(_asset)].length;
+    }
+
+    function getComment(IAsset _asset, uint index) public view returns(string memory, address, uint256, string memory) {
+        Comment memory comment = commentsByAsset[address(_asset)][index];
+        return (comment.message, comment.author, comment.timestamp, comment.state.name);
     }
 
     function start(IAsset _asset) public;

@@ -1,9 +1,9 @@
 pragma solidity ^0.5.0;
 
-import "./IAsset.sol";
+import "./Asset.sol";
 
 // @title Any asset type (eg: a paper, ...)
-contract AssetFile is IAsset {
+contract AssetFile is Asset {
 
     // @dev file data for this asset
     struct File {

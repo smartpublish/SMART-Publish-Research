@@ -29,15 +29,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // TODO Refactor
     this.papersCardByState$['Submitted'] = this.publicationService.getAllPapersOnState("Submitted").pipe(
-      map(paper => HomeComponent.paperToCard(paper,'Read', 'Review'))
+      map(paper => HomeComponent.paperToCard(paper,'Read'))
     );
 
     this.papersCardByState$['OnReview'] = this.publicationService.getAllPapersOnState("OnReview").pipe(
-      map(paper => HomeComponent.paperToCard(paper,'Read', 'Accept'))
+      map(paper => HomeComponent.paperToCard(paper,'Read'))
     );
 
     this.papersCardByState$['Published'] = this.publicationService.getAllPapersOnState("Published").pipe(
-      map(paper => HomeComponent.paperToCard(paper,'Read', ''))
+      map(paper => HomeComponent.paperToCard(paper,'Read'))
     );
 
     this.stateChangedSubscription = this.publicationService.getStateChangedPapers()
@@ -48,13 +48,13 @@ export class HomeComponent implements OnInit, OnDestroy {
         switch(event.state) {
           case 'OnReview': {
             this.papersCardByState$['OnReview'] = this.publicationService.getAllPapersOnState("OnReview").pipe(
-              map(paper => HomeComponent.paperToCard(paper,'Read', 'Accept'))
+              map(paper => HomeComponent.paperToCard(paper,'Read'))
             );
             break;
           }
           case 'Published': {
             this.papersCardByState$['Published'] = this.publicationService.getAllPapersOnState("Published").pipe(
-              map(paper => HomeComponent.paperToCard(paper,'Read', ''))
+              map(paper => HomeComponent.paperToCard(paper,'Read'))
             );
             break;
           }
@@ -65,13 +65,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       switch(event.oldState) {
         case 'OnReview': {
           this.papersCardByState$['OnReview'] = this.publicationService.getAllPapersOnState("OnReview").pipe(
-            map(paper => HomeComponent.paperToCard(paper,'Read', 'Accept'))
+            map(paper => HomeComponent.paperToCard(paper,'Read'))
           );
           break;
         }
         case 'Submitted': {
           this.papersCardByState$['Submitted'] = this.publicationService.getAllPapersOnState("Submitted").pipe(
-            map(paper => HomeComponent.paperToCard(paper,'Read', 'Review'))
+            map(paper => HomeComponent.paperToCard(paper,'Read'))
           );
           break;
         }
@@ -90,40 +90,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.router.navigate(['/detail', paper.ethAddress]);
   }
 
-  clickActionCardHandleSubmitted(event) {
-    let paper:Paper = event.item;
-    if(event.action_number == 1) {
-      window.open(paper['publicLocation'], "_blank");
-    } else if(event.action_number == 2) {
-      this.publicationService.review(paper);
-    }
-  }
-
-  clickActionCardHandleOnReview(event) {
-    let paper:Paper = event.item;
-    if(event.action_number == 1) {
-      window.open(paper['publicLocation'], "_blank");
-    } else if(event.action_number == 2) {
-      this.publicationService.accept(paper);
-    }
-  }
-
-  clickActionCardHandlePublished(event) {
+  clickActionCardHandle(event) {
     let paper:Paper = event.item;
     if(event.action_number == 1) {
       window.open(paper['publicLocation'], "_blank");
     }
   }
-
+  
   // TODO Refactor
-  private static paperToCard(paper, action_1_name, action_2_name): DataCard {
+  private static paperToCard(paper, action_1_name): DataCard {
     return {
       model: paper,
       title: paper['title'],
       subtitle: '',
       description: paper['abstract'],
-      action_1_name: action_1_name,
-      action_2_name: action_2_name
+      action_1_name: action_1_name
     } as DataCard;
   };
 

@@ -44,6 +44,7 @@ contract AssetFactory {
 
         AssetWorkflow[] memory assetWorkflows = new AssetWorkflow[](1);
         assetWorkflows[0] = _workflow;
+        paper.addWorkflow(_workflow);
 
         assetByCreator[msg.sender].push(AssetMetadata(paper, assetWorkflows)) - 1;
         _workflow.start(paper);
