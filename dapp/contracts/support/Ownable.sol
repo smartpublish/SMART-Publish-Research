@@ -17,15 +17,15 @@ contract Ownable {
    * @dev The Ownable constructor sets the original `owner` of the contract to the sender
    * account.
    */
-    constructor() public {
-        owner = msg.sender;
+    constructor(address sender) public {
+        owner = sender;
     }
 
   /**
    * @dev Throws if called by any account other than the owner.
    */
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "You are not de fucking owner ");
         _;
     }
 

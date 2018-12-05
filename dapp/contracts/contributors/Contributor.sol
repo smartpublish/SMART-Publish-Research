@@ -1,23 +1,14 @@
 pragma solidity ^0.5.0;
 
-import "./ContributorOracle.sol";
 import "../support/Ownable.sol";
 
 contract Contributor is Ownable {
 
-    ContributorOracle private oracle;
     string public ORCID;
 
-    constructor(ContributorOracle _oracle) public {
-        oracle = _oracle;
-    }
+    constructor(address sender) Ownable(sender) public {}
 
-    function validateORCID(string memory _ORCID) public payable {
-        oracle.validateORCID(_ORCID, this);
-    }
-
-    function setORCID(string calldata _ORCID) external {
-        require(oracle.owner() == msg.sender, "Expected call by oracle");
+    function setORCID(string calldata _ORCID) onlyOwner external {
         ORCID = _ORCID;
     } 
 }
