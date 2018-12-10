@@ -3,7 +3,14 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  auth0_config: {
+    clientID: 'h1YtDN7KnKnxXixef8ZaJJbHPBEa9ZC1',
+    domain: 'smartpublish.eu.auth0.com',
+    responseType: 'token id_token',
+    redirectUri: 'http://localhost:4200/callback',
+    scope: 'openid profile'
+  }
 };
 
 /*

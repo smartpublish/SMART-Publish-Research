@@ -8,11 +8,17 @@
           <span class="navbar-toggler-icon"></span>
       </button>
       <div class="navbar-collapse collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-item nav-link" href="#" [routerLink]="['/submit']">Publish</a>
+            <a class="nav-item nav-link" href="#" [routerLink]="['/search']">Search</a>
+          </div>
           <div class="navbar-nav ml-auto">
-              <a class="nav-item nav-link" href="#" [routerLink]="['/submit']">Publish</a>
-              <a class="nav-item nav-link" href="#" [routerLink]="['/search']">Search</a>
-              <a class="nav-item nav-link" href="#" [routerLink]="['/review']">My Work</a>
+            <div class="nav-item"><a class="nav-link" href="#" *ngIf="!authService.isAuthenticated()" (click)="authService.login()">Log In</a></div>
+            <div class="nav-item"><a class="nav-link" href="#" *ngIf="authService.isAuthenticated()">My Work</a></div>
+            <div class="nav-item" *ngIf="authService.isAuthenticated()">
+              <app-user-logged-navbar></app-user-logged-navbar>
             </div>
+          </div>
       </div>
   </div>
 </nav>

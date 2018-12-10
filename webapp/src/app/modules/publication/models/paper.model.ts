@@ -1,3 +1,5 @@
+import { Contributor } from "./contributor.model";
+
 export interface IAsset {
 
 }
@@ -9,6 +11,7 @@ class AssetFile implements IAsset {
   public readonly publicLocation: string;
   public readonly summaryHashAlgorithm: string;
   public readonly summaryHash: string;
+  public readonly contributors: Contributor[];
 
   constructor(
     ethAddress: string,

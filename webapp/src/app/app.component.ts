@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthenticationService } from './core/services';
 
 @Component({
   selector: 'app-root',
@@ -6,14 +7,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  title = 'webapp';
-  account = '';
-  balance = '';
 
-  constructor() {
-
+  constructor(public authService: AuthenticationService) {
+    authService.handleAuthentication();
   }
 
   ngOnInit() {
+    if (localStorage.getItem('isLoggedIn') === 'true') {
+      this.authService.renewSession();
+    }
   }
 }

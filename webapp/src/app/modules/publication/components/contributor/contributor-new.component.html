@@ -1,0 +1,7 @@
+<form [formGroup]="contributorForm" class="form-inline">
+  <div class="form-group mb-2">
+    <label for="ORCID">ORCID</label>
+    <input id="ORCID" name="ORCID" type="text" formControlName="ORCID" class="form-control" aria-describedby="ORCIDHelp" placeholder="Enter ORCID Id" required>
+  </div>
+  <button (click)="onDelete()" class="mb-2"><span aria-hidden="true">&times;</span></button>
+</form>
