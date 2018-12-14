@@ -5,19 +5,18 @@ import "./Contributor.sol";
 contract Contributors {
 
     mapping(address => Contributor) internal contributorsByOwner;
-    mapping(string => Contributor) internal contributorsByORCID;
+    mapping(string => Contributor) internal contributorsByIdentifier;
 
     event ContributorCreated(Contributor contributor);
 
-    function createContributor(string calldata _ORCID) external returns (Contributor) {
+    function createContributor(string calldata _identifier) external returns (Contributor) {
         Contributor contributor = new Contributor(msg.sender);
         address owner = contributor.owner();
         require(contributorsByOwner[owner] == Contributor(address(0)), "Owner already contains a contributor");
-        require(contributorsByORCID[_ORCID] == Contributor(address(0)), "ORCID already associated with contributor");
+        require(contributorsByIdentifier[_identifier] == Contributor(address(0)), "Identifier already associated with contributor");
         contributorsByOwner[owner] = contributor;
-        contributorsByORCID[_ORCID] = contributor;
-        //contributor.setORCID(_ORCID);
-        address(contributor).delegatecall(abi.encodeWithSignature("setORCID(string)", _ORCID));
+        contributorsByIdentifier[_identifier] = contributor;
+        address(contributor).delegatecall(abi.encodeWithSignature("setIdentifier(string)", _identifier));
         
         emit ContributorCreated(contributor);
     }
@@ -28,8 +27,8 @@ contract Contributors {
         return contributor;
     } 
 
-    function getContributorByORCID(string memory ORCID) public view returns (Contributor) {
-        Contributor contributor = contributorsByORCID[ORCID];
+    function getContributorByIdentifier(string memory _identifier) public view returns (Contributor) {
+        Contributor contributor = contributorsByIdentifier[_identifier];
         require(contributor != Contributor(address(0)), "Contributor does not exists");
         return contributor;
     }

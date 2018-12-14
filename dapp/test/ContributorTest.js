@@ -25,10 +25,10 @@ contract('ContributorTest', function(accounts) {
         assertEquals(event.contributor, contributor.address)
     });
 
-    it("should return Contributor by ORCID", async function() {
+    it("should return Contributor by Identifier", async function() {
         let tx = await deployed.createContributor("0000-0002-1825-0097", {from: accounts[1] })
         let event = eventsOf(tx, 'ContributorCreated')[0]
-        let contributor = await deployed.getContributorByORCID.call("0000-0002-1825-0097")
+        let contributor = await deployed.getContributorByIdentifier.call("0000-0002-1825-0097")
         assertEquals(event.contributor, contributor.address)
     });
 
@@ -39,15 +39,15 @@ contract('ContributorTest', function(accounts) {
 
     it("owner should not be undefined", async function() {
         await deployed.createContributor("0000-0002-1825-0097", {from: accounts[1] })
-        let address = await deployed.getContributorByORCID.call("0000-0002-1825-0097")
+        let address = await deployed.getContributorByIdentifier.call("0000-0002-1825-0097")
         let contributor = await Contributor.at(address)
         let owner = await contributor.owner.call()
         if(owner === undefined) throw new AssertionError("Expected not undefined")
     });
 
-    it("should fail when same ORCID create two contributors", async function() {
+    it("should fail when same Identifier create two contributors", async function() {
         await deployed.createContributor("0000-0002-1825-0097", {from: accounts[1] })
-        await truffleAssert.fails(deployed.createContributor("0000-0002-1825-0097", {from: accounts[2] }),'ORCID already associated with contributor')
+        await truffleAssert.fails(deployed.createContributor("0000-0002-1825-0097", {from: accounts[2] }),'Identifier already associated with contributor')
     });
 
 });
