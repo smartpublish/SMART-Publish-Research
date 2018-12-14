@@ -16,6 +16,8 @@ contract AssetFile is Asset {
 
     File[] files;
 
+    constructor(address sender) Asset(sender) public {}
+
     function addFile(string memory _fileSystemName, string memory _publicLocation,
         string memory _summaryHashAlgorithm, string memory _summaryHash) public returns(uint) {
 

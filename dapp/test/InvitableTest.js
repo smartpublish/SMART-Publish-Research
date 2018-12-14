@@ -58,6 +58,7 @@ contract('InvitableTest', function(accounts) {
 
 });
 
+
 function assertEquals(one, other) {
     if(one != other) throw new AssertionError('Expected equals: ' + one + " != " + other);
 }

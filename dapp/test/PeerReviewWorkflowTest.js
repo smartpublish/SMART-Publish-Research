@@ -3,7 +3,7 @@ var truffleAssert = require('truffle-assertions');
 var PeerReviewWorkflow = artifacts.require('PeerReviewWorkflow');
 var Paper = artifacts.require('Paper');
 
-contract('PeerReviewWorkflowTest', function() {
+contract('PeerReviewWorkflowTest', function(accounts) {
     it("should has a workflow name", function () {
         var workflow;
         return PeerReviewWorkflow.deployed().then(function (instance) {
@@ -62,7 +62,7 @@ contract('PeerReviewWorkflowTest', function() {
 
     var asset;
     beforeEach(function() {
-        return Paper.new()
+        return Paper.new(accounts[0], accounts[1])
             .then(function(instance) {
                 asset = instance;
             });

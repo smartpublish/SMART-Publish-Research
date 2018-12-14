@@ -8,10 +8,13 @@ contract Invitable {
         bool isUsed;
     }
 
+    event InvitationCreated(address assetAddress, bytes32 hashCode);
+
     mapping(bytes32 => Invitation) internal invitations;
 
     function createInvitation(bytes32 _hashedCode, uint256 _expiresInSeconds) internal {
         invitations[_hashedCode] = Invitation(_hashedCode, _expiresInSeconds, false);
+        emit InvitationCreated(address(this), _hashedCode);
     }
 
     function consumeInvitation(string memory code) internal {

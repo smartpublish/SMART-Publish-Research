@@ -3,9 +3,11 @@ pragma solidity ^0.5.0;
 import "./IAsset.sol";
 import "./AssetWorkflow.sol";
 import "./Paper.sol";
+import "./contributors/Contributors.sol";
 
 contract AssetFactory {
 
+    Contributors private contributors;
     mapping(string => address) internal assetTypeRegistry;
 
     struct AssetMetadata {
@@ -31,8 +33,9 @@ contract AssetFactory {
         string memory _summaryHashAlgorithm,
         string memory _summaryHash,
         AssetWorkflow _workflow) public returns(Paper) {
-
-        Paper paper = new Paper();
+        
+        //Contributor contributor = contributors.getContributorByOwner(msg.sender);
+        Paper paper = new Paper(msg.sender, Contributor(address(0)));
         paper.init(
             _title,
             _summary,
