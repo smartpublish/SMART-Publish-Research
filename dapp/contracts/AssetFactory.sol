@@ -35,7 +35,7 @@ contract AssetFactory {
         AssetWorkflow _workflow) public returns(Paper) {
         
         //Contributor contributor = contributors.getContributorByOwner(msg.sender);
-        Paper paper = new Paper(msg.sender, Contributor(address(0)));
+        Paper paper = new Paper(Contributor(address(0)));
         paper.init(
             _title,
             _summary,

@@ -62,7 +62,7 @@ contract('PeerReviewWorkflowTest', function(accounts) {
 
     var asset;
     beforeEach(function() {
-        return Paper.new(accounts[0], accounts[1])
+        return Paper.new(accounts[0])
             .then(function(instance) {
                 asset = instance;
             });

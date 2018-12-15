@@ -13,7 +13,7 @@ contract Paper is AssetFile, Invitable {
 
     Contributor[] contributors;
 
-    constructor(address sender, Contributor _contributor) AssetFile(sender) public {
+    constructor(Contributor _contributor) AssetFile(address(_contributor.owner)) public {
         contributors.push(_contributor);
     }
 
