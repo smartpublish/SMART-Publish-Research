@@ -17,6 +17,7 @@ contract Contributable is Ownable, Invitable {
         createInvitation(_hashedCode, _expiresInSeconds);
     }
 
+    //TODO _contributors as parameter is hackeable, (fake contract same abi is enought)
     function join(Contributors _contributors, string memory _code) public {
         Contributor contributor = _contributors.getContributorByOwner(address(msg.sender));
         consumeInvitation(_code);
