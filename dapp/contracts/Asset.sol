@@ -3,13 +3,14 @@ pragma solidity ^0.5.0;
 import "./IAsset.sol";
 import "./IWorkflow.sol";
 import "../libraries/HashSet.sol";
-import "./support/Ownable.sol";
+import "./support/Contributable.sol";
+import "./contributors/Contributor.sol";
 
-contract Asset is IAsset, Ownable {
+contract Asset is IAsset, Contributable {
 
     HashSet.data private wfs;
     
-    constructor(address sender) Ownable(sender) public {}
+    constructor(Contributor contributor) Contributable(contributor) public {}
 
     function addWorkflow(IWorkflow wf) public {
         HashSet.add(wfs, address(wf));

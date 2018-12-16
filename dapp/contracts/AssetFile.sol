@@ -1,6 +1,7 @@
 pragma solidity ^0.5.0;
 
 import "./Asset.sol";
+import "./contributors/Contributor.sol";
 
 // @title Any asset type (eg: a paper, ...)
 contract AssetFile is Asset {
@@ -16,7 +17,7 @@ contract AssetFile is Asset {
 
     File[] files;
 
-    constructor(address sender) Asset(sender) public {}
+    constructor(Contributor contributor) Asset(contributor) public {}
 
     function addFile(string memory _fileSystemName, string memory _publicLocation,
         string memory _summaryHashAlgorithm, string memory _summaryHash) public returns(uint) {
