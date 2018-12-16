@@ -19,7 +19,9 @@ contract AssetFactory {
 
     event AssetCreated(address assetAddress, string assetType);
 
-    constructor () public { }
+    constructor (Contributors _contributors) public { 
+        contributors = _contributors;
+    }
 
     function register(string calldata objectType, address object) external  {
         assetTypeRegistry[objectType] = object;
@@ -34,8 +36,8 @@ contract AssetFactory {
         string memory _summaryHash,
         AssetWorkflow _workflow) public returns(Paper) {
         
-        //Contributor contributor = contributors.getContributorByOwner(msg.sender);
-        Paper paper = new Paper(Contributor(address(0)));
+        Contributor contributor = contributors.getContributorByOwner(msg.sender);
+        Paper paper = new Paper(contributor);
         paper.init(
             _title,
             _summary,

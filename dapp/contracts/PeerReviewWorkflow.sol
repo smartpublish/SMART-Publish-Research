@@ -4,24 +4,24 @@ import "./AssetWorkflow.sol";
 
 contract PeerReviewWorkflow is AssetWorkflow {
 
-    string constant STATE_SUMBITTED = 'Submitted';
-    string constant STATE_ONREVIEW = 'OnReview';
-    string constant STATE_PUBLISHED = 'Published';
-    string constant STATE_REJECTED = 'Rejected';
+    string constant STATE_SUMBITTED = "Submitted";
+    string constant STATE_ONREVIEW = "OnReview";
+    string constant STATE_PUBLISHED = "Published";
+    string constant STATE_REJECTED = "Rejected";
 
-    string constant TRANSITION_SUBMIT = 'Submit';
-    string constant TRANSITION_REVIEW = 'Review';
-    string constant TRANSITION_ACCEPT = 'Accept';
-    string constant TRANSITION_PUBLISH = 'Publish';
-    string constant TRANSITION_REJECT = 'Reject';
+    string constant TRANSITION_SUBMIT = "Submit";
+    string constant TRANSITION_REVIEW = "Review";
+    string constant TRANSITION_ACCEPT = "Accept";
+    string constant TRANSITION_PUBLISH = "Publish";
+    string constant TRANSITION_REJECT = "Reject";
 
     mapping(address => uint) internal successfulReviewsByAsset;
     uint constant REVIEWS_OK_TO_PUBLISH = 3;
 
     constructor() public {
-        name = 'Peer Review';
+        name = "Peer Review";
 
-        addTransition(TRANSITION_SUBMIT,'',STATE_SUMBITTED);
+        addTransition(TRANSITION_SUBMIT,"",STATE_SUMBITTED);
         addTransition(TRANSITION_REVIEW,STATE_SUMBITTED,STATE_ONREVIEW);
         addTransition(TRANSITION_ACCEPT,STATE_ONREVIEW,STATE_ONREVIEW);
         addTransition(TRANSITION_PUBLISH,STATE_ONREVIEW,STATE_PUBLISHED);
@@ -38,7 +38,7 @@ contract PeerReviewWorkflow is AssetWorkflow {
     }
 
     function accept(IAsset _asset, string memory _comment) public {
-        require(isOn(STATE_ONREVIEW, _asset), 'The current state not allow to Accept.');
+        require(isOn(STATE_ONREVIEW, _asset), "The current state not allow to Accept.");
 
         addComment(_asset, _comment);
         uint sucessful = successfulReviewsByAsset[address(_asset)] + 1;

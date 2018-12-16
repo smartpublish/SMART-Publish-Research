@@ -17,9 +17,10 @@ module.exports = function(deployer) {
     deployer.link(HashSet, AssetFactory);
     deployer.deploy(PeerReviewWorkflow);
 
-    deployer.deploy(Contributors);
-    deployer.link(Contributors, AssetFactory);
-    deployer.deploy(AssetFactory);
+    deployer.deploy(Contributors).then(function() {
+        return deployer.deploy(AssetFactory, Contributors.address)
+    });
+    
      // Assets
     // deployer.deploy(AssetFactory).then(function (factory) {
         // return deployer.deploy(Paper).then(function () {
