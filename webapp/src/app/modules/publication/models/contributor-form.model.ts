@@ -2,12 +2,12 @@ import { FormControl, Validators } from "@angular/forms";
 import { Contributor } from "./contributor.model";
 
 export class ContributorForm {
-  ORCID = new FormControl()
+  email = new FormControl()
 
   constructor(contributor?: Contributor) {
-    if(contributor && contributor.ORCID) {
-      this.ORCID.setValue(contributor.ORCID)
+    if(contributor && contributor.email) {
+      this.email.setValue(contributor.email)
     }
-    this.ORCID.setValidators([Validators.required])
+    this.email.setValidators([Validators.required])
   }
 }

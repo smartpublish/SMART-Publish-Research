@@ -40,3 +40,6 @@ Thumbs.db
 
 # documentation
 documentation/*
+
+# Environments
+/src/environments/

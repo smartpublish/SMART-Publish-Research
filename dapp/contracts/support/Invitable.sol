@@ -12,12 +12,12 @@ contract Invitable {
 
     mapping(bytes32 => Invitation) internal invitations;
 
-    function createInvitation(bytes32 _hashedCode, uint256 _expiresInSeconds) internal {
+    function createInvitation(bytes32 _hashedCode, uint256 _expiresInSeconds) public {
         invitations[_hashedCode] = Invitation(_hashedCode, _expiresInSeconds, false);
         emit InvitationCreated(address(this), _hashedCode);
     }
 
-    function consumeInvitation(string memory code) internal {
+    function consumeInvitation(string memory code) public {
         bytes32 hashedCode = performKeccak256(code);
         Invitation memory invitation = invitations[hashedCode];
         require(invitation.isUsed == false, "Invitation already used or not valid");

@@ -27,7 +27,8 @@ import { UserLoggedNavbarComponent } from './navbar/user-logged-navbar/user-logg
       FooterComponent,
       ModalComponent,
       NavbarComponent,
-      CardlistComponent
+      CardlistComponent,
+      ModalModule
     ],
     providers: [],
 })

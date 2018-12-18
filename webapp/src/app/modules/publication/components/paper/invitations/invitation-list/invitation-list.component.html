@@ -1,0 +1,10 @@
+<h5>Invitation list</h5>
+<ul class="list-group list-group-flush mt-3">
+  <li class="list-group-item list-group-item-action flex-column align-items-start" *ngFor="let invitation of invitations$ | async">
+    <dl class="item-property">
+      <dt><p>{{invitation.guest.email}}</p></dt>
+      <dd><a [href]="sanitize(invitation.link_mailto)" target="_top">{{invitation.link}}</a></dd>
+      <dd><p>{{invitation.expires | date:'medium'}}</p></dd>
+    </dl>
+  </li>
+</ul>

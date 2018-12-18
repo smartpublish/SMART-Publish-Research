@@ -8,6 +8,26 @@
               <dt>Abstract</dt>
               <dd><p>{{paper.abstract}}</p></dd>
             </dl>
+            <dl class="item-property">
+              <dt>Contributors</dt>
+              <!--<dd><p>{{paper.contributors}}</p></dd>-->
+              <button (click)="lgModal.show()" type="button" class="btn btn-outline-secondary mx-sm-1 mb-2 clickable">+</button>
+              <div bsModal #lgModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
+                <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h4 id="dialog-sizes-name1" class="modal-title pull-left">Invitations</h4>
+                      <button type="button" class="close pull-right" (click)="lgModal.hide()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                      </button>
+                    </div>
+                    <div class="modal-body">
+                      <app-invitations [paper]="paper"></app-invitations>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </dl>
         </div>
         <div class="col-sm-3">
           <app-workflows [paper]="paper"></app-workflows>

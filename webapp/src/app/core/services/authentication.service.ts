@@ -45,7 +45,6 @@ export class AuthenticationService {
   }
 
   private setSession(authResult): void {
-    console.log('setSession');
     // Set isLoggedIn flag in localStorage
     localStorage.setItem('isLoggedIn', 'true');
     // Set the time that the access token will expire at
@@ -83,18 +82,22 @@ export class AuthenticationService {
     return new Date().getTime() < this._expiresAt;
   }
 
-  public getProfile(cb): void {
-    console.log('getProfile');
-    if (!this._accessToken) {
-      throw new Error('Access Token must exist to fetch profile');
-    }
-  
-    const self = this;
-    this.auth0.client.userInfo(this._accessToken, (err, profile) => {
-      if (profile) {
-        self.userProfile = profile;
+  public getProfile():Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (this.userProfile) {
+        resolve(this.userProfile);
+      } else {
+        if (!this._accessToken) {
+          reject('Access Token must exist to fetch profile');
+        }
+      
+        this.auth0.client.userInfo(this._accessToken, (err, profile) => {
+          if (profile) {
+            this.userProfile = profile;
+          }
+          resolve(profile);
+        });
       }
-      cb(err, profile);
     });
   }
 }

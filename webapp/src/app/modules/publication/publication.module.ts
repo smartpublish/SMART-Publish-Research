@@ -13,6 +13,9 @@ import { SharedModule } from '@app/shared/shared.module';
 import { WorkflowsComponent } from './components/paper/workflows/workflows.component';
 import { WorkflowTransitionComponent } from './components/paper/workflows/workflow-transition/workflow-transition.component';
 import { ContributorNewComponent } from './components/contributor/contributor-new.component';
+import { InvitationsComponent } from './components/paper/invitations/invitations.component';
+import { InvitationNewComponent } from './components/paper/invitations/invitation-new/invitation-new.component';
+import { InvitationListComponent } from './components/paper/invitations/invitation-list/invitation-list.component'
 
 @NgModule({
   imports: [
@@ -31,7 +34,10 @@ import { ContributorNewComponent } from './components/contributor/contributor-ne
     CommentsComponent,
     WorkflowsComponent,
     WorkflowTransitionComponent,
-    ContributorNewComponent
+    ContributorNewComponent,
+    InvitationsComponent,
+    InvitationNewComponent,
+    InvitationListComponent
   ],
   exports: [
     SubmitComponent

@@ -1,7 +1,7 @@
 import { Contributor } from "./contributor.model";
 
 export interface IAsset {
-
+  readonly ethAddress: string
 }
 
 class AssetFile implements IAsset {

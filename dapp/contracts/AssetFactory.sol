@@ -34,9 +34,10 @@ contract AssetFactory {
         string memory _publicLocation,
         string memory _summaryHashAlgorithm,
         string memory _summaryHash,
-        AssetWorkflow _workflow) public returns(Paper) {
+        AssetWorkflow _workflow,
+        string memory _contributorId) public returns(Paper) {
         
-        Contributor contributor = contributors.getContributorByOwner(msg.sender);
+        Contributor contributor = contributors.getOrCreateContributor(msg.sender, _contributorId);
         Paper paper = new Paper(contributor);
         paper.init(
             _title,

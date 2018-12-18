@@ -1,7 +1,9 @@
 <form [formGroup]="contributorForm" class="form-inline">
   <div class="form-group mb-2">
-    <label for="ORCID">ORCID</label>
-    <input id="ORCID" name="ORCID" type="text" formControlName="ORCID" class="form-control" aria-describedby="ORCIDHelp" placeholder="Enter ORCID Id" required>
+    <label for="email" class="sr-only">Email</label>
+    <input id="email" formControlName="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="eg: co-author@gmail.com" required>
   </div>
-  <button (click)="onDelete()" class="mb-2"><span aria-hidden="true">&times;</span></button>
+  <div class="form-group mx-sm-2 mb-2">
+    <button (click)="onDelete()" type="button" class="btn btn-light mx-sm-1 clickable">&times;</button>
+  </div>
 </form>

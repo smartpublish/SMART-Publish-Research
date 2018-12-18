@@ -7,6 +7,7 @@ import {Observable} from "rxjs";
 import {IpfsService} from "@app/core/services/ipfs.service";
 import {AlertService} from "@app/core/services/alert.service";
 import {HashService} from "@app/core/services/hash.service";
+import { AuthenticationService } from '@app/core/services';
 
 declare let require: any;
 
@@ -30,7 +31,8 @@ export class PublicationService {
     private ethereumService: EthereumService,
     private ipfsService: IpfsService,
     private alertService: AlertService,
-    private hashService: HashService
+    private hashService: HashService,
+    private authService: AuthenticationService
   ) {
     this.WF_SC.setProvider(ethereumService.web3Provider);
     this.ASSET_FACTORY_SC.setProvider(ethereumService.web3Provider);
@@ -231,7 +233,7 @@ export class PublicationService {
   }
 
   submit(title: string, abstract: string, file: File): Promise<Paper> {
-    return this.submitToIpfs(title, abstract, file).then((paper) => this.submitToEthereum(paper));
+    return this.submitToIpfs(title, abstract, file).then((paper) => this.submitToEth(paper));
   }
 
   private submitToIpfs(title:string, abstract: string, file: File): Promise<Paper> {
@@ -268,40 +270,36 @@ export class PublicationService {
     })
   }
 
-  private submitToEthereum(paper: Paper): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.ASSET_FACTORY_SC.deployed().then(instance => {
-      return instance.createPaper(
+  private async submitToEth(paper: Paper): Promise<Paper> {
+    let instance = await this.ASSET_FACTORY_SC.deployed()
+    let profile = await this.authService.getProfile()
+    let tx = await instance.createPaper(
+      paper.title,
+      paper.abstract,
+      paper.fileSystemName,
+      paper.publicLocation,
+      paper.summaryHashAlgorithm,
+      paper.summaryHash,
+      this.WF_SC_INSTANCE.address, // Creates Paper with PeerReviewWorkflow by default
+      profile.sub // user_id
+    );
+    let paperCreatedEvent = tx.logs.filter(
+      log => log['event'] === 'AssetCreated' && log.args['assetType'] === 'paper' && log.args['assetAddress']
+    );
+    if(paperCreatedEvent && paperCreatedEvent.length == 1) {
+      return new Paper(
         paper.title,
         paper.abstract,
+        paperCreatedEvent[0].args['assetAddress'],
+        paper.fileName,
         paper.fileSystemName,
         paper.publicLocation,
         paper.summaryHashAlgorithm,
-        paper.summaryHash,
-        this.WF_SC_INSTANCE.address // Creates Paper with PeerReviewWorkflow by default
-        );
-      }).then((result) => {
-        console.log(result);
-        let paperCreatedEvent = result.logs.filter(
-          log => log['event'] === 'AssetCreated' && log.args['assetType'] === 'paper' && log.args['assetAddress']
-        );
-        if(paperCreatedEvent && paperCreatedEvent.length == 1) {
-          return resolve(new Paper(
-            paper.title,
-            paper.abstract,
-            paperCreatedEvent[0].args['assetAddress'],
-            paper.fileName,
-            paper.fileSystemName,
-            paper.publicLocation,
-            paper.summaryHashAlgorithm,
-            paper.summaryHash
-          ));
-        }
-      }).catch((error) => {
-        console.error(error);
-        return reject("Error creating the Paper on Ethereum or procesing the response");
-      });
-    });
+        paper.summaryHash
+      );
+    } else {
+      throw new Error("Error creating the Paper on Ethereum or procesing the response")
+    }
   }
 
   review(paper: Paper, comment: string): Promise<any> {

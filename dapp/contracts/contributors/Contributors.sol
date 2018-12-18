@@ -9,7 +9,7 @@ contract Contributors {
 
     event ContributorCreated(Contributor contributor);
 
-    function createContributor(string calldata _identifier) external returns (Contributor) {
+    function createContributor(string memory _identifier) public returns (Contributor) {
         Contributor contributor = new Contributor(msg.sender);
         address owner = contributor.owner();
         require(contributorsByOwner[owner] == Contributor(address(0)), "Owner already contains a contributor");
@@ -30,6 +30,14 @@ contract Contributors {
     function getContributorByIdentifier(string memory _identifier) public view returns (Contributor) {
         Contributor contributor = contributorsByIdentifier[_identifier];
         require(contributor != Contributor(address(0)), "Contributor does not exists");
+        return contributor;
+    }
+
+    function getOrCreateContributor(address owner, string memory _identifier) public returns (Contributor) {
+        Contributor contributor = contributorsByOwner[owner];
+        if(contributor != Contributor(address(0))) {
+            contributor = createContributor(_identifier);
+        }
         return contributor;
     }
 }

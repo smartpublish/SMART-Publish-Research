@@ -1,0 +1,10 @@
+<h5>New invitation</h5>
+<form [formGroup]="form" class="form-inline">
+  <div class="form-group mb-2 mr-sm-2">
+    <label for="email" class="sr-only">Email</label>
+    <input id="email" formControlName="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="co-author@gmail.com" required>
+  </div>
+
+  <button (click)="onSubmit()" [disabled]="!form.valid" class="btn btn-primary mb-2">Generate link</button>
+</form>
+ 

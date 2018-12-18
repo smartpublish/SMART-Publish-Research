@@ -1,7 +1,5 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
-import { PublicationService } from '@app/modules/publication/services/publication.service';
-import { AlertService } from '@app/core/services/alert.service';
 
 @Component({
   selector: 'app-comment-new',
@@ -15,9 +13,7 @@ export class CommentNewComponent {
   message: FormControl = new FormControl('', Validators.required);
 
   constructor(
-    private fb: FormBuilder,
-    private publicationService: PublicationService,
-    private alertService: AlertService
+    private fb: FormBuilder
   ) {
     this.form = fb.group({
       message: this.message

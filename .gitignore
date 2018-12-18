@@ -19,9 +19,9 @@
 log/
 target/
 
-#Gradle
+# Gradle
 .gradle/
 build/
 
-#NPM
+# NPM
 dapp/node_modules/
