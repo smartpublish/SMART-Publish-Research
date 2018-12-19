@@ -1,8 +1,5 @@
-
 var truffleAssert = require('truffle-assertions');
-
-var Invitable = artifacts.require('InvitableForTest');
-
+var Invitable = artifacts.require('./InvitableForTest');
 const AssertionError = require('assertion-error');
 
 contract('InvitableTest', function(accounts) {

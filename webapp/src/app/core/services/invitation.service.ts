@@ -6,20 +6,22 @@ import { IAsset, Paper } from '@app/modules/publication/models';
 import { AuthenticationService } from './authentication.service';
 import TruffleContract from "truffle-contract";
 import { EthereumService } from './ethereum.service';
+import { AlertService } from './alert.service';
 
 declare let require: any;
 
-let tokenAbiInvitable = require('@contracts/Invitable.json');
+let tokenAbiContributable = require('@contracts/Contributable.json');
 
 @Injectable({
   providedIn: 'root'
 })
 export class InvitationService {
 
-  private readonly INV_SC = TruffleContract(tokenAbiInvitable);
+  private readonly INV_SC = TruffleContract(tokenAbiContributable);
 
   constructor(
     private ethereumService: EthereumService,
+    private alertService: AlertService,
     private authService: AuthenticationService,
     private emailService: EmailService
   ) { 
@@ -56,7 +58,7 @@ export class InvitationService {
     let block = await web3.eth.getBlockNumber().then(web3.eth.getBlock)
     let expires = block.timestamp + 24 * 60 * 60
     let instance = await this.INV_SC.at(asset.ethAddress)
-    let tx = await instance.createInvitation(hashedCode, expires)
+    let tx = await instance.addInvitation(hashedCode, expires)
     return new Date(expires * 1000);
   }
 
