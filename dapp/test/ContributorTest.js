@@ -50,6 +50,15 @@ contract('ContributorTest', function(accounts) {
         await truffleAssert.fails(deployed.createContributor("0000-0002-1825-0097", {from: accounts[2] }),'Identifier already associated with contributor')
     });
 
+    it("should get or create a new contributor", async function() {
+        let tx = await deployed.getOrCreateContributor(accounts[1], "0000-0002-1825-0097", {from: accounts[1]})
+        truffleAssert.eventEmitted(tx, 'ContributorCreated', null, 'ContributorCreated should be emitted')
+        let contributor_address = await deployed.getOrCreateContributor.call(accounts[1], "0000-0002-1825-0097", {from: accounts[1]})
+        let contributor = await Contributor.at(contributor_address)
+        let contributor_account = await contributor.owner.call()
+        assert.strictEqual(contributor_account, accounts[1], 'Contributors should be match')
+    });
+
 });
 
 

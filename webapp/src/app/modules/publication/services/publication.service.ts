@@ -1,13 +1,8 @@
-import {Injectable} from '@angular/core';
-import {EthereumService} from "@app/core/services/ethereum.service";
-import {Paper} from "@app/modules/publication/models/paper.model";
-import {Comment} from "@app/modules/publication/models/comment.model";
+import { Injectable } from '@angular/core';
+import { Paper, Comment, Contributor } from "../models"
+import { EthereumService, IpfsService, AlertService, HashService, AuthenticationService } from "@app/core/services";
 import * as TruffleContract from "truffle-contract";
-import {Observable} from "rxjs";
-import {IpfsService} from "@app/core/services/ipfs.service";
-import {AlertService} from "@app/core/services/alert.service";
-import {HashService} from "@app/core/services/hash.service";
-import { AuthenticationService } from '@app/core/services';
+import { Observable } from "rxjs";
 
 declare let require: any;
 
@@ -57,31 +52,25 @@ export class PublicationService {
     });
   }
 
-  getPaper(address: string): Promise<Paper> {
-    return new Promise<Paper>((resolve, reject) => {
-      this.PAPER_SC.at(address).then(instance => {
-        return Promise.all([
-          instance.title.call(),
-          instance.summary.call(),
-          instance.getFile.call(0)
-        ]);
-      }).then(values => {
-        let paper: Paper = new Paper(
-          values[0],
-          values[1],
-          address,
-          null,
-          values[2][0],
-          values[2][1],
-          values[2][2],
-          values[2][3]
-          );
-
-        resolve(paper);
-      }).catch(err => {
-        reject(err)
-      });
-    });
+  async getPaper(address: string): Promise<Paper> {
+    let instance = await this.PAPER_SC.at(address);
+    let values = await Promise.all([
+      instance.title.call(),
+      instance.summary.call(),
+      instance.getFile.call(0),
+      instance.getContributors.call()
+    ]);
+    return new Paper(
+      values[0],
+      values[1],
+      address,
+      null,
+      values[2][0],
+      values[2][1],
+      values[2][2],
+      values[2][3],
+      values[3].map(c => { return {ethAddress: c} }) as Contributor[]
+    );
   }
 
   stateChanged:Observable<AssetStateChanged>;
@@ -258,7 +247,8 @@ export class PublicationService {
             'IPFS',
             'https://ipfs.io/ipfs/' + ipfsObject,
             h.hashAlgorithm,
-            h.hash);
+            h.hash,
+            null);
             
           resolve(paper);
         }).catch(error => {
@@ -295,7 +285,8 @@ export class PublicationService {
         paper.fileSystemName,
         paper.publicLocation,
         paper.summaryHashAlgorithm,
-        paper.summaryHash
+        paper.summaryHash,
+        paper.contributors
       );
     } else {
       throw new Error("Error creating the Paper on Ethereum or procesing the response")

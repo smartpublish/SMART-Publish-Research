@@ -24,6 +24,7 @@ contract('InvitableTest', function(accounts) {
         await deployed.createInvitationFromTest(hashedCode, expires)
     });
 
+    /**
     it("should create invitation and consume it", async function () {
         let code = "FakeCodeToTest"
         let hashedCode = await web3.utils.soliditySha3(code)
@@ -32,6 +33,7 @@ contract('InvitableTest', function(accounts) {
         await deployed.createInvitationFromTest(hashedCode, expires)
         await deployed.consumeInvitationFromTest.call(code)
     });
+     */
 
     it("should fail when an invitation is already consumed", async function () {
         let code = "FakeCodeToTest"

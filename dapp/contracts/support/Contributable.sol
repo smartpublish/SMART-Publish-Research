@@ -13,6 +13,14 @@ contract Contributable is Ownable, Invitable {
         contributors.push(contributor);
     }
 
+    function getContributorCount() public view returns (uint) {
+        return contributors.length;
+    }
+
+    function getContributors() public view returns (Contributor[] memory) {
+        return contributors;
+    }
+
     function addInvitation(bytes32 _hashedCode, uint256 _expiresInSeconds) public onlyOwner {
         createInvitation(_hashedCode, _expiresInSeconds);
     }

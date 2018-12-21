@@ -10,29 +10,21 @@
             </dl>
             <dl class="item-property">
               <dt>Contributors</dt>
-              <!--<dd><p>{{paper.contributors}}</p></dd>-->
-              <button (click)="lgModal.show()" type="button" class="btn btn-outline-secondary mx-sm-1 mb-2 clickable">+</button>
-              <div bsModal #lgModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="dialog-sizes-name1">
-                <div class="modal-dialog modal-lg">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h4 id="dialog-sizes-name1" class="modal-title pull-left">Invitations</h4>
-                      <button type="button" class="close pull-right" (click)="lgModal.hide()" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                    </div>
-                    <div class="modal-body">
-                      <app-invitations [paper]="paper"></app-invitations>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <dd *ngFor="let contributor of paper.contributors"><p>{{contributor.ethAddress}}</p></dd>
+              <app-invitations [paper]="paper"></app-invitations>
             </dl>
         </div>
         <div class="col-sm-3">
           <app-workflows [paper]="paper"></app-workflows>
         </div>
       </div>
+      <a href="{{paper.publicLocation}}" target="_blank" class="btn btn-lg btn-primary"> Read </a>
+    </article>
+  </div>
+
+  <div class="card mt-4">
+    <article class="card-body p-5">
+      <h5 class="card-title">System properties</h5>
       <div class="row">
         <div class="col-sm-12">
             <dl class="item-property">
@@ -55,7 +47,6 @@
               <dt>Summary Hash</dt>
               <dd>{{paper.summaryHash}}</dd>
             </dl>
-            <a href="{{paper.publicLocation}}" target="_blank" class="btn btn-lg btn-primary"> Read </a>
         </div>
       </div>
     </article>
@@ -63,6 +54,7 @@
 
   <div class="card mt-4">
       <article class="card-body p-5">
+        <h5 class="card-title">Comments</h5>
         <app-comments [paper]="paper"></app-comments>
       </article>
   </div>
