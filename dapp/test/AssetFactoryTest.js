@@ -14,7 +14,7 @@ contract('AssetFactoryTest', function(accounts) {
     });
 
     it("should create a new Paper with pre-existing Contributor", async function() {
-        await contributors.createContributor("0000-0002-1825-0097",{ from: accounts[0] })
+        await contributors.createContributor("0000-0002-1825-0097",{ from: accounts[1] })
         let tx = await factory.createPaper(
             'Awesome Title paper',
             'Best abstract',
@@ -23,10 +23,18 @@ contract('AssetFactoryTest', function(accounts) {
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
             workflow.address,
-            'google-oauth2|129380127374018398127'
+            '0000-0002-1825-0097',
+            { from: accounts[1] }
         )
-        truffleAssert.eventEmitted(tx, 'AssetCreated', null, 'AssetCreated should be emitted')
+        let paperAddress;
+        truffleAssert.eventEmitted(tx, 'AssetCreated', function(e) {
+            paperAddress = e.assetAddress;
+            return e.assetAddress !== undefined;
+        }, 'AssetCreated should be emitted')
         truffleAssert.eventNotEmitted(tx, 'ContributorCreated', null, 'ContributorCreated should not be emitted')
+        let paper = await Paper.at(paperAddress)
+        let owner = await paper.owner.call()
+        assert.strictEqual(owner, accounts[1], 'Paper owner should be match')
     });
 
     it("should create a new Paper using PeerReviewWorkflow", async function () {

@@ -9,7 +9,7 @@ contract Contributable is Ownable, Invitable {
 
     Contributor[] public contributors;
 
-    constructor(Contributor contributor) Ownable(address(contributor.owner)) public {
+    constructor(Contributor contributor) Ownable() public {
         contributors.push(contributor);
     }
 

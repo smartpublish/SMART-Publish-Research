@@ -55,6 +55,8 @@ contract AssetFactory {
         assetByCreator[msg.sender].push(AssetMetadata(paper, assetWorkflows)) - 1;
         _workflow.start(paper);
 
+        paper.transferOwnership(msg.sender);
+        
         emit AssetCreated(address(paper), 'paper');
         return paper;
     }

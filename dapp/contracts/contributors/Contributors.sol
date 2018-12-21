@@ -10,14 +10,14 @@ contract Contributors {
     event ContributorCreated(Contributor contributor);
 
     function createContributor(string memory _identifier) public returns (Contributor) {
-        Contributor contributor = new Contributor(msg.sender);
+        Contributor contributor = new Contributor(_identifier);
+        contributor.transferOwnership(tx.origin);
         address owner = contributor.owner();
-        require(contributorsByOwner[owner] == Contributor(address(0)), "Owner already contains a contributor");
+        require(contributorsByOwner[owner] == Contributor(address(0)), "Owner is already a contributor");
         require(contributorsByIdentifier[_identifier] == Contributor(address(0)), "Identifier already associated with contributor");
         contributorsByOwner[owner] = contributor;
         contributorsByIdentifier[_identifier] = contributor;
-        address(contributor).delegatecall(abi.encodeWithSignature("setIdentifier(string)", _identifier));
-        
+
         emit ContributorCreated(contributor);
     }
 
@@ -35,7 +35,7 @@ contract Contributors {
 
     function getOrCreateContributor(address owner, string memory _identifier) public returns (Contributor) {
         Contributor contributor = contributorsByOwner[owner];
-        if(contributor != Contributor(address(0))) {
+        if(contributor == Contributor(address(0))) {
             contributor = createContributor(_identifier);
         }
         return contributor;

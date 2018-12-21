@@ -6,7 +6,9 @@ contract Contributor is Ownable {
 
     string public identifier;
 
-    constructor(address sender) Ownable(sender) public {}
+    constructor(string memory _identifier) Ownable() public {
+        identifier = _identifier;
+    }
 
     function setIdentifier(string calldata _identifier) onlyOwner external {
         identifier = _identifier;

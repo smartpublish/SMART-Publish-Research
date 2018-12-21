@@ -18,7 +18,7 @@ contract('ContributorTest', function(accounts) {
         truffleAssert.eventEmitted(tx, 'ContributorCreated');
     });
 
-    it("should return Contributor by its address", async function() {
+    it("should return Contributor by its Owner address", async function() {
         let tx = await deployed.createContributor("0000-0002-1825-0097",{from: accounts[1] })
         let event = eventsOf(tx, 'ContributorCreated')[0]
         let contributor = await deployed.getContributorByOwner.call(accounts[1])
@@ -34,7 +34,7 @@ contract('ContributorTest', function(accounts) {
 
     it("should fail when same owner create two contributors", async function() {
         await deployed.createContributor("0000-0002-1825-0097", {from: accounts[1] })
-        await truffleAssert.reverts(deployed.createContributor("0000-0002-1825-0098", {from: accounts[1] }),'Owner already contains a contributor')
+        await truffleAssert.reverts(deployed.createContributor("0000-0002-1825-0098", {from: accounts[1] }),'Owner is already a contributor')
     });
 
     it("owner should not be undefined", async function() {
