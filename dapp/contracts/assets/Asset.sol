@@ -2,9 +2,9 @@ pragma solidity ^0.5.0;
 
 import "./IAsset.sol";
 import "./IWorkflow.sol";
-import "../libraries/HashSet.sol";
-import "./support/Contributable.sol";
-import "./contributors/Contributor.sol";
+import "../../libraries/HashSet.sol";
+import "../support/Contributable.sol";
+import "../contributors/Contributor.sol";
 
 contract Asset is IAsset, Contributable {
 
