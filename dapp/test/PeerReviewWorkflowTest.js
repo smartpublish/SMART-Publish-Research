@@ -4,35 +4,31 @@ var PeerReviewWorkflow = artifacts.require('PeerReviewWorkflow');
 var Paper = artifacts.require('Paper');
 
 contract('PeerReviewWorkflowTest', function(accounts) {
-    it("should has a workflow name", function () {
-        var workflow;
-        return PeerReviewWorkflow.deployed().then(function (instance) {
-            return instance.name.call();
-        }).then(function(name) {
-            assert.strictEqual(name, 'Peer Review', 'Workflow name does not match')
-        });
+
+    var asset;
+    beforeEach(async function() {
+        asset = await Paper.new(accounts[0], accounts[0])
     });
 
-    it("should initialize states", function () {
-        var workflow;
-        return PeerReviewWorkflow.deployed().then(function (instance) {
-            workflow = instance;
-            return workflow.getStatesCount.call();
-        }).then(function (count) {
-            assert.strictEqual(parseInt(count, 10), 4, 'States count does not match');
-            return workflow.getState.call(0);
-        }).then(function (state) {
-            assert.strictEqual(state, 'Submitted', 'Submitted state does not exists');
-            return workflow.getState.call(1);
-        }).then(function (state) {
-            assert.strictEqual(state, 'OnReview', 'OnReview state does not exists');
-            return workflow.getState.call(2);
-        }).then(function (state) {
-            assert.strictEqual(state, 'Published', 'Published state does not exists');
-            return workflow.getState.call(3);
-        }).then(function (state) {
-            assert.strictEqual(state, 'Rejected', 'Rejected state does not exists');
-        });
+    it("should has a workflow name", async function () {
+        let instance = await PeerReviewWorkflow.deployed();
+        let name = await instance.name.call();
+        assert.strictEqual(name, 'Peer Review', 'Workflow name does not match')
+    });
+
+    it("should initialize states", async function () {
+        let workflow = await PeerReviewWorkflow.deployed();
+        let count = await workflow.getStatesCount.call();
+        assert.strictEqual(parseInt(count, 10), 4, 'States count does not match');
+        let state = await workflow.getState.call(0);
+        assert.strictEqual(state, 'Submitted', 'Submitted state does not exists');
+        let state1 = await workflow.getState.call(1);
+        assert.strictEqual(state1, 'OnReview', 'OnReview state does not exists');
+        let state2 = await workflow.getState.call(2);
+        assert.strictEqual(state2, 'Published', 'Published state does not exists');
+        let state3 = await workflow.getState.call(3);
+        assert.strictEqual(state3, 'Rejected', 'Rejected state does not exists');
+      
     });
 
     it("should initialize transitions", function () {
@@ -60,13 +56,6 @@ contract('PeerReviewWorkflowTest', function(accounts) {
         });
     });
 
-    var asset;
-    beforeEach(function() {
-        return Paper.new(accounts[0])
-            .then(function(instance) {
-                asset = instance;
-            });
-    });
 
     it("should run transitions from Submit to Publish", function () {
         var workflow;

@@ -12,7 +12,7 @@ contract('ContributableTest', function(accounts) {
             contributor_address = e.contributor;
             return e.contributor !== undefined;
         }, 'ContributorCreated should be emitted')
-        contributable = await Contributable.new(contributor_address)
+        contributable = await Contributable.new(contributors.address, contributor_address)
     });
 
     it("should get Contributors", async function () {

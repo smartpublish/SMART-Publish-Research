@@ -3,6 +3,7 @@ pragma solidity ^0.5.0;
 import "./AssetFile.sol";
 import "./support/Invitable.sol";
 import "./contributors/Contributor.sol";
+import "./contributors/Contributors.sol";
 
 contract Paper is AssetFile {
 
@@ -11,7 +12,7 @@ contract Paper is AssetFile {
     // @dev abstract is a reserved keyword
     string public summary;
 
-    constructor(Contributor _contributor) AssetFile(_contributor) public {}
+    constructor(Contributors _contributors, Contributor _contributor) AssetFile(_contributors, _contributor) public {}
 
     function init(string calldata _title, string calldata _abstract, string calldata _fileSystemName,
         string calldata _publicLocation, string calldata _summaryHashAlgorithm, string calldata _summaryHash) external {
