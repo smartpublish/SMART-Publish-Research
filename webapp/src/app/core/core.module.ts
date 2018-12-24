@@ -6,6 +6,7 @@ import { CoreRoutingModule } from './core-routing.module'
 import { AlertComponent } from './components/alert/alert.component';
 import { NotFoundComponent } from './components/not-found/not-found.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { AlertModule } from 'ngx-bootstrap/alert';
 import { 
   AlertService, 
   AuthenticationService, 
@@ -21,7 +22,8 @@ import {
     CommonModule,
     RouterModule,
     CoreRoutingModule,
-    HttpClientModule 
+    HttpClientModule ,
+    AlertModule.forRoot()
   ],
   declarations: [
     AlertComponent,
