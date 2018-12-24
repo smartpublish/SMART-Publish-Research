@@ -35,7 +35,17 @@ export class AlertService {
         this.ref.tick();
     }
 
+    info(message: string, keepAfterNavigationChange = false) {
+        this.keepAfterNavigationChange = keepAfterNavigationChange;
+        this.subject.next({ type: 'info', text: message });
+        this.ref.tick();
+    }
+
     getMessage(): Observable<any> {
         return this.subject.asObservable();
+    }
+
+    onClosed(dismissedAlert: any): void {
+        this.subject.next({})
     }
 }
