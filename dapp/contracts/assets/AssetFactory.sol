@@ -38,7 +38,7 @@ contract AssetFactory {
         string memory _contributorId) public returns(Paper) {
         
         Contributor contributor = contributors.getOrCreateContributor(msg.sender, _contributorId);
-        Paper paper = new Paper(contributor);
+        Paper paper = new Paper(contributors, contributor);
         paper.init(
             _title,
             _summary,
@@ -60,5 +60,4 @@ contract AssetFactory {
         emit AssetCreated(address(paper), 'paper');
         return paper;
     }
-
 }

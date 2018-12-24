@@ -7,10 +7,23 @@ import "../contributors/Contributors.sol";
 
 contract Contributable is Ownable, Invitable {
 
+    Contributors public contributorRegistry;
     Contributor[] public contributors;
+    mapping(address => bool) private owners;
 
-    constructor(Contributor contributor) Ownable() public {
-        contributors.push(contributor);
+    constructor(Contributors _contributors, Contributor _contributor) Ownable() public {
+        contributorRegistry = _contributors;
+        add(_contributor);
+    }
+
+    modifier onlyContributors() {
+        require(owners[msg.sender] == true, "You are not a contributor");
+        _;
+    }
+
+    function add(Contributor _contributor) private {
+        contributors.push(_contributor);
+        owners[address(_contributor.owner)] = true;
     }
 
     function getContributorCount() public view returns (uint) {
@@ -25,10 +38,9 @@ contract Contributable is Ownable, Invitable {
         createInvitation(_hashedCode, _expiresInSeconds);
     }
 
-    //TODO _contributors as parameter is hackeable, (fake contract same abi is enought)
-    function join(Contributors _contributors, string memory _code) public {
-        Contributor contributor = _contributors.getContributorByOwner(address(msg.sender));
+    function join(string memory _code) public {
+        Contributor contributor = contributorRegistry.getContributorByOwner(address(msg.sender));
         consumeInvitation(_code);
-        contributors.push(contributor);
+        add(contributor);
     }
 }

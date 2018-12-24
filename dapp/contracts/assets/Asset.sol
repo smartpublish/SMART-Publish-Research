@@ -5,12 +5,13 @@ import "./IWorkflow.sol";
 import "../../libraries/HashSet.sol";
 import "../support/Contributable.sol";
 import "../contributors/Contributor.sol";
+import "../contributors/Contributors.sol";
 
 contract Asset is IAsset, Contributable {
 
     HashSet.data private wfs;
     
-    constructor(Contributor contributor) Contributable(contributor) public {}
+    constructor(Contributors _contributors, Contributor _contributor) Contributable(_contributors, _contributor) public {}
 
     function addWorkflow(IWorkflow wf) public {
         HashSet.add(wfs, address(wf));
