@@ -8,6 +8,7 @@ import { ModalModule } from 'ngx-bootstrap/modal';
 import { CardlistComponent } from './cardlist/cardlist.component';
 import { RouterModule } from "@angular/router";
 import { UserLoggedNavbarComponent } from './navbar/user-logged-navbar/user-logged-navbar.component';
+import { AlertModule } from 'ngx-bootstrap/alert';
 
 @NgModule({
     declarations: [
@@ -21,14 +22,16 @@ import { UserLoggedNavbarComponent } from './navbar/user-logged-navbar/user-logg
       CommonModule,
       RouterModule,
       ModalModule.forRoot(),
-      BsDropdownModule.forRoot()
+      BsDropdownModule.forRoot(),
+      AlertModule.forRoot()
     ],
     exports: [
       FooterComponent,
       ModalComponent,
       NavbarComponent,
       CardlistComponent,
-      ModalModule
+      ModalModule,
+      AlertModule
     ],
     providers: [],
 })
