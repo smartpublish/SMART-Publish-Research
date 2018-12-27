@@ -4,42 +4,41 @@ import "./Ownable.sol";
 import "./Invitable.sol";
 import "../contributors/Contributor.sol";
 import "../contributors/Contributors.sol";
+import "../../libraries/HashSet.sol";
 
 contract Contributable is Ownable, Invitable {
 
     Contributors public contributorRegistry;
-    Contributor[] public contributors;
-    mapping(address => bool) private owners;
+    HashSet.data private contributors;
 
     constructor(Contributors _contributors, Contributor _contributor) Ownable() public {
         contributorRegistry = _contributors;
         add(_contributor);
     }
 
-    modifier onlyContributors() {
-        require(owners[msg.sender] == true, "You are not a contributor");
-        _;
-    }
-
     function add(Contributor _contributor) private {
-        contributors.push(_contributor);
-        owners[address(_contributor.owner)] = true;
+        HashSet.add(contributors, address(_contributor));
     }
 
     function getContributorCount() public view returns (uint) {
-        return contributors.length;
+        return HashSet.size(contributors);
     }
 
-    function getContributors() public view returns (Contributor[] memory) {
-        return contributors;
+    function getContributors() public view returns (address[] memory) {
+        return HashSet.toArray(contributors);
+    }
+
+    function getContributor(uint index) public view returns(address) {
+        return HashSet.get(contributors, index);
     }
 
     function addInvitation(bytes32 _hashedCode, uint256 _expiresInSeconds) public onlyOwner {
         createInvitation(_hashedCode, _expiresInSeconds);
     }
 
-    function join(string memory _code) public {
-        Contributor contributor = contributorRegistry.getContributorByOwner(address(msg.sender));
+    function join(string memory _code, string memory _contributorId) public {
+        Contributor contributor = contributorRegistry.getOrCreateContributor(msg.sender, _contributorId);
+        require(!HashSet.contains(contributors, address(contributor)), "You are already a contributor");
         consumeInvitation(_code);
         add(contributor);
     }

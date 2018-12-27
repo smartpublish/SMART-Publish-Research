@@ -1,8 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ContributorInvitation } from '@app/modules/publication/models';
 import { ActivatedRoute } from '@angular/router';
-import { AlertService } from '@app/core/services';
+import { AlertService, AuthenticationService } from '@app/core/services';
 import { InvitationService } from '@app/modules/publication/services/invitation.service';
+import { AlertComponent } from 'ngx-bootstrap/alert/alert.component';
 
 @Component({
   selector: 'app-invitation-join',
@@ -11,12 +12,14 @@ import { InvitationService } from '@app/modules/publication/services/invitation.
 })
 export class InvitationJoinComponent implements OnInit {
 
-  invitation:ContributorInvitation;
+  invitation: ContributorInvitation;
+  @ViewChild('alert') alertRef: AlertComponent;
   
   constructor(
     private route:ActivatedRoute,
     private alertService: AlertService,
-    private invitationService: InvitationService) { }
+    private invitationService: InvitationService,
+    private authService: AuthenticationService) { }
 
   ngOnInit() {
     let token = this.route.snapshot.paramMap.get('invitation');
@@ -42,12 +45,11 @@ export class InvitationJoinComponent implements OnInit {
 
   onJoin() {
     this.invitationService.join(this.invitation)
-    .then(e => this.alertService.success("You are now a Contributor!"))
+    .then(e => {
+      this.alertService.success("You are now a Contributor!")
+      this.alertRef.close()
+    })
     .catch(e => this.alertService.error(e))
-  }
-
-  reject() {
-
   }
 
 }

@@ -6,6 +6,7 @@ import TruffleContract from "truffle-contract"
 import { EthereumService } from '../../../core/services/ethereum.service'
 import { Router } from '@angular/router'
 import { Location } from '@angular/common'
+import { AuthenticationService } from '@app/core/services';
 
 declare let require: any
 
@@ -22,7 +23,8 @@ export class InvitationService {
   constructor(
     private ethereumService: EthereumService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    private authService: AuthenticationService
   ) { 
     this.INV_SC.setProvider(ethereumService.web3Provider)
     this.ethereumService.getAccountInfo().then((acctInfo: any) => {
@@ -54,13 +56,14 @@ export class InvitationService {
     }
   }
   
-  join(invitation: ContributorInvitation):Promise<any> {
-    return this.joinOnEthereum(invitation)
+  async join(invitation: ContributorInvitation):Promise<any> {
+    let profile = await this.authService.getProfile()
+    return this.joinOnEthereum(invitation, profile.sub)
   }
 
-  private async joinOnEthereum(invitation: ContributorInvitation):Promise<any> {
+  private async joinOnEthereum(invitation: ContributorInvitation, user_id: string):Promise<any> {
     let instance = await this.INV_SC.at(invitation.asset.ethAddress)
-    return await instance.join(invitation.token)
+    return await instance.join(invitation.token, user_id)
   }
 
   private async createInvitationOnEthereum(invitation: ContributorInvitation):Promise<ContributorInvitation> {

@@ -40,10 +40,11 @@ export class PaperNewComponent implements OnInit {
       this.paperForm.get('abstract').value,
       this.file
     ).then((paper:Paper) => {
-      this.router.navigate(['/detail', paper.ethAddress]);
-      this.alertService.success("Congratulation! Your paper was submitted correctly. Just wait for reviewers");
+      this.paperForm.reset()
+      this.router.navigate(['/detail', paper.ethAddress])
+      this.alertService.success("Congratulation! Your paper was submitted correctly. Just wait for reviewers")
     }).catch((error) => {
-      this.alertService.error(error);
+      this.alertService.error(error)
     });
   }
 

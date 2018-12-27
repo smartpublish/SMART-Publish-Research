@@ -22,6 +22,11 @@ library HashSet {
          return true;
     }
 
+    // @dev Returns true if this set contains the specified element.
+    function contains(data storage self, address _value) public view returns(bool exist) {
+        return ArrayList.indexOf(self.values, _value) > -1;
+    }
+
     // @dev Returns the element at the specified position in this hash.
     function get(data storage self, uint index) public view returns(address element) {
         return ArrayList.get(self.values, index);
