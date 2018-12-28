@@ -58,7 +58,8 @@ export class PublicationService {
       instance.title.call(),
       instance.summary.call(),
       instance.getFile.call(0),
-      instance.getContributors.call()
+      instance.getContributors.call(),
+      instance.owner.call()
     ]);
     return new Paper(
       values[0],
@@ -69,7 +70,8 @@ export class PublicationService {
       values[2][1],
       values[2][2],
       values[2][3],
-      values[3].map(c => { return {ethAddress: c} }) as Contributor[]
+      values[3].map(c => { return {ethAddress: c} }) as Contributor[],
+      values[4]
     );
   }
 
@@ -248,6 +250,7 @@ export class PublicationService {
             'https://ipfs.io/ipfs/' + ipfsObject,
             h.hashAlgorithm,
             h.hash,
+            null,
             null);
             
           resolve(paper);
@@ -286,7 +289,8 @@ export class PublicationService {
         paper.publicLocation,
         paper.summaryHashAlgorithm,
         paper.summaryHash,
-        paper.contributors
+        paper.contributors,
+        paper.ownerAddress
       );
     } else {
       throw new Error("Error creating the Paper on Ethereum or procesing the response")

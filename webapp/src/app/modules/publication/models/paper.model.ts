@@ -3,6 +3,7 @@ import { Contributor } from "./contributor.model";
 export interface IAsset {
   readonly ethAddress: string
   readonly contributors: Contributor[]
+  readonly ownerAddress: string
 }
 
 class AssetFile implements IAsset {
@@ -13,6 +14,7 @@ class AssetFile implements IAsset {
   public readonly summaryHashAlgorithm: string;
   public readonly summaryHash: string;
   public readonly contributors: Contributor[];
+  public readonly ownerAddress: string;
 
   constructor(
     ethAddress: string,
@@ -21,7 +23,8 @@ class AssetFile implements IAsset {
     publicLocation: string,
     hashAlgorithm: string,
     hash: string,
-    contributors: Contributor[]) {
+    contributors: Contributor[],
+    ownerAddress: string) {
 
     this.ethAddress = ethAddress;
     this.fileName = fileName;
@@ -30,6 +33,7 @@ class AssetFile implements IAsset {
     this.summaryHashAlgorithm = hashAlgorithm;
     this.summaryHash = hash;
     this.contributors = contributors;
+    this.ownerAddress = ownerAddress;
   }
 
 }
@@ -47,9 +51,10 @@ export class Paper extends AssetFile {
     publicLocation: string,
     hashAlgorithm: string,
     hash: string,
-    contributors: Contributor[]) {
+    contributors: Contributor[],
+    ownerAddress: string) {
 
-    super(ethAddress, fileName, fileSystemName, publicLocation, hashAlgorithm, hash, contributors);
+    super(ethAddress, fileName, fileSystemName, publicLocation, hashAlgorithm, hash, contributors, ownerAddress);
     this.title = title;
     this.abstract = abstract;
   }
@@ -67,7 +72,8 @@ export class Paper extends AssetFile {
       publicLocation? publicLocation : this.publicLocation,
       this.summaryHashAlgorithm,
       this.summaryHash,
-      this.contributors
+      this.contributors,
+      this.ownerAddress
     )
   }
 }

@@ -61,6 +61,11 @@ export class InvitationService {
     return this.joinOnEthereum(invitation, profile.sub)
   }
 
+  async isOwner(paper: Paper): Promise<boolean> {
+    let accountInfo: any = await this.ethereumService.getAccountInfo()
+    return accountInfo.fromAccount.toUpperCase() === paper.ownerAddress.toUpperCase()
+  }
+
   private async joinOnEthereum(invitation: ContributorInvitation, user_id: string):Promise<any> {
     let instance = await this.INV_SC.at(invitation.asset.ethAddress)
     return await instance.join(invitation.token, user_id)

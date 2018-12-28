@@ -14,7 +14,8 @@ import { AlertService } from '@app/core/services';
 export class InvitationsComponent implements OnInit {
 
   @Input() paper:Paper;
-  invitations$:Observable<ContributorInvitation[]>;
+  invitations$:Observable<ContributorInvitation[]>
+  owner:boolean = false
 
   constructor(
     private invitationService: InvitationService,
@@ -25,6 +26,8 @@ export class InvitationsComponent implements OnInit {
     .pipe(
       scan<ContributorInvitation>((acc, value, index) => [value, ...acc], [])
     );
+    
+    this.invitationService.isOwner(this.paper).then(value => this.owner = value)
   }
 
   onNewInvitation(email: string) {
