@@ -2,9 +2,10 @@
 <ul class="list-group list-group-flush mt-3">
   <li class="list-group-item list-group-item-action flex-column align-items-start" *ngFor="let invitation of invitations$ | async">
     <dl class="item-property">
-      <dt><p>{{invitation.guest.email}}</p></dt>
-      <dd><a [href]="sanitize(invitation.link_mailto)" target="_top">{{invitation.link}}</a></dd>
-      <dd><p>{{invitation.expires | date:'medium'}}</p></dd>
+      <dt><p>{{invitation.guest?.email}}</p></dt>
+      <dd *ngIf="invitation.link"><a [href]="sanitize(invitation.link_mailto)" target="_top">{{invitation.link}}</a></dd>
+      <dd><small class="text-muted">{{invitation.hashCode}}</small></dd>
+      <dd><p class="text-muted">{{invitation.expires | date:'medium'}}</p></dd>
     </dl>
   </li>
 </ul>

@@ -14,5 +14,6 @@ export interface ContributorInvitation extends Invitation {
   link: string,
   link_mailto: string,
   expires: Date,
-  created: Date
+  created: Date,
+  hashCode: string
 }

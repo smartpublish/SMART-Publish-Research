@@ -37,7 +37,21 @@ export class InvitationService {
   invitations$: Subject<ContributorInvitation> = new Subject<ContributorInvitation>();
 
   getInvitations(paper: Paper): Observable<ContributorInvitation> {
-    // TODO Implement server method to get current invitations
+    // TODO Calcule 'fromblock'
+    this.INV_SC.at(paper.ethAddress).then(function(instance) {
+      return instance.getPastEvents('InvitationCreated',{
+        filter: {},
+        fromBlock: 0,
+        toBlock: 'latest'
+      });
+    }).then(result => {
+      result.forEach(event => {
+        this.invitations$.next({
+          expires: new Date(event.args.expires * 1000),
+          hashCode: event.args.hashCode
+        } as ContributorInvitation)
+      });
+    });
     return this.invitations$.asObservable()
   }
 
@@ -74,6 +88,7 @@ export class InvitationService {
   private async createInvitationOnEthereum(invitation: ContributorInvitation):Promise<ContributorInvitation> {
     let web3 = this.ethereumService.getWeb3();
     let hashedCode = await web3.utils.soliditySha3(invitation.token)
+    invitation.hashCode = hashedCode
     let instance = await this.INV_SC.at(invitation.asset.ethAddress)
     let tx = await instance.addInvitation(hashedCode, invitation.expires.getTime() / 1000)
     return invitation
