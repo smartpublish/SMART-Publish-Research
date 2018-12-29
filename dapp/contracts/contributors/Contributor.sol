@@ -4,11 +4,13 @@ import "../support/Ownable.sol";
 
 contract Contributor is Ownable {
 
-    string public ORCID;
+    string public identifier;
 
-    constructor(address sender) Ownable(sender) public {}
+    constructor(string memory _identifier) Ownable() public {
+        identifier = _identifier;
+    }
 
-    function setORCID(string calldata _ORCID) onlyOwner external {
-        ORCID = _ORCID;
+    function setIdentifier(string calldata _identifier) onlyOwner external {
+        identifier = _identifier;
     } 
 }

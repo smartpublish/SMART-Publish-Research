@@ -1,26 +1,38 @@
-import {NgModule} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {RouterModule} from '@angular/router';
-import {AlertComponent} from './components/alert/alert.component';
-import {NotFoundComponent} from './components/not-found/not-found.component';
-import {AlertService} from "@app/core/services/alert.service";
-import {EthereumService} from "@app/core/services/ethereum.service";
-import {IpfsService} from "@app/core/services/ipfs.service";
-import {ContributorService} from "@app/core/services";
-import {HashService} from "@app/core/services/hash.service";
-import {FileService} from "@app/core/services/file.service";
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { HttpClientModule  } from '@angular/common/http';
+import { CoreRoutingModule } from './core-routing.module'
+import { AlertComponent } from './components/alert/alert.component';
+import { NotFoundComponent } from './components/not-found/not-found.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { AlertModule } from 'ngx-bootstrap/alert';
+import { 
+  AlertService, 
+  AuthenticationService, 
+  EthereumService, 
+  IpfsService,
+  ContributorService,
+  HashService,
+  FileService
+ } from "./services";
 
 @NgModule({
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    CoreRoutingModule,
+    HttpClientModule ,
+    AlertModule.forRoot()
   ],
   declarations: [
     AlertComponent,
-    NotFoundComponent
+    NotFoundComponent,
+    ProfileComponent
   ],
   providers: [
     AlertService,
+    AuthenticationService,
     EthereumService,
     IpfsService,
     ContributorService,

@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from "@angular/router";
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
-import { ContributorService } from "@app/core/services";
+import { FormGroup, FormArray } from "@angular/forms";
 import { PublicationService } from "@app/modules/publication/services/publication.service";
 import { Paper } from "@app/modules/publication/models/paper.model";
 import { AlertService } from "@app/core/services/alert.service";
+import { Subscription } from 'rxjs';
+import { PublicationFormService } from '../../services/publication-form.service';
+import { environment } from '@env/environment';
+import { EmailService } from '@app/core/services/email.service';
 
 @Component({
   selector: 'app-paper-new',
@@ -13,49 +16,56 @@ import { AlertService } from "@app/core/services/alert.service";
 })
 export class PaperNewComponent implements OnInit {
 
-  form: FormGroup;
-  ethAccount: FormControl = new FormControl('', Validators.required);
-  title: FormControl = new FormControl('', Validators.required);
-  abstract: FormControl = new FormControl('', Validators.required);
-
+  paperForm: FormGroup;
+  paperFormSub: Subscription;
+  contributorsForm: FormArray;
+  formInvalid: boolean = false;
   file: File;
 
   constructor(
-    private contributorService: ContributorService,
     private publicationService: PublicationService,
+    private publicationFormService: PublicationFormService,
     private alertService: AlertService,
     private router: Router,
-    private fb: FormBuilder) {
-
-    this.form = fb.group({
-      title: this.title,
-      abstract: this.abstract,
-      ethAccount: this.ethAccount,
-      file: ['', Validators.required]
-      // TODO Contributors, Organizations
-    });
+    private emailService: EmailService) {
   }
 
   onFileChange($event) {
-    this.file = $event.target.files[0];
+    this.file = $event.target.files[0] 
   }
 
   onSubmit() {
-    this.publicationService.submit(this.title.value, this.abstract.value, this.file).then((paper:Paper) => {
-      this.router.navigate(['/detail', paper.ethAddress]);
-      this.alertService.success("Congratulation! Your paper was submitted correctly. Just wait for reviewers");
+    this.publicationService.submit(
+      this.paperForm.get('title').value,
+      this.paperForm.get('abstract').value,
+      this.file
+    ).then((paper:Paper) => {
+      this.paperForm.reset()
+      this.router.navigate(['/detail', paper.ethAddress])
+      this.alertService.success("Congratulation! Your paper was submitted correctly. Just wait for reviewers")
     }).catch((error) => {
-      this.alertService.error(error);
+      this.alertService.error(error)
     });
   }
 
   ngOnInit() {
-    let that = this;
-    this.contributorService.getAccountInfo().then(function(acctInfo : any){
-      that.ethAccount.setValue(acctInfo.fromAccount + " (" + acctInfo.balance + " ethers.)");
-    }).catch(function(error){
-      console.log(error);
-    });
+    this.paperFormSub = this.publicationFormService.paperForm$
+      .subscribe(form => {
+          this.paperForm = form
+          this.contributorsForm = this.paperForm.get('contributors') as FormArray
+        })
+  }
+
+  ngOnDestroy() {
+    this.paperFormSub.unsubscribe()
+  }
+
+  addContributor() {
+    this.publicationFormService.addContributor()
+  }
+
+  deleteContributor(index: number) {
+    this.publicationFormService.deleteContributor(index)
   }
 
 }

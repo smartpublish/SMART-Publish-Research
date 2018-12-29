@@ -5,8 +5,10 @@ html {
     position: relative;
     min-height: 100%;
 }
-
 body {
     font-family: "Baskerville";
     margin-bottom: 60px;
+}
+.clickable:hover {
+    cursor: pointer;
 }

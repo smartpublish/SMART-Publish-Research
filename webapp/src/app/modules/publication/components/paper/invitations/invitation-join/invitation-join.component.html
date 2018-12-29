@@ -1,0 +1,16 @@
+<alert #alert *ngIf="invitation" type="success" [dismissible]="true">
+    <h4 class="alert-heading">Invitation</h4>
+    <section *ngIf="authService.isAuthenticated(); else login">
+        <p>You were invited to join on this Paper</p>
+        <hr>
+        <div class="row">
+            <div class="col-12 text-center">
+                <button type="button" class="btn btn-success" (click)="onJoin()">Accept join to this paper</button>
+            </div>
+        </div>
+    </section>
+    <ng-template #login>
+        <p>In order to be able to join to this manuscript you must login first</p>
+        <button class="btn btn-sucess" (click)="authService.login()">Log In / Register</button>
+    </ng-template>
+</alert>

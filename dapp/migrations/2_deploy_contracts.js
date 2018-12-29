@@ -4,6 +4,7 @@ var AssetFactory = artifacts.require("AssetFactory");
 var PeerReviewWorkflow = artifacts.require('PeerReviewWorkflow');
 var Paper = artifacts.require('Paper');
 var Contributors = artifacts.require('Contributors');
+var Contributable = artifacts.require('Contributable');
 
 module.exports = function(deployer) {
     // Libraries
@@ -13,11 +14,14 @@ module.exports = function(deployer) {
     
     // Application
     deployer.link(HashSet, PeerReviewWorkflow);
+    deployer.link(HashSet, Contributable);
     deployer.link(HashSet, Paper);
     deployer.link(HashSet, AssetFactory);
     deployer.deploy(PeerReviewWorkflow);
-    deployer.deploy(AssetFactory);
-    deployer.deploy(Contributors);
+
+    deployer.deploy(Contributors).then(function() {
+        return deployer.deploy(AssetFactory, Contributors.address)
+    });
     
      // Assets
     // deployer.deploy(AssetFactory).then(function (factory) {

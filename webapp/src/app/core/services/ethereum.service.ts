@@ -20,6 +20,10 @@ export class EthereumService {
     window.web3 = new Web3(this.web3Provider);
   }
 
+  getWeb3() {
+    return window.web3;
+  }
+
   getAccountInfo() {
     return new Promise((resolve, reject) => {
       window.web3.eth.getCoinbase(function(err, account) {

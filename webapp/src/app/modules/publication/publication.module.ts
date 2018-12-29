@@ -12,6 +12,13 @@ import { CommentsComponent } from './components/paper/comments/comments.componen
 import { SharedModule } from '@app/shared/shared.module';
 import { WorkflowsComponent } from './components/paper/workflows/workflows.component';
 import { WorkflowTransitionComponent } from './components/paper/workflows/workflow-transition/workflow-transition.component';
+import { ContributorNewComponent } from './components/contributor/contributor-new.component';
+import { 
+  InvitationsComponent,
+  InvitationNewComponent,
+  InvitationListComponent,
+  InvitationJoinComponent
+} from './components/paper/invitations';
 
 @NgModule({
   imports: [
@@ -29,7 +36,12 @@ import { WorkflowTransitionComponent } from './components/paper/workflows/workfl
     CommentListComponent,
     CommentsComponent,
     WorkflowsComponent,
-    WorkflowTransitionComponent
+    WorkflowTransitionComponent,
+    ContributorNewComponent,
+    InvitationsComponent,
+    InvitationNewComponent,
+    InvitationListComponent,
+    InvitationJoinComponent
   ],
   exports: [
     SubmitComponent

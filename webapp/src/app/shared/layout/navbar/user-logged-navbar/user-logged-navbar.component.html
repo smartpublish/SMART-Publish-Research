@@ -1,0 +1,10 @@
+<div *ngIf="(profile$ | async) as profile" class="btn-group" dropdown placement="bottom right">
+  <a id="navlink-user-private" dropdownToggle role="button" class="nav-link clickable dropdown-toggle" aria-controls="dropdown-user-private">
+    {{profile.name | titlecase}} <img src="{{profile.picture}}" width="24" height="24" class="rounded-circle" alt="avatar"><span class="caret"></span>
+  </a>
+  <ul id="dropdown-user-private" *dropdownMenu class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="navlink-user-private">
+    <li role="menuitem"><a class="dropdown-item" role="menuitem" href="#" [routerLink]="['/profile']">View Profile</a></li>
+    <li class="divider dropdown-divider"></li>
+    <li role="menuitem"><a class="dropdown-item" role="menuitem" href="#" (click)="authService.logout()">Logout</a></li>
+  </ul>
+</div>
