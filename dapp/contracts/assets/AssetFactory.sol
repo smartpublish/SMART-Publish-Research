@@ -8,23 +8,13 @@ import "../contributors/Contributors.sol";
 contract AssetFactory {
 
     Contributors private contributors;
-    mapping(string => address) internal assetTypeRegistry;
 
-    struct AssetMetadata {
-        IAsset asset;
-        AssetWorkflow[] workflows;
-    }
-
-    mapping(address => AssetMetadata[]) internal assetByCreator;
+    mapping(address => IAsset[]) internal assetByCreator;
 
     event AssetCreated(address assetAddress, string assetType);
 
     constructor (Contributors _contributors) public { 
         contributors = _contributors;
-    }
-
-    function register(string calldata objectType, address object) external  {
-        assetTypeRegistry[objectType] = object;
     }
 
     function createPaper(
@@ -39,24 +29,12 @@ contract AssetFactory {
         
         Contributor contributor = contributors.getOrCreateContributor(msg.sender, _contributorId);
         Paper paper = new Paper(contributors, contributor);
-        paper.init(
-            _title,
-            _summary,
-            _fileSystemName,
-            _publicLocation,
-            _summaryHashAlgorithm,
-            _summaryHash
-        );
-
-        AssetWorkflow[] memory assetWorkflows = new AssetWorkflow[](1);
-        assetWorkflows[0] = _workflow;
+        paper.init(_title, _summary, _fileSystemName, _publicLocation, _summaryHashAlgorithm, _summaryHash);
         paper.addWorkflow(_workflow);
-
-        assetByCreator[msg.sender].push(AssetMetadata(paper, assetWorkflows)) - 1;
         _workflow.start(paper);
-
         paper.transferOwnership(msg.sender);
-        
+
+        assetByCreator[msg.sender].push(paper);
         emit AssetCreated(address(paper), 'paper');
         return paper;
     }

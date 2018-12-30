@@ -37,7 +37,7 @@ contract('AssetFactoryTest', function(accounts) {
         assert.strictEqual(owner, accounts[1], 'Paper owner should be match')
     });
 
-    it("should create a new Paper using PeerReviewWorkflow", async function () {
+    it("should create a new Paper using PeerReviewWorkflow", async function() {
         let tx = await factory.createPaper(
             'Awesome Title paper',
             'Best abstract',
@@ -48,15 +48,12 @@ contract('AssetFactoryTest', function(accounts) {
             workflow.address,
             'google-oauth2|129380127374018398127'
         )
-        truffleAssert.eventEmitted(tx, 'AssetCreated', function (e) {
-            return e.assetAddress !== undefined;
-        });
+        truffleAssert.eventEmitted(tx, 'AssetCreated');
     });
 
 
-    it("should get properties: title and abstract from a Paper after be submitted", function () {
-        var paperAddress, paper;
-        return factory.createPaper(
+    it("should get properties: title and abstract from a Paper after be submitted", async function() {
+        let tx = await factory.createPaper(
             'Awesome Title paper',
             'Best abstract',
             'IPFS',
@@ -65,28 +62,50 @@ contract('AssetFactoryTest', function(accounts) {
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
             workflow.address,
             'google-oauth2|129380127374018398127'
-        ).then(function (tx) {
-            return truffleAssert.eventEmitted(tx, 'AssetCreated', function (e) {
-                paperAddress = e.assetAddress;
-                return e.assetAddress !== undefined;
-            });
-        }).then(function() {
-            return Paper.at(paperAddress);
-        }).then(function (instance) {
-            paper = instance;
-            return Promise.all([
-                paper.title.call(),
-                paper.summary.call(),
-                paper.getFile.call(0)
-            ]);
-        }).then(function (values) {
-            assert.strictEqual(values[0],'Awesome Title paper','Titles are different');
-            assert.strictEqual(values[1],'Best abstract','Abstracts are different');
-            assert.strictEqual(values[2][0],'IPFS','File System Names are different');
-            assert.strictEqual(values[2][1],'https://ipfs.io/test','Public locations are different');
-            assert.strictEqual(values[2][2],'blake2b','Summary Hash Algorithms are different');
-            assert.strictEqual(values[2][3],'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B','Summary Hashes are different');
+        )
+        let paperAddress;
+        truffleAssert.eventEmitted(tx, 'AssetCreated', function (e) {
+            paperAddress = e.assetAddress;
+            return e.assetAddress !== undefined;
         });
+
+        let paper = await Paper.at(paperAddress)
+        let title = await paper.title.call()
+        assert.strictEqual(title,'Awesome Title paper','Titles are different');
+        
+        let summary = await paper.summary.call()
+        assert.strictEqual(summary,'Best abstract','Abstracts are different');
+        
+        let file = await paper.getFile(0)
+        assert.strictEqual(file[0],'IPFS','File System Names are different');
+        assert.strictEqual(file[1],'https://ipfs.io/test','Public locations are different');
+        assert.strictEqual(file[2],'blake2b','Summary Hash Algorithms are different');
+        assert.strictEqual(file[3],'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B','Summary Hashes are different');
+    });
+
+    it("should get contributor: Author from Paper after be submitted", async function() {
+        let tx = await factory.createPaper(
+            'Awesome Title paper',
+            'Best abstract',
+            'IPFS',
+            'https://ipfs.io/test',
+            'blake2b',
+            'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            workflow.address,
+            'google-oauth2|129380127374018398127',
+            { from: accounts[1] }
+        )
+        let paperAddress;
+        truffleAssert.eventEmitted(tx, 'AssetCreated', function (e) {
+            paperAddress = e.assetAddress;
+            return e.assetAddress !== undefined;
+        });
+
+        let paper = await Paper.at(paperAddress)
+        let contributorsArray = await paper.getContributors.call()
+        let contributor_address = await contributors.getOrCreateContributor.call(accounts[1],'google-oauth2|129380127374018398127')
+        assert.strictEqual(contributorsArray.length, 1, 'Contributor author should be the only set')
+        assert.strictEqual(contributorsArray[0],contributor_address,'Contributor should be match')
     });
 
 });

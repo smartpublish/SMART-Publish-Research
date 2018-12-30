@@ -19,6 +19,7 @@ contract Contributors {
         contributorsByIdentifier[_identifier] = contributor;
 
         emit ContributorCreated(contributor);
+        return contributor;
     }
 
     function getContributorByOwner(address owner) public view returns (Contributor) {
@@ -35,7 +36,7 @@ contract Contributors {
 
     function getOrCreateContributor(address owner, string memory _identifier) public returns (Contributor) {
         Contributor contributor = contributorsByOwner[owner];
-        if(contributor == Contributor(address(0))) {
+        if(contributor == Contributor(address(0)) && contributorsByIdentifier[_identifier] == Contributor(address(0))) {
             contributor = createContributor(_identifier);
         }
         return contributor;
