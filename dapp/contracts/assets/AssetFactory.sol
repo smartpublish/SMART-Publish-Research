@@ -38,4 +38,8 @@ contract AssetFactory {
         emit AssetCreated(address(paper), 'paper');
         return paper;
     }
+
+    function getAssetsByCreator(address creator) public view returns(IAsset[] memory) {
+        return assetByCreator[creator];
+    }
 }

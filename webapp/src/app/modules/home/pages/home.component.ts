@@ -4,7 +4,7 @@ import { AssetStateChanged, PublicationService } from "@app/modules/publication/
 import { BehaviorSubject, Subscription} from "rxjs";
 import { DataCard } from "@app/shared/layout/cardlist/cardlist.component";
 import { Paper } from "@app/modules/publication/models/paper.model";
-import { map, filter } from 'rxjs/operators';
+import { map, filter, scan } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
@@ -29,15 +29,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // TODO Refactor
     this.papersCardByState$['Submitted'] = this.publicationService.getAllPapersOnState("Submitted").pipe(
-      map(paper => HomeComponent.paperToCard(paper,'Read'))
+      map(paper => HomeComponent.paperToCard(paper,'Read')),
+      scan<DataCard>((acc, value, index) => [value, ...acc], [])
     );
 
     this.papersCardByState$['OnReview'] = this.publicationService.getAllPapersOnState("OnReview").pipe(
-      map(paper => HomeComponent.paperToCard(paper,'Read'))
+      map(paper => HomeComponent.paperToCard(paper,'Read')),
+      scan<DataCard>((acc, value, index) => [value, ...acc], [])
     );
 
     this.papersCardByState$['Published'] = this.publicationService.getAllPapersOnState("Published").pipe(
-      map(paper => HomeComponent.paperToCard(paper,'Read'))
+      map(paper => HomeComponent.paperToCard(paper,'Read')),
+      scan<DataCard>((acc, value, index) => [value, ...acc], [])
     );
 
     this.stateChangedSubscription = this.publicationService.getStateChangedPapers()
@@ -48,13 +51,15 @@ export class HomeComponent implements OnInit, OnDestroy {
         switch(event.state) {
           case 'OnReview': {
             this.papersCardByState$['OnReview'] = this.publicationService.getAllPapersOnState("OnReview").pipe(
-              map(paper => HomeComponent.paperToCard(paper,'Read'))
+              map(paper => HomeComponent.paperToCard(paper,'Read')),
+              scan<DataCard>((acc, value, index) => [value, ...acc], [])
             );
             break;
           }
           case 'Published': {
             this.papersCardByState$['Published'] = this.publicationService.getAllPapersOnState("Published").pipe(
-              map(paper => HomeComponent.paperToCard(paper,'Read'))
+              map(paper => HomeComponent.paperToCard(paper,'Read')),
+              scan<DataCard>((acc, value, index) => [value, ...acc], [])
             );
             break;
           }
@@ -65,13 +70,15 @@ export class HomeComponent implements OnInit, OnDestroy {
       switch(event.oldState) {
         case 'OnReview': {
           this.papersCardByState$['OnReview'] = this.publicationService.getAllPapersOnState("OnReview").pipe(
-            map(paper => HomeComponent.paperToCard(paper,'Read'))
+            map(paper => HomeComponent.paperToCard(paper,'Read')),
+            scan<DataCard>((acc, value, index) => [value, ...acc], [])
           );
           break;
         }
         case 'Submitted': {
           this.papersCardByState$['Submitted'] = this.publicationService.getAllPapersOnState("Submitted").pipe(
-            map(paper => HomeComponent.paperToCard(paper,'Read'))
+            map(paper => HomeComponent.paperToCard(paper,'Read')),
+            scan<DataCard>((acc, value, index) => [value, ...acc], [])
           );
           break;
         }
