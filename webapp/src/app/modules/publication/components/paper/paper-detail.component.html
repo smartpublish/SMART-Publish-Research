@@ -19,6 +19,10 @@
               </dd>
               <app-invitations [paper]="paper"></app-invitations>
             </dl>
+            <dl class="item-property">
+              <dt>Keywords</dt>
+              <dd><p>{{paper.keywords.join(', ')}}</p></dd>
+            </dl>
         </div>
         <div class="col-sm-3">
           <app-workflows [paper]="paper"></app-workflows>

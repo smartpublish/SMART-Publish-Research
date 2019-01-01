@@ -13,7 +13,7 @@ contract AssetFactory {
     IAsset[] internal assets;
     mapping(string => IAsset[]) assetByKeywords;
 
-    event AssetCreated(address assetAddress, string assetType);
+    event AssetCreated(IAsset asset, string assetType, address indexed sender);
 
     constructor (Contributors _contributors) public { 
         contributors = _contributors;
@@ -56,7 +56,7 @@ contract AssetFactory {
         assetByCreator[msg.sender].push(paper);
         assets.push(paper);
         addKeywords(paper, _keywords);
-        emit AssetCreated(address(paper), 'paper');
+        emit AssetCreated(paper, 'paper', msg.sender);
         return paper;
     }
 

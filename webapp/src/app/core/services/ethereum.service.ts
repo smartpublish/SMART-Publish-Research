@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import * as Web3 from 'web3';
+import { ethers } from 'ethers';
 
 declare let window: any;
 
@@ -9,6 +10,7 @@ declare let window: any;
 export class EthereumService {
 
   readonly web3Provider: null;
+  readonly ethersProvider;
 
   constructor() {
     if (typeof window.web3 !== 'undefined') {
@@ -18,6 +20,11 @@ export class EthereumService {
     }
 
     window.web3 = new Web3(this.web3Provider);
+    this.ethersProvider = new ethers.providers.Web3Provider(this.web3Provider);
+  }
+
+  getProvider() {
+    return this.ethersProvider;
   }
 
   getWeb3() {

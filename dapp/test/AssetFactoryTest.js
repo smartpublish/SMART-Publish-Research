@@ -29,8 +29,8 @@ contract('AssetFactoryTest', function(accounts) {
         )
         let paperAddress;
         truffleAssert.eventEmitted(tx, 'AssetCreated', function(e) {
-            paperAddress = e.assetAddress;
-            return e.assetAddress !== undefined;
+            paperAddress = e.asset;
+            return e.asset !== undefined;
         }, 'AssetCreated should be emitted')
         truffleAssert.eventNotEmitted(tx, 'ContributorCreated', null, 'ContributorCreated should not be emitted')
         let paper = await Paper.at(paperAddress)
@@ -68,8 +68,8 @@ contract('AssetFactoryTest', function(accounts) {
         )
         let paperAddress;
         truffleAssert.eventEmitted(tx, 'AssetCreated', function (e) {
-            paperAddress = e.assetAddress;
-            return e.assetAddress !== undefined;
+            paperAddress = e.asset;
+            return e.asset !== undefined && e.sender === accounts[0];
         });
 
         let paper = await Paper.at(paperAddress)
@@ -101,8 +101,8 @@ contract('AssetFactoryTest', function(accounts) {
         )
         let paperAddress;
         truffleAssert.eventEmitted(tx, 'AssetCreated', function (e) {
-            paperAddress = e.assetAddress;
-            return e.assetAddress !== undefined;
+            paperAddress = e.asset;
+            return e.asset !== undefined && e.sender === accounts[1];
         });
 
         let paper = await Paper.at(paperAddress)
@@ -126,8 +126,8 @@ contract('AssetFactoryTest', function(accounts) {
         )
         let paperAddress;
         truffleAssert.eventEmitted(tx, 'AssetCreated', function (e) {
-            paperAddress = e.assetAddress;
-            return e.assetAddress !== undefined;
+            paperAddress = e.asset;
+            return e.asset !== undefined && e.sender === accounts[0];
         });
 
         // Add keywords

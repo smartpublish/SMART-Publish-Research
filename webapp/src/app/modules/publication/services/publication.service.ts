@@ -4,7 +4,7 @@ import { EthereumService, IpfsService, AlertService, HashService, Authentication
 import * as TruffleContract from "truffle-contract";
 import { Observable } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
-import { promise } from 'protractor';
+import { ethers, Contract } from 'ethers';
 
 declare let require: any;
 
@@ -60,18 +60,16 @@ export class PublicationService {
       paper_sc.title.call(),
       paper_sc.summary.call(),
       paper_sc.getFile.call(0),
-      paper_sc.getKeywordCount.call(),
+      paper_sc.getKeywordsCount.call(),
       paper_sc.getContributors.call(),
       paper_sc.owner.call()
     ]);
-    console.log(values)
     let keywords_count = parseInt(values[3],10)
     let keywords_promises: any = []
     for(let i = 0; i < keywords_count; i++) {
-      keywords_promises.push(paper_sc.getKeyword.call(i));
+      keywords_promises.push(paper_sc.keywords.call(i));
     }
-    let keywords = (await Promise.all(keywords_promises))
-    console.log(keywords)
+    let keywords = await Promise.all(keywords_promises)
     return new Paper(
       values[0],
       values[1],
@@ -81,9 +79,9 @@ export class PublicationService {
       values[2][1],
       values[2][2],
       values[2][3],
-      null, // TODO Refactor
-      values[3].map(c => { return {ethAddress: c} }) as Contributor[],
-      values[4]
+      keywords.map(item => {return item}) as string[],
+      values[4].map(c => { return {ethAddress: c} }) as Contributor[],
+      values[5]
     );
   }
 
@@ -237,9 +235,8 @@ export class PublicationService {
 
   async submit(title: string, abstract: string, keywords: string[], file: File): Promise<Paper> {
     let paper = await this.submitToIpfs(title, abstract, file)
-    paper = paper.copy(paper.fileSystemName, paper.publicLocation, keywords.map(item => item['value']));
-    console.log(paper)
-    return await this.submitToEth(paper);
+    paper = paper.copy(paper.fileSystemName, paper.publicLocation, keywords.map(item => item['value']))
+    return this.submitToEth(paper)
   }
 
   private submitToIpfs(title:string, abstract: string, file: File): Promise<Paper> {
@@ -279,40 +276,53 @@ export class PublicationService {
     })
   }
 
-  private async submitToEth(paper: Paper): Promise<Paper> {
-    let instance = await this.ASSET_FACTORY_SC.deployed()
-    let profile = await this.authService.getProfile()
-    let tx = await instance.createPaper(
-      paper.title,
-      paper.abstract,
-      paper.fileSystemName,
-      paper.publicLocation,
-      paper.summaryHashAlgorithm,
-      paper.summaryHash,
-      paper.keywords,
-      this.WF_SC_INSTANCE.address, // Creates Paper with PeerReviewWorkflow by default
-      profile.sub // user_id
-    );
-    let paperCreatedEvent = tx.logs.filter(
-      log => log['event'] === 'AssetCreated' && log.args['assetType'] === 'paper' && log.args['assetAddress']
-    );
-    if(paperCreatedEvent && paperCreatedEvent.length == 1) {
-      return new Paper(
-        paper.title,
-        paper.abstract,
-        paperCreatedEvent[0].args['assetAddress'],
-        paper.fileName,
-        paper.fileSystemName,
-        paper.publicLocation,
-        paper.summaryHashAlgorithm,
-        paper.summaryHash,
-        paper.keywords,
-        paper.contributors,
-        paper.ownerAddress
-      );
-    } else {
-      throw new Error("Error creating the Paper on Ethereum or procesing the response")
-    }
+  private submitToEth(paper: Paper): Promise<Paper> {
+    return new Promise<Paper>(async (resolve, reject) => {
+      const abi = tokenAbiAssetFactory.abi;
+      let provider = this.ethereumService.getProvider();
+      let truffle_instance = await this.ASSET_FACTORY_SC.deployed()
+      let address = truffle_instance.address
+      // Uses ethers.js because ABIEncoderV2 does not work with truffle-contract and web3js
+      let signer = provider.getSigner()
+      let instance = new Contract(address, abi, signer)
+      let profile = await this.authService.getProfile()
+      let account = await signer.getAddress()
+      let filter = instance.filters.AssetCreated(null, null, account)
+      instance.on(filter, (asset, type, sender) => {
+        console.log('Asset created (' + asset.toString() + '), type: ' + type + ' from sender: ' + sender)
+        resolve(new Paper(
+          paper.title,
+          paper.abstract,
+          asset,
+          paper.fileName,
+          paper.fileSystemName,
+          paper.publicLocation,
+          paper.summaryHashAlgorithm,
+          paper.summaryHash,
+          paper.keywords,
+          paper.contributors,
+          paper.ownerAddress
+        ));
+      })
+  
+      try {
+        await instance.createPaper(
+          paper.title,
+          paper.abstract,
+          paper.fileSystemName,
+          paper.publicLocation,
+          paper.summaryHashAlgorithm,
+          paper.summaryHash,
+          paper.keywords,
+          this.WF_SC_INSTANCE.address, // Creates Paper with PeerReviewWorkflow by default
+          profile.sub // user_id
+        );
+      } catch(error) {
+        console.log('Failed TX:', error.transactionHash)
+        console.error(error)
+        reject("Error creating the Paper on Ethereum or procesing the response")
+      }
+    });
   }
 
   review(paper: Paper, comment: string): Promise<any> {
