@@ -3,6 +3,8 @@ import { Paper, Comment, Contributor } from "../models"
 import { EthereumService, IpfsService, AlertService, HashService, AuthenticationService } from "@app/core/services";
 import * as TruffleContract from "truffle-contract";
 import { Observable } from "rxjs";
+import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
+import { promise } from 'protractor';
 
 declare let require: any;
 
@@ -53,14 +55,23 @@ export class PublicationService {
   }
 
   async getPaper(address: string): Promise<Paper> {
-    let instance = await this.PAPER_SC.at(address);
+    let paper_sc = await this.PAPER_SC.at(address);
     let values = await Promise.all([
-      instance.title.call(),
-      instance.summary.call(),
-      instance.getFile.call(0),
-      instance.getContributors.call(),
-      instance.owner.call()
+      paper_sc.title.call(),
+      paper_sc.summary.call(),
+      paper_sc.getFile.call(0),
+      paper_sc.getKeywordCount.call(),
+      paper_sc.getContributors.call(),
+      paper_sc.owner.call()
     ]);
+    console.log(values)
+    let keywords_count = parseInt(values[3],10)
+    let keywords_promises: any = []
+    for(let i = 0; i < keywords_count; i++) {
+      keywords_promises.push(paper_sc.getKeyword.call(i));
+    }
+    let keywords = (await Promise.all(keywords_promises))
+    console.log(keywords)
     return new Paper(
       values[0],
       values[1],
@@ -70,6 +81,7 @@ export class PublicationService {
       values[2][1],
       values[2][2],
       values[2][3],
+      null, // TODO Refactor
       values[3].map(c => { return {ethAddress: c} }) as Contributor[],
       values[4]
     );
@@ -223,8 +235,11 @@ export class PublicationService {
     });
   }
 
-  submit(title: string, abstract: string, file: File): Promise<Paper> {
-    return this.submitToIpfs(title, abstract, file).then((paper) => this.submitToEth(paper));
+  async submit(title: string, abstract: string, keywords: string[], file: File): Promise<Paper> {
+    let paper = await this.submitToIpfs(title, abstract, file)
+    paper = paper.copy(paper.fileSystemName, paper.publicLocation, keywords.map(item => item['value']));
+    console.log(paper)
+    return await this.submitToEth(paper);
   }
 
   private submitToIpfs(title:string, abstract: string, file: File): Promise<Paper> {
@@ -251,6 +266,7 @@ export class PublicationService {
             h.hashAlgorithm,
             h.hash,
             null,
+            null,
             null);
             
           resolve(paper);
@@ -273,6 +289,7 @@ export class PublicationService {
       paper.publicLocation,
       paper.summaryHashAlgorithm,
       paper.summaryHash,
+      paper.keywords,
       this.WF_SC_INSTANCE.address, // Creates Paper with PeerReviewWorkflow by default
       profile.sub // user_id
     );
@@ -289,6 +306,7 @@ export class PublicationService {
         paper.publicLocation,
         paper.summaryHashAlgorithm,
         paper.summaryHash,
+        paper.keywords,
         paper.contributors,
         paper.ownerAddress
       );
@@ -311,6 +329,16 @@ export class PublicationService {
 
   addComment(paper: Paper, message: string): Promise<void> {
     return this.WF_SC.deployed().then(instance => instance.addComment(paper.ethAddress, message));
+  }
+
+  search(terms: Observable<string>): Observable<Paper> {
+    // TODO Refactor: Search on all papers
+    return terms.pipe(
+      filter(text => text.length > 1),
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(term => this.getAllPapersOnState(term))
+    );
   }
 }
 

@@ -1,11 +1,7 @@
 pragma solidity ^0.5.0;
 
-import "./Asset.sol";
-import "../contributors/Contributor.sol";
-import "../contributors/Contributors.sol";
-
-// @title Any asset type (eg: a paper, ...)
-contract AssetFile is Asset {
+// @title Any files type (eg: a paper, ...)
+contract Archivable {
 
     // @dev file data for this asset
     struct File {
@@ -17,8 +13,6 @@ contract AssetFile is Asset {
     }
 
     File[] files;
-
-    constructor(Contributors _contributors, Contributor _contributor) Asset(_contributors, _contributor) public {}
 
     function addFile(string memory _fileSystemName, string memory _publicLocation,
         string memory _summaryHashAlgorithm, string memory _summaryHash) public returns(uint) {

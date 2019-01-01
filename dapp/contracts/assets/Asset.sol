@@ -1,32 +1,46 @@
 pragma solidity ^0.5.0;
 
 import "./IAsset.sol";
-import "./IWorkflow.sol";
-import "../../libraries/HashSet.sol";
 import "../support/Contributable.sol";
+import "../support/Actionable.sol";
+import "../support/Archivable.sol";
 import "../contributors/Contributor.sol";
 import "../contributors/Contributors.sol";
 
-contract Asset is IAsset, Contributable {
-
-    HashSet.data private wfs;
+contract Asset is IAsset, Archivable, Actionable, Contributable {
     
-    constructor(Contributors _contributors, Contributor _contributor) Contributable(_contributors, _contributor) public {}
+    string public title;
+    string public summary;
+    string[] public keywords;
 
-    function addWorkflow(IWorkflow wf) public {
-        HashSet.add(wfs, address(wf));
+    constructor(
+        Contributors _contributors,
+        Contributor _contributor,
+        string memory _title, 
+        string memory _summary) Contributable(_contributors, _contributor) public {
+            title = _title;
+            summary = _summary;
+        }
+
+    function setTitle(string calldata _title) external {
+        title = _title;
     }
 
-    function removeWorkflow(IWorkflow wf) public {
-        HashSet.remove(wfs, address(wf));
+    function setSummary(string calldata _abstract) external {
+        summary = _abstract;
     }
 
-    function getWorkflowCount() public view returns(uint) {
-        HashSet.size(wfs);
+    function getKeywordsCount() external view returns(uint) {
+        return keywords.length;
     }
 
-    function getWorkflows() public view returns(address[] memory) {
-        return HashSet.toArray(wfs);
+    function addKeyword(string calldata _keyword) external {
+        keywords.push(_keyword);
     }
 
+    function removeKeywords(uint index) external {
+        keywords[index] = keywords[keywords.length - 1];
+        delete keywords[keywords.length - 1];
+        keywords.length--;
+    }
 }

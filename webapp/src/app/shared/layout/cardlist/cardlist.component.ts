@@ -1,5 +1,5 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output, DoCheck, IterableDiffers, OnChanges, ChangeDetectorRef, ChangeDetectionStrategy} from '@angular/core';
-import {Observable, Subject, Subscription} from "rxjs";
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Observable } from "rxjs";
 
 @Component({
   selector: 'app-cardlist',
@@ -15,7 +15,7 @@ export class CardlistComponent implements OnInit, OnDestroy {
   @Output() clickActionCard: EventEmitter<any> = new EventEmitter();
   @Output() clickCard: EventEmitter<any> = new EventEmitter();
 
-  constructor(private cd: ChangeDetectorRef) { }
+  constructor() { }
 
   ngOnInit() {
   }

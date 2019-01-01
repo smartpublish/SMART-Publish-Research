@@ -4,17 +4,20 @@
         <img src="assets/images/brand/logo.png" width="30" height="34" class="d-inline-block align-top" alt="logo">
         SMART Papers
       </a>
-      <button class="navbar-toggler float-right" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler float-right" type="button" (click)="isCollapsed = !isCollapsed"
+        [attr.aria-expanded]="!isCollapsed" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="navbar-collapse collapse" id="navbarNavAltMarkup">
+      <div class="navbar-collapse collapse" id="navbarNavAltMarkup" [collapse]="isCollapsed">
           <div class="navbar-nav">
-            <a class="nav-item nav-link" href="#" [routerLink]="['/submit']">Publish</a>
-            <a class="nav-item nav-link" href="#" [routerLink]="['/search']">Search</a>
+            <a class="nav-item nav-link" href="#" [routerLinkActive]="['active']" [routerLink]="['/submit']">Publish</a>
           </div>
           <div class="navbar-nav ml-auto">
+            <div class="nav-item">
+              <app-search-box></app-search-box>
+            </div>
             <div class="nav-item"><a class="nav-link" href="#" *ngIf="!authService.isAuthenticated()" (click)="authService.login()">Log In</a></div>
-            <div class="nav-item"><a class="nav-link" href="#" [routerLink]="['/work']" *ngIf="authService.isAuthenticated()">My Work</a></div>
+            <div class="nav-item"><a class="nav-link" href="#" [routerLinkActive]="['active']" [routerLink]="['/work']" *ngIf="authService.isAuthenticated()">My Work</a></div>
             <div class="nav-item" *ngIf="authService.isAuthenticated()">
               <app-user-logged-navbar></app-user-logged-navbar>
             </div>

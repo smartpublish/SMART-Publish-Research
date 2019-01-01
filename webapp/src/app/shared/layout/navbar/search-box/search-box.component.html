@@ -1,0 +1,20 @@
+<form class="form-inline">
+  <input (keyup)="searchTerm$.next($event.target.value)" 
+    triggers="keypress"
+    [outsideClick]="true" 
+    placement="bottom" 
+    [popover]="results" 
+    popoverTitle="Results" 
+    class="form-control mr-sm-2" 
+    type="search" placeholder="Search" aria-label="Search">
+</form>
+<ng-template #results>
+  <ul class="list-group list-group-flush mt-3">
+    <li *ngFor="let paper of results$ | async" (click)="onClickResult(paper, $event)"
+      class="list-group-item list-group-item-action flex-column align-items-start clickable">
+        <h4>{{paper.title}}</h4>
+        <p>{{paper.abstract}}</p>
+        <p><a href="{{paper.publicLocation}}" target="_blank" class="btn btn-default" role="button">Read</a></p>
+    </li>
+  </ul>
+</ng-template>

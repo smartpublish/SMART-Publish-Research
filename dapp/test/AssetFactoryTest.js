@@ -22,6 +22,7 @@ contract('AssetFactoryTest', function(accounts) {
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            ['tag1','tag2'],
             workflow.address,
             '0000-0002-1825-0097',
             { from: accounts[1] }
@@ -45,6 +46,7 @@ contract('AssetFactoryTest', function(accounts) {
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            ['tag1','tag2'],
             workflow.address,
             'google-oauth2|129380127374018398127'
         )
@@ -60,6 +62,7 @@ contract('AssetFactoryTest', function(accounts) {
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            ['tag1','tag2'],
             workflow.address,
             'google-oauth2|129380127374018398127'
         )
@@ -91,6 +94,7 @@ contract('AssetFactoryTest', function(accounts) {
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            ['tag1','tag2'],
             workflow.address,
             'google-oauth2|129380127374018398127',
             { from: accounts[1] }
@@ -108,4 +112,40 @@ contract('AssetFactoryTest', function(accounts) {
         assert.strictEqual(contributorsArray[0],contributor_address,'Contributor should be match')
     });
 
+    it("should CRUD keywords after paper is submitted", async function() {
+        let tx = await factory.createPaper(
+            'Awesome Title paper',
+            'Best abstract',
+            'IPFS',
+            'https://ipfs.io/test',
+            'blake2b',
+            'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            [],
+            workflow.address,
+            'google-oauth2|129380127374018398127'
+        )
+        let paperAddress;
+        truffleAssert.eventEmitted(tx, 'AssetCreated', function (e) {
+            paperAddress = e.assetAddress;
+            return e.assetAddress !== undefined;
+        });
+
+        // Add keywords
+        tx = await factory.addKeywords(paperAddress, ['tag1', 'tag2'])
+        
+        // Get by keywords
+        let papers = await factory.getAssetByKeywords(['tag2'])
+        assert.strictEqual(papers.length, 1, 'Keyword should returns 1 paper')
+        assert.strictEqual(papers[0], paperAddress, 'Paper address should match')
+
+        // Remove keywords
+        tx = await factory.removeKeywords(paperAddress, ['tag2'])
+
+        // Get by keywords
+        papers = await factory.getAssetByKeywords(['tag2'])
+        assert.strictEqual(papers.length, 0, 'Keyword should returns 0 papers')
+        papers = await factory.getAssetByKeywords(['tag1'])
+        assert.strictEqual(papers.length, 1, 'Keyword should returns 1 paper')
+        assert.strictEqual(papers[0], paperAddress, 'Paper address should match')
+    });
 });
