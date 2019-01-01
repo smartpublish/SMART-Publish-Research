@@ -1,11 +1,10 @@
+import { NgModule } from '@angular/core';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { CoreModule } from "@app/core/core.module";
-import { HomeModule } from "@app/modules/home/home.module";
-import { NgModule } from '@angular/core';
 import { SharedModule } from '@app/shared/shared.module';
-import { PublicationModule } from "@app/modules/publication/publication.module";
+import { HomeModule, PublicationModule, MyWorkModule} from "@app/modules";
 
 @NgModule({
   declarations: [
@@ -24,7 +23,8 @@ import { PublicationModule } from "@app/modules/publication/publication.module";
     // features
     HomeModule,
     PublicationModule,
-
+    MyWorkModule,
+    
     // app
     AppRoutingModule
   ],

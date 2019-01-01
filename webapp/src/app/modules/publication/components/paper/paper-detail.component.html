@@ -12,8 +12,16 @@
             </dl>
             <dl class="item-property">
               <dt>Contributors</dt>
-              <dd *ngFor="let contributor of paper.contributors"><p>{{contributor.ethAddress}}</p></dd>
+              <dd>
+                <ul class="list-unstyled">
+                  <li *ngFor="let contributor of paper.contributors">{{contributor.ethAddress}}</li>
+                </ul>
+              </dd>
               <app-invitations [paper]="paper"></app-invitations>
+            </dl>
+            <dl class="item-property">
+              <dt>Keywords</dt>
+              <dd><p>{{paper.keywords.join(', ')}}</p></dd>
             </dl>
         </div>
         <div class="col-sm-3">

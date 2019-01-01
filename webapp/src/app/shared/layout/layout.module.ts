@@ -9,6 +9,9 @@ import { CardlistComponent } from './cardlist/cardlist.component';
 import { RouterModule } from "@angular/router";
 import { UserLoggedNavbarComponent } from './navbar/user-logged-navbar/user-logged-navbar.component';
 import { AlertModule } from 'ngx-bootstrap/alert';
+import { PopoverModule } from 'ngx-bootstrap/popover';
+import { SearchBoxComponent } from './navbar/search-box/search-box.component';
+import { CollapseModule } from 'ngx-bootstrap/collapse';
 
 @NgModule({
     declarations: [
@@ -16,14 +19,17 @@ import { AlertModule } from 'ngx-bootstrap/alert';
       ModalComponent,
       NavbarComponent,
       CardlistComponent,
-      UserLoggedNavbarComponent
+      UserLoggedNavbarComponent,
+      SearchBoxComponent
     ],
     imports: [
       CommonModule,
       RouterModule,
       ModalModule.forRoot(),
       BsDropdownModule.forRoot(),
-      AlertModule.forRoot()
+      AlertModule.forRoot(),
+      PopoverModule.forRoot(),
+      CollapseModule.forRoot()
     ],
     exports: [
       FooterComponent,

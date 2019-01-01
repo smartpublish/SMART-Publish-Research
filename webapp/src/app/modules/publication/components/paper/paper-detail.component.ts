@@ -1,17 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Paper } from '../../models/paper.model';
 import { PublicationService } from '../../services/publication.service';
 import { AlertService } from '@app/core/services/alert.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-paper-detail',
   templateUrl: './paper-detail.component.html',
   styleUrls: ['./paper-detail.component.scss']
 })
-export class PaperDetailComponent implements OnInit {
+export class PaperDetailComponent implements OnInit, OnDestroy {
 
-  paper:Paper;
+  paper:Paper
+  urlChangesSub:Subscription
 
   constructor(
     private route:ActivatedRoute,
@@ -20,7 +22,13 @@ export class PaperDetailComponent implements OnInit {
     private router: Router) { }
 
   ngOnInit() {
-    this.getPaper(this.route.snapshot.paramMap.get('ethAddr'));
+    this.urlChangesSub = this.route.params.subscribe(params => {
+      this.getPaper(params['ethAddr'])
+    });
+  }
+
+  ngOnDestroy() {
+    this.urlChangesSub.unsubscribe()
   }
 
   getPaper(address: string) {

@@ -38,6 +38,7 @@ export class PaperNewComponent implements OnInit {
     this.publicationService.submit(
       this.paperForm.get('title').value,
       this.paperForm.get('abstract').value,
+      this.paperForm.get('keywords').value,
       this.file
     ).then((paper:Paper) => {
       this.paperForm.reset()

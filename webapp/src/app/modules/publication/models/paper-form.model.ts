@@ -6,6 +6,7 @@ export class PaperForm {
   title = new FormControl()
   abstract = new FormControl()
   file = new FormControl()
+  keywords = new FormControl()
   // contributors = new FormArray([])
 
   constructor(paper?: Paper) {
@@ -27,6 +28,11 @@ export class PaperForm {
     }
     this.file.setValidators([Validators.required])
 
+    if(paper && paper.keywords) {
+      this.keywords.setValue(paper.keywords);
+    }
+    this.keywords.setValidators([Validators.required])
+    
     /*
     if(paper && paper.contributors) {
       this.contributors.setValue([paper.contributors])

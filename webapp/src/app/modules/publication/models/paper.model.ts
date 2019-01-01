@@ -6,13 +6,14 @@ export interface IAsset {
   readonly ownerAddress: string
 }
 
-class AssetFile implements IAsset {
+class Asset implements IAsset {
   public readonly ethAddress: string;
   public readonly fileName: string;
   public readonly fileSystemName: string;
   public readonly publicLocation: string;
   public readonly summaryHashAlgorithm: string;
   public readonly summaryHash: string;
+  public readonly keywords: string[];
   public readonly contributors: Contributor[];
   public readonly ownerAddress: string;
 
@@ -23,6 +24,7 @@ class AssetFile implements IAsset {
     publicLocation: string,
     hashAlgorithm: string,
     hash: string,
+    keywords: string[],
     contributors: Contributor[],
     ownerAddress: string) {
 
@@ -32,13 +34,14 @@ class AssetFile implements IAsset {
     this.publicLocation = publicLocation;
     this.summaryHashAlgorithm = hashAlgorithm;
     this.summaryHash = hash;
+    this.keywords = keywords;
     this.contributors = contributors;
     this.ownerAddress = ownerAddress;
   }
 
 }
 
-export class Paper extends AssetFile {
+export class Paper extends Asset {
   public readonly title: string;
   public readonly abstract: string;
 
@@ -51,10 +54,11 @@ export class Paper extends AssetFile {
     publicLocation: string,
     hashAlgorithm: string,
     hash: string,
+    keywords: string[],
     contributors: Contributor[],
     ownerAddress: string) {
 
-    super(ethAddress, fileName, fileSystemName, publicLocation, hashAlgorithm, hash, contributors, ownerAddress);
+    super(ethAddress, fileName, fileSystemName, publicLocation, hashAlgorithm, hash, keywords, contributors, ownerAddress);
     this.title = title;
     this.abstract = abstract;
   }
@@ -62,6 +66,7 @@ export class Paper extends AssetFile {
   copy(
     fileSystemName?: string,
     publicLocation?: string,
+    keywords?: string[],
   ): Paper {
     return new Paper(
       this.title,
@@ -72,6 +77,7 @@ export class Paper extends AssetFile {
       publicLocation? publicLocation : this.publicLocation,
       this.summaryHashAlgorithm,
       this.summaryHash,
+      keywords? keywords : this.keywords,
       this.contributors,
       this.ownerAddress
     )

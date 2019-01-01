@@ -1,0 +1,7 @@
+<app-cardlist
+  [title]="'My papers'"
+  [description]="'Papers submitted by me'"
+  [items$]="my_papers$"
+  (clickCard)="clickCardHandle($event)"
+  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>
+
