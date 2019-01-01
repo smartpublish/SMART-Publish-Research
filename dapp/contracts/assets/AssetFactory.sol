@@ -86,7 +86,7 @@ contract AssetFactory {
         // _asset.removeKeywords(_keywords)
     }
 
-    function getAssetByKeywords(string[] memory _keywords) public view returns(IAsset[] memory) {
+    function getAssetsByKeywords(string[] memory _keywords) public view returns(IAsset[] memory) {
         uint length = 0;
         for(uint i = 0; i < _keywords.length; i++) {
             length += assetByKeywords[_keywords[i]].length;

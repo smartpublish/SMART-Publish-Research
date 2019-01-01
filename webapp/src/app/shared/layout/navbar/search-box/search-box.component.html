@@ -1,13 +1,11 @@
-<form class="form-inline">
-  <input (keyup)="searchTerm$.next($event.target.value)" 
-    triggers="keypress"
-    [outsideClick]="true" 
-    placement="bottom" 
-    [popover]="results" 
-    popoverTitle="Results" 
-    class="form-control mr-sm-2" 
-    type="search" placeholder="Search" aria-label="Search">
-</form>
+<input (keyup)="search($event)" 
+  triggers="keypress"
+  [outsideClick]="true" 
+  placement="bottom" 
+  [popover]="results" 
+  popoverTitle="Results" 
+  class="form-control mr-sm-2" 
+  type="search" placeholder="Search" aria-label="Search">
 <ng-template #results>
   <ul class="list-group list-group-flush mt-3">
     <li *ngFor="let paper of results$ | async" (click)="onClickResult(paper, $event)"

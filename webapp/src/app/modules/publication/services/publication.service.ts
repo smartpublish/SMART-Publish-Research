@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Paper, Comment, Contributor } from "../models"
 import { EthereumService, IpfsService, AlertService, HashService, AuthenticationService } from "@app/core/services";
 import * as TruffleContract from "truffle-contract";
-import { Observable } from "rxjs";
+import { Observable, merge } from "rxjs";
 import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
-import { ethers, Contract } from 'ethers';
+import { Contract } from 'ethers';
 
 declare let require: any;
 
@@ -341,13 +341,34 @@ export class PublicationService {
     return this.WF_SC.deployed().then(instance => instance.addComment(paper.ethAddress, message));
   }
 
+  getPapersByKeywords(keywords:string[]): Observable<Paper> {
+    return Observable.create(async observer => {
+      const abi = tokenAbiAssetFactory.abi;
+      let provider = this.ethereumService.getProvider();
+      let truffle_instance = await this.ASSET_FACTORY_SC.deployed()
+      let address = truffle_instance.address
+      // Uses ethers.js because ABIEncoderV2 does not work with truffle-contract and web3js
+      let signer = provider.getSigner()
+      let instance = new Contract(address, abi, signer)
+      let assets = await instance.getAssetsByKeywords(keywords)
+      assets.forEach(asset => {
+        this.getPaper(asset).then(paper => {
+          observer.next(paper)
+        });
+      });
+    });
+  }
+
   search(terms: Observable<string>): Observable<Paper> {
     // TODO Refactor: Search on all papers
     return terms.pipe(
-      filter(text => text.length > 1),
       debounceTime(400),
       distinctUntilChanged(),
-      switchMap(term => this.getAllPapersOnState(term))
+      switchMap(term => merge(
+          this.getPapersByKeywords([term]),
+          this.getAllPapersOnState(term)
+        )
+      )
     );
   }
 }

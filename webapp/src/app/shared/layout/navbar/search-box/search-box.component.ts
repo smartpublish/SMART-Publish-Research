@@ -25,8 +25,13 @@ export class SearchBoxComponent implements OnInit {
   }
 
   onClickResult(paper:Paper, $event) {
-    $event.stopPropagation();
-    this.router.navigate(['/detail', paper.ethAddress]);
+    $event.stopPropagation()
+    this.router.navigate(['/detail', paper.ethAddress])
+  }
+
+  search($event) {
+    $event.stopPropagation()
+    this.searchTerm$.next($event.target.value)
   }
 
 }
