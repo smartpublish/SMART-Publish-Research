@@ -34,8 +34,8 @@ contract AssetWorkflow is IWorkflow {
     State[] private states;
     Transition[] private transitions;
 
-    event AssetStateChanged(address assetAddress, string state, string oldState, string transition);
-    event AssetCommentAdded(address assetAddress, string message, address author, uint256 timestamp, string state);
+    event AssetStateChanged(address indexed asset, string state, string oldState, string transition);
+    event AssetCommentAdded(address indexed asset, string message, address author, uint256 timestamp, string state);
 
     function addState(string memory _name) internal {
         // Avoid empty states or creation states ''

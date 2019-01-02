@@ -33,8 +33,9 @@ export class PaperDetailComponent implements OnInit, OnDestroy {
 
   getPaper(address: string) {
     this.publicationService.getPaper(address).then(paper => this.paper = paper).catch(error => {
-      this.alertService.error('Paper does not exist or could no be fetched');
-      this.router.navigate(['**']);
+      console.error(error)
+      this.alertService.error('Paper does not exist or could no be fetched')
+      this.router.navigate(['home'])
     });
   }
 

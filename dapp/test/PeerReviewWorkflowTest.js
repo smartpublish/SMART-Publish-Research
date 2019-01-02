@@ -48,7 +48,7 @@ contract('PeerReviewWorkflowTest', function(accounts) {
     it("should run transitions from Submit to Publish", async function() {
         let tx = await workflow.submit(asset.address)
         truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {
-            return e.assetAddress === asset.address && e.state === 'Submitted'
+            return e.asset === asset.address && e.state === 'Submitted'
         });
 
         let assetArray = await workflow.findAssetsByState.call('Submitted')
@@ -56,7 +56,7 @@ contract('PeerReviewWorkflowTest', function(accounts) {
 
         tx = await workflow.review(asset.address, 'This is a comment for Review')
         truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {
-            return e.assetAddress === asset.address && e.state === 'OnReview'
+            return e.asset === asset.address && e.state === 'OnReview'
         });
 
         assetArray = await workflow.findAssetsByState.call('Submitted')
@@ -79,7 +79,7 @@ contract('PeerReviewWorkflowTest', function(accounts) {
         // Changed state automatically: Third time accept > Published
         tx = await workflow.accept(asset.address, 'Third comment on Accept')
         truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {
-            return e.assetAddress === asset.address && e.state === 'Published'
+            return e.asset === asset.address && e.state === 'Published'
         });
         assetArray = await workflow.findAssetsByState.call('Published')
         assert.strictEqual(assetArray.length, 1, 'Assets on state Published must be 1')
@@ -110,7 +110,7 @@ contract('PeerReviewWorkflowTest', function(accounts) {
         
         tx = await workflow.addComment(asset.address, 'This is my first comment')
         truffleAssert.eventEmitted(tx, 'AssetCommentAdded', function (e) {
-            return e.assetAddress === asset.address 
+            return e.asset === asset.address 
             && e.state === 'Submitted' 
             && e.message === 'This is my first comment'
             && e.author != undefined
@@ -119,7 +119,7 @@ contract('PeerReviewWorkflowTest', function(accounts) {
 
         tx = await workflow.addComment(asset.address, 'This is a second comment')
         truffleAssert.eventEmitted(tx, 'AssetCommentAdded', function (e) {
-            return e.assetAddress === asset.address 
+            return e.asset === asset.address 
             && e.state === 'Submitted' 
             && e.message === 'This is a second comment'
             && e.author != undefined

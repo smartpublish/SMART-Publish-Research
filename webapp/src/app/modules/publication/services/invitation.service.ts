@@ -2,14 +2,13 @@ import { Injectable } from '@angular/core'
 import { environment } from '@env/environment'
 import { Observable, Subject } from 'rxjs'
 import { IAsset, Paper, ContributorInvitation } from '@app/modules/publication/models'
-import TruffleContract from "truffle-contract"
 import { EthereumService } from '../../../core/services/ethereum.service'
 import { Router } from '@angular/router'
 import { Location } from '@angular/common'
-import { AuthenticationService } from '@app/core/services';
+import { AuthenticationService } from '@app/core/services'
+import { Contract } from 'ethers'
 
 declare let require: any
-
 let tokenAbiContributable = require('@contracts/Contributable.json')
 
 @Injectable({
@@ -17,7 +16,7 @@ let tokenAbiContributable = require('@contracts/Contributable.json')
 })
 export class InvitationService {
 
-  private readonly INV_SC = TruffleContract(tokenAbiContributable)
+  private readonly PROVIDER:any
   private static readonly EXPIRATION_DAYS = 7
 
   constructor(
@@ -26,32 +25,26 @@ export class InvitationService {
     private location: Location,
     private authService: AuthenticationService
   ) { 
-    this.INV_SC.setProvider(ethereumService.web3Provider)
-    this.ethereumService.getAccountInfo().then((acctInfo: any) => {
-      this.INV_SC.defaults({
-        from: acctInfo.fromAccount
-      });
-    });
+    this.PROVIDER = this.ethereumService.getProvider()
+
+    // Workaround issue: https://github.com/ethers-io/ethers.js/issues/386
+    this.PROVIDER.getBlockNumber().then(number => this.PROVIDER.resetEventsBlock(number + 1))
   }
 
   invitations$: Subject<ContributorInvitation> = new Subject<ContributorInvitation>();
 
   getInvitations(paper: Paper): Observable<ContributorInvitation> {
     // TODO Calcule 'fromblock'
-    this.INV_SC.at(paper.ethAddress).then(function(instance) {
-      return instance.getPastEvents('InvitationCreated',{
-        filter: {},
-        fromBlock: 0,
-        toBlock: 'latest'
-      });
-    }).then(result => {
-      result.forEach(event => {
-        this.invitations$.next({
-          expires: new Date(event.args.expires * 1000),
-          hashCode: event.args.hashCode
-        } as ContributorInvitation)
-      });
-    });
+    let instance = new Contract(paper.ethAddress, tokenAbiContributable.abi, this.PROVIDER)
+    this.PROVIDER.resetEventsBlock(0)
+    let filter = instance.filters.InvitationCreated(paper.ethAddress, null, null)
+    instance.on(filter, (asset, hashCode, expires) => {
+      this.invitations$.next({
+        expires: new Date(expires * 1000),
+        hashCode: hashCode
+      } as ContributorInvitation)
+    })
+    
     return this.invitations$.asObservable()
   }
 
@@ -76,12 +69,15 @@ export class InvitationService {
   }
 
   async isOwner(paper: Paper): Promise<boolean> {
-    let accountInfo: any = await this.ethereumService.getAccountInfo()
-    return accountInfo.fromAccount.toUpperCase() === paper.ownerAddress.toUpperCase()
+    let signer = await this.PROVIDER.getSigner()
+    let account = await signer.getAddress()
+    return account.toUpperCase() === paper.ownerAddress.toUpperCase()
   }
 
   private async joinOnEthereum(invitation: ContributorInvitation, user_id: string):Promise<any> {
-    let instance = await this.INV_SC.at(invitation.asset.ethAddress)
+    let address = await this.ethereumService.getSCAddress(tokenAbiContributable)
+    let signer = this.PROVIDER.getSigner()
+    let instance = new Contract(address, tokenAbiContributable.abi, signer)
     return await instance.join(invitation.token, user_id)
   }
 
@@ -89,8 +85,9 @@ export class InvitationService {
     let web3 = this.ethereumService.getWeb3();
     let hashedCode = await web3.utils.soliditySha3(invitation.token)
     invitation.hashCode = hashedCode
-    let instance = await this.INV_SC.at(invitation.asset.ethAddress)
-    let tx = await instance.addInvitation(hashedCode, invitation.expires.getTime() / 1000)
+    let signer = this.PROVIDER.getSigner()
+    let instance = new Contract(invitation.asset.ethAddress, tokenAbiContributable.abi, signer)
+    await instance.addInvitation(hashedCode, invitation.expires.getTime() / 1000)
     return invitation
   }
 
