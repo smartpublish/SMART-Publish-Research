@@ -6,8 +6,6 @@ import { Paper } from "@app/modules/publication/models/paper.model";
 import { AlertService } from "@app/core/services/alert.service";
 import { Subscription } from 'rxjs';
 import { PublicationFormService } from '../../services/publication-form.service';
-import { environment } from '@env/environment';
-import { EmailService } from '@app/core/services/email.service';
 
 @Component({
   selector: 'app-paper-new',
@@ -26,8 +24,7 @@ export class PaperNewComponent implements OnInit {
     private publicationService: PublicationService,
     private publicationFormService: PublicationFormService,
     private alertService: AlertService,
-    private router: Router,
-    private emailService: EmailService) {
+    private router: Router) {
   }
 
   onFileChange($event) {
