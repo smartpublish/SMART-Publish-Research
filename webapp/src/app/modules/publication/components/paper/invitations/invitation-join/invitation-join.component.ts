@@ -3,7 +3,7 @@ import { ContributorInvitation } from '@app/modules/publication/models';
 import { ActivatedRoute } from '@angular/router';
 import { AlertService, AuthenticationService } from '@app/core/services';
 import { InvitationService } from '@app/modules/publication/services/invitation.service';
-import { AlertComponent } from 'ngx-bootstrap/alert/alert.component';
+import { AlertComponent } from 'ngx-bootstrap/alert';
 
 @Component({
   selector: 'app-invitation-join',
