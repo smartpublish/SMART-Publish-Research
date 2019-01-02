@@ -1,4 +1,4 @@
-import { IAsset } from "./paper.model";
+import { IAsset } from './paper.model'
 
 export interface Invitation {
 

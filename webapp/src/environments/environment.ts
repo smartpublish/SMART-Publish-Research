@@ -12,7 +12,7 @@ export const environment = {
     redirectUri: 'http://localhost:4200/#/home',
     scope: 'openid profile'
   }
-};
+}
 
 /*
  * For easier debugging in development mode, you can import the following file

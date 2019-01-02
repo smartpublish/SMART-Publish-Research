@@ -7,5 +7,5 @@ export interface Comment {
 
 export interface WorkflowState {
     name: string
-    state: string 
+    state: string
 }

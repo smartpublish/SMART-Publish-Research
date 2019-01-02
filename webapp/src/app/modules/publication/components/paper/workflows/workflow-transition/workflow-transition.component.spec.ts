@@ -1,25 +1,25 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { WorkflowTransitionComponent } from './workflow-transition.component';
+import { WorkflowTransitionComponent } from './workflow-transition.component'
 
 describe('WorkflowTransitionComponent', () => {
-  let component: WorkflowTransitionComponent;
-  let fixture: ComponentFixture<WorkflowTransitionComponent>;
+  let component: WorkflowTransitionComponent
+  let fixture: ComponentFixture<WorkflowTransitionComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ WorkflowTransitionComponent ]
     })
-    .compileComponents();
-  }));
+    .compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(WorkflowTransitionComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(WorkflowTransitionComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

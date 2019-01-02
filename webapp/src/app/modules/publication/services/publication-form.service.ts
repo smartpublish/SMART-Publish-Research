@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core'
 import { Observable, BehaviorSubject } from 'rxjs'
 import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms'
-import { Paper, PaperForm, Contributor, ContributorForm } from '../models';
+import { Paper, PaperForm, Contributor, ContributorForm } from '../models'
 
 @Injectable({
   providedIn: 'root'
 })
 export class PublicationFormService {
 
-  private paperForm: BehaviorSubject<FormGroup | undefined> = 
+  private paperForm: BehaviorSubject<FormGroup | undefined> =
     new BehaviorSubject(this.fb.group(new PaperForm()))
 
   paperForm$: Observable<FormGroup> = this.paperForm.asObservable()

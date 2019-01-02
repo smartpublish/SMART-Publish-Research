@@ -1,10 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { InvitationService } from '@app/modules/publication/services/invitation.service';
+import { Component, OnInit, Input } from '@angular/core'
+import { InvitationService } from '@app/modules/publication/services/invitation.service'
 import { ContributorInvitation } from '@app/modules/publication/models'
-import { Observable, of } from 'rxjs';
-import { scan, catchError } from 'rxjs/operators';
-import { Paper } from '@app/modules/publication/models';
-import { AlertService } from '@app/core/services';
+import { Observable, of } from 'rxjs'
+import { scan, catchError } from 'rxjs/operators'
+import { Paper } from '@app/modules/publication/models'
+import { AlertService } from '@app/core/services'
 
 @Component({
   selector: 'app-invitations',
@@ -13,9 +13,9 @@ import { AlertService } from '@app/core/services';
 })
 export class InvitationsComponent implements OnInit {
 
-  @Input() paper:Paper;
-  invitations$:Observable<ContributorInvitation[]>
-  owner:boolean = false
+  @Input() paper: Paper
+  invitations$: Observable<ContributorInvitation[]>
+  owner = false
 
   constructor(
     private invitationService: InvitationService,
@@ -25,8 +25,8 @@ export class InvitationsComponent implements OnInit {
     this.invitations$ = this.invitationService.getInvitations(this.paper)
     .pipe(
       scan<ContributorInvitation>((acc, value, index) => [value, ...acc], [])
-    );
-    
+    )
+
     this.invitationService.isOwner(this.paper).then(value => this.owner = value)
   }
 
@@ -39,15 +39,15 @@ export class InvitationsComponent implements OnInit {
 
   private handleError<T> (operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-  
+
       // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-  
-      this.alertService.error('There was an error with the invitation');
-  
+      console.error(error) // log to console instead
+
+      this.alertService.error('There was an error with the invitation')
+
       // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
+      return of(result as T)
+    }
   }
 
 }

@@ -6,19 +6,19 @@ import { PublicationService } from '@app/modules/publication/services/publicatio
 import { Contract } from 'ethers'
 
 declare let require: any
-let tokenAbiAssetFactory = require('@contracts/AssetFactory.json')
+const tokenAbiAssetFactory = require('@contracts/AssetFactory.json')
 
 @Injectable({
   providedIn: 'root'
 })
 export class MyWorkService {
 
-  private readonly PROVIDER:any
+  private readonly PROVIDER: any
 
   constructor(
     private ethereumService: EthereumService,
     private publicationService: PublicationService
-  ) { 
+  ) {
     this.PROVIDER = this.ethereumService.getProvider()
 
     // Workaround issue: https://github.com/ethers-io/ethers.js/issues/386
@@ -27,15 +27,15 @@ export class MyWorkService {
 
   getMyPapers(): Observable<Paper> {
     return Observable.create(async observer => {
-      let address = await this.ethereumService.getSCAddress(tokenAbiAssetFactory)
-      let instance = new Contract(address, tokenAbiAssetFactory.abi, this.PROVIDER)
-      let signer = await this.PROVIDER.getSigner()
-      let account = await signer.getAddress()
-      let assetsAddress:string[] = await instance.getAssetsByCreator(account)
+      const address = await this.ethereumService.getSCAddress(tokenAbiAssetFactory)
+      const instance = new Contract(address, tokenAbiAssetFactory.abi, this.PROVIDER)
+      const signer = await this.PROVIDER.getSigner()
+      const account = await signer.getAddress()
+      const assetsAddress: string[] = await instance.getAssetsByCreator(account)
       assetsAddress.forEach(async address => {
-        let paper = await this.publicationService.getPaper(address)
+        const paper = await this.publicationService.getPaper(address)
         observer.next(paper)
-      });
-    });
+      })
+    })
   }
 }

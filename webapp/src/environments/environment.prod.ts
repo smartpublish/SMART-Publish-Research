@@ -7,4 +7,4 @@ export const environment = {
     redirectUri: 'http://localhost:3000/callback',
     scope: 'openid'
   }
-};
+}

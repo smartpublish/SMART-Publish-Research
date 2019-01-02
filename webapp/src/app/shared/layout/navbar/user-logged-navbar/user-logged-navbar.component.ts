@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from '@app/core/services';
+import { Component, OnInit } from '@angular/core'
+import { AuthenticationService } from '@app/core/services'
 
 @Component({
   selector: 'app-user-logged-navbar',
@@ -8,11 +8,11 @@ import { AuthenticationService } from '@app/core/services';
 })
 export class UserLoggedNavbarComponent implements OnInit {
 
-  profile$: any;
+  profile$: any
 
   constructor(public authService: AuthenticationService) { }
 
   ngOnInit() {
-    this.profile$ = this.authService.getProfile();
+    this.profile$ = this.authService.getProfile()
   }
 }

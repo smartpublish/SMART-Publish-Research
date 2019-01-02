@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { EthereumService } from "./ethereum.service";
+import { Injectable } from '@angular/core'
+import { EthereumService } from './ethereum.service'
 
 @Injectable({
   providedIn: 'root',

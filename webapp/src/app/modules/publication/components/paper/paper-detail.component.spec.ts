@@ -1,25 +1,25 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { PaperDetailComponent } from './paper-detail.component';
+import { PaperDetailComponent } from './paper-detail.component'
 
 describe('PaperDetailComponent', () => {
-  let component: PaperDetailComponent;
-  let fixture: ComponentFixture<PaperDetailComponent>;
+  let component: PaperDetailComponent
+  let fixture: ComponentFixture<PaperDetailComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ PaperDetailComponent ]
     })
-    .compileComponents();
-  }));
+    .compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PaperDetailComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(PaperDetailComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

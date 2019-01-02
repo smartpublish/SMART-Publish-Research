@@ -1,13 +1,13 @@
-import { PublicationModule } from './publication.module';
+import { PublicationModule } from './publication.module'
 
 describe('PublicationModule', () => {
-  let publicationModule: PublicationModule;
+  let publicationModule: PublicationModule
 
   beforeEach(() => {
-    publicationModule = new PublicationModule();
-  });
+    publicationModule = new PublicationModule()
+  })
 
   it('should create an instance', () => {
-    expect(publicationModule).toBeTruthy();
-  });
-});
+    expect(publicationModule).toBeTruthy()
+  })
+})

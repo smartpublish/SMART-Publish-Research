@@ -1,5 +1,5 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, Output, EventEmitter } from '@angular/core'
+import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
 
 @Component({
   selector: 'app-comment-new',
@@ -8,20 +8,20 @@ import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
 })
 export class CommentNewComponent {
 
-  @Output() comment:EventEmitter<string> = new EventEmitter<string>();
-  form: FormGroup;
-  message: FormControl = new FormControl('', Validators.required);
+  @Output() comment: EventEmitter<string> = new EventEmitter<string>()
+  form: FormGroup
+  message: FormControl = new FormControl('', Validators.required)
 
   constructor(
     private fb: FormBuilder
   ) {
     this.form = fb.group({
       message: this.message
-    });
+    })
    }
 
   onSubmit() {
-    this.comment.emit(this.message.value);
+    this.comment.emit(this.message.value)
   }
 
 }

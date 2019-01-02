@@ -1,9 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Paper } from '../../models/paper.model';
-import { PublicationService } from '../../services/publication.service';
-import { AlertService } from '@app/core/services/alert.service';
-import { Subscription } from 'rxjs';
+import { Component, OnInit, OnDestroy } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { Paper } from '../../models/paper.model'
+import { PublicationService } from '../../services/publication.service'
+import { AlertService } from '@app/core/services/alert.service'
+import { Subscription } from 'rxjs'
 
 @Component({
   selector: 'app-paper-detail',
@@ -12,11 +12,11 @@ import { Subscription } from 'rxjs';
 })
 export class PaperDetailComponent implements OnInit, OnDestroy {
 
-  paper:Paper
-  urlChangesSub:Subscription
+  paper: Paper
+  urlChangesSub: Subscription
 
   constructor(
-    private route:ActivatedRoute,
+    private route: ActivatedRoute,
     private publicationService: PublicationService,
     private alertService: AlertService,
     private router: Router) { }
@@ -24,7 +24,7 @@ export class PaperDetailComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.urlChangesSub = this.route.params.subscribe(params => {
       this.getPaper(params['ethAddr'])
-    });
+    })
   }
 
   ngOnDestroy() {
@@ -36,7 +36,7 @@ export class PaperDetailComponent implements OnInit, OnDestroy {
       console.error(error)
       this.alertService.error('Paper does not exist or could no be fetched')
       this.router.navigate(['home'])
-    });
+    })
   }
 
 }

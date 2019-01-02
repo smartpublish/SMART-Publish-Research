@@ -1,25 +1,25 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { WorkflowsComponent } from './workflows.component';
+import { WorkflowsComponent } from './workflows.component'
 
 describe('WorkflowsComponent', () => {
-  let component: WorkflowsComponent;
-  let fixture: ComponentFixture<WorkflowsComponent>;
+  let component: WorkflowsComponent
+  let fixture: ComponentFixture<WorkflowsComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ WorkflowsComponent ]
     })
-    .compileComponents();
-  }));
+    .compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(WorkflowsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(WorkflowsComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})
