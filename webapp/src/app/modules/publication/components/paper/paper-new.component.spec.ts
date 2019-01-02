@@ -1,25 +1,25 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
-import { PaperNewComponent } from './paper-new.component';
+import { PaperNewComponent } from './paper-new.component'
 
 describe('PaperNewComponent', () => {
-  let component: PaperNewComponent;
-  let fixture: ComponentFixture<PaperNewComponent>;
+  let component: PaperNewComponent
+  let fixture: ComponentFixture<PaperNewComponent>
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: [ PaperNewComponent ]
     })
-    .compileComponents();
-  }));
+    .compileComponents()
+  }))
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(PaperNewComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(PaperNewComponent)
+    component = fixture.componentInstance
+    fixture.detectChanges()
+  })
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

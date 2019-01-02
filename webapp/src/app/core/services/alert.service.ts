@@ -1,11 +1,11 @@
-import { Injectable, ApplicationRef } from '@angular/core';
-import { Router, NavigationStart } from '@angular/router';
-import { Observable, Subject } from 'rxjs';
+import { Injectable, ApplicationRef } from '@angular/core'
+import { Router, NavigationStart } from '@angular/router'
+import { Observable, Subject } from 'rxjs'
 
 @Injectable()
 export class AlertService {
-    private subject = new Subject<any>();
-    private keepAfterNavigationChange = false;
+    private subject = new Subject<any>()
+    private keepAfterNavigationChange = false
 
     constructor(private router: Router) {
         // clear alert message on route change
@@ -13,32 +13,32 @@ export class AlertService {
             if (event instanceof NavigationStart) {
                 if (this.keepAfterNavigationChange) {
                     // only keep for a single location change
-                    this.keepAfterNavigationChange = false;
+                    this.keepAfterNavigationChange = false
                 } else {
                     // clear alert
-                    this.subject.next();
+                    this.subject.next()
                 }
             }
-        });
+        })
     }
 
     success(message: string, keepAfterNavigationChange = false) {
-        this.keepAfterNavigationChange = keepAfterNavigationChange;
-        this.subject.next({ type: 'success', text: message });
+        this.keepAfterNavigationChange = keepAfterNavigationChange
+        this.subject.next({ type: 'success', text: message })
     }
 
     error(message: string, keepAfterNavigationChange = false) {
-        this.keepAfterNavigationChange = keepAfterNavigationChange;
-        this.subject.next({ type: 'danger', text: message });
+        this.keepAfterNavigationChange = keepAfterNavigationChange
+        this.subject.next({ type: 'danger', text: message })
     }
 
     info(message: string, keepAfterNavigationChange = false) {
-        this.keepAfterNavigationChange = keepAfterNavigationChange;
-        this.subject.next({ type: 'info', text: message });
+        this.keepAfterNavigationChange = keepAfterNavigationChange
+        this.subject.next({ type: 'info', text: message })
     }
 
     getMessage(): Observable<any> {
-        return this.subject.asObservable();
+        return this.subject.asObservable()
     }
 
     onClosed(dismissedAlert: any): void {

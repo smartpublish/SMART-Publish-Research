@@ -8,7 +8,7 @@ contract Invitable {
         bool isUsed;
     }
 
-    event InvitationCreated(address assetAddress, bytes32 hashCode, uint256 expires);
+    event InvitationCreated(address indexed asset, bytes32 hashCode, uint256 expires);
 
     mapping(bytes32 => Invitation) internal invitations;
 

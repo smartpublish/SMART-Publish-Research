@@ -1,51 +1,47 @@
-import { Injectable } from '@angular/core';
-import * as Web3 from 'web3';
-import { ethers } from 'ethers';
+import { Injectable } from '@angular/core'
+import { ethers } from 'ethers'
+import { AlertService } from './alert.service'
 
-declare let window: any;
+declare let window: any
 
 @Injectable({
   providedIn: 'root'
 })
 export class EthereumService {
 
-  readonly web3Provider: null;
-  readonly ethersProvider;
+  readonly ethersProvider
 
-  constructor() {
-    if (typeof window.web3 !== 'undefined') {
-      this.web3Provider = window.web3.currentProvider;
+  constructor(private alertService: AlertService) {
+    // New MetaMask injects a Web3 Provider as "window.ethereum"
+    if (window.ethereum) {
+      this.ethersProvider = new ethers.providers.Web3Provider(window.ethereum)
+      try {
+        window.ethereum.enable()
+      } catch (error) {
+        console.error(error)
+        this.alertService.error('You must allow access Metamask in order to use this application')
+      }
+    } else if (window.web3) {
+      this.ethersProvider = new ethers.providers.Web3Provider(window.web3.currentProvider)
     } else {
-      this.web3Provider = new Web3.providers.HttpProvider('http://localhost:8545');
+      this.ethersProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545')
     }
-
-    window.web3 = new Web3(this.web3Provider);
-    this.ethersProvider = new ethers.providers.Web3Provider(this.web3Provider);
   }
 
   getProvider() {
-    return this.ethersProvider;
+    return this.ethersProvider
+  }
+
+  async getSCAddress(JSON_ABI): Promise<string> {
+    const network = await this.ethersProvider.getNetwork()
+    if (network.chainId) {
+      return JSON_ABI.networks[network.chainId].address
+    }
+    throw new Error('Blockchain network could not be detected')
   }
 
   getWeb3() {
-    return window.web3;
-  }
-
-  getAccountInfo() {
-    return new Promise((resolve, reject) => {
-      window.web3.eth.getCoinbase(function(err, account) {
-
-        if(err === null) {
-          window.web3.eth.getBalance(account, function(err, balance) {
-            if(err === null) {
-              return resolve({fromAccount: account, balance:(window.web3.utils.fromWei(balance, "ether"))});
-            } else {
-              return reject({fromAccount: "error", balance:0});
-            }
-          });
-        }
-      });
-    });
+    return window.web3
   }
 
 }

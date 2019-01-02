@@ -2,56 +2,49 @@ import { Injectable } from '@angular/core'
 import { environment } from '@env/environment'
 import { Observable, Subject } from 'rxjs'
 import { IAsset, Paper, ContributorInvitation } from '@app/modules/publication/models'
-import TruffleContract from "truffle-contract"
 import { EthereumService } from '../../../core/services/ethereum.service'
 import { Router } from '@angular/router'
 import { Location } from '@angular/common'
-import { AuthenticationService } from '@app/core/services';
+import { AuthenticationService } from '@app/core/services'
+import { Contract } from 'ethers'
 
 declare let require: any
-
-let tokenAbiContributable = require('@contracts/Contributable.json')
+const tokenAbiContributable = require('@contracts/Contributable.json')
 
 @Injectable({
   providedIn: 'root'
 })
 export class InvitationService {
 
-  private readonly INV_SC = TruffleContract(tokenAbiContributable)
-  private static readonly EXPIRATION_DAYS = 7
-
   constructor(
     private ethereumService: EthereumService,
     private router: Router,
     private location: Location,
     private authService: AuthenticationService
-  ) { 
-    this.INV_SC.setProvider(ethereumService.web3Provider)
-    this.ethereumService.getAccountInfo().then((acctInfo: any) => {
-      this.INV_SC.defaults({
-        from: acctInfo.fromAccount
-      });
-    });
-  }
+  ) {
+    this.PROVIDER = this.ethereumService.getProvider()
 
-  invitations$: Subject<ContributorInvitation> = new Subject<ContributorInvitation>();
+    // Workaround issue: https://github.com/ethers-io/ethers.js/issues/386
+    this.PROVIDER.getBlockNumber().then(number => this.PROVIDER.resetEventsBlock(number + 1))
+  }
+  private static readonly EXPIRATION_DAYS = 7
+
+  private readonly PROVIDER: any
+
+  invitations$: Subject<ContributorInvitation> = new Subject<ContributorInvitation>()
 
   getInvitations(paper: Paper): Observable<ContributorInvitation> {
     // TODO Calcule 'fromblock'
-    this.INV_SC.at(paper.ethAddress).then(function(instance) {
-      return instance.getPastEvents('InvitationCreated',{
-        filter: {},
-        fromBlock: 0,
-        toBlock: 'latest'
-      });
-    }).then(result => {
-      result.forEach(event => {
-        this.invitations$.next({
-          expires: new Date(event.args.expires * 1000),
-          hashCode: event.args.hashCode
-        } as ContributorInvitation)
-      });
-    });
+    const instance = new Contract(paper.ethAddress, tokenAbiContributable.abi, this.PROVIDER)
+    //this.PROVIDER.resetEventsBlock(0)
+    const filter = instance.filters.InvitationCreated(paper.ethAddress, null, null)
+    instance.on(filter, (asset, hashCode, expires) => {
+      this.invitations$.next({
+        expires: new Date(expires * 1000),
+        hashCode: hashCode
+      } as ContributorInvitation)
+    })
+
     return this.invitations$.asObservable()
   }
 
@@ -59,38 +52,42 @@ export class InvitationService {
     this.buildContributorInvitation(asset, email).then(async invitation => {
       invitation = await this.createInvitationOnEthereum(invitation)
       this.invitations$.next(invitation)
-    });
-    
+    })
+
     return this.invitations$.asObservable()
   }
 
   validate(invitation: ContributorInvitation) {
-    if(invitation.expires > new Date()) {
+    if (invitation.expires > new Date()) {
       throw new Error('Invitation expired')
     }
   }
-  
-  async join(invitation: ContributorInvitation):Promise<any> {
-    let profile = await this.authService.getProfile()
+
+  async join(invitation: ContributorInvitation): Promise<any> {
+    const profile = await this.authService.getProfile()
     return this.joinOnEthereum(invitation, profile.sub)
   }
 
   async isOwner(paper: Paper): Promise<boolean> {
-    let accountInfo: any = await this.ethereumService.getAccountInfo()
-    return accountInfo.fromAccount.toUpperCase() === paper.ownerAddress.toUpperCase()
+    const signer = await this.PROVIDER.getSigner()
+    const account = await signer.getAddress()
+    return account.toUpperCase() === paper.ownerAddress.toUpperCase()
   }
 
-  private async joinOnEthereum(invitation: ContributorInvitation, user_id: string):Promise<any> {
-    let instance = await this.INV_SC.at(invitation.asset.ethAddress)
+  private async joinOnEthereum(invitation: ContributorInvitation, user_id: string): Promise<any> {
+    const address = await this.ethereumService.getSCAddress(tokenAbiContributable)
+    const signer = this.PROVIDER.getSigner()
+    const instance = new Contract(address, tokenAbiContributable.abi, signer)
     return await instance.join(invitation.token, user_id)
   }
 
-  private async createInvitationOnEthereum(invitation: ContributorInvitation):Promise<ContributorInvitation> {
-    let web3 = this.ethereumService.getWeb3();
-    let hashedCode = await web3.utils.soliditySha3(invitation.token)
+  private async createInvitationOnEthereum(invitation: ContributorInvitation): Promise<ContributorInvitation> {
+    const web3 = this.ethereumService.getWeb3()
+    const hashedCode = await web3.utils.soliditySha3(invitation.token)
     invitation.hashCode = hashedCode
-    let instance = await this.INV_SC.at(invitation.asset.ethAddress)
-    let tx = await instance.addInvitation(hashedCode, invitation.expires.getTime() / 1000)
+    const signer = this.PROVIDER.getSigner()
+    const instance = new Contract(invitation.asset.ethAddress, tokenAbiContributable.abi, signer)
+    await instance.addInvitation(hashedCode, invitation.expires.getTime() / 1000)
     return invitation
   }
 
@@ -109,19 +106,19 @@ export class InvitationService {
     }))
   }
 
-  private async getTimestampFromEthereum():Promise<Date> {
-    let web3 = this.ethereumService.getWeb3();
-    let block = await web3.eth.getBlockNumber().then(web3.eth.getBlock)
-    let expires = block.timestamp + 24 * 60 * 60
-    return new Date(expires * 1000);
+  private async getTimestampFromEthereum(): Promise<Date> {
+    const web3 = this.ethereumService.getWeb3()
+    const block = await web3.eth.getBlockNumber().then(web3.eth.getBlock)
+    const expires = block.timestamp + 24 * 60 * 60
+    return new Date(expires * 1000)
   }
 
-  private async buildContributorInvitation(asset:IAsset, email:string): Promise<ContributorInvitation> {
-    let now = await this.getTimestampFromEthereum()
-    let expires = new Date(now.getTime())
+  private async buildContributorInvitation(asset: IAsset, email: string): Promise<ContributorInvitation> {
+    const now = await this.getTimestampFromEthereum()
+    const expires = new Date(now.getTime())
     expires.setDate(expires.getDate() + InvitationService.EXPIRATION_DAYS)
 
-    let invitation = {
+    const invitation = {
       guest: { email: email },
       asset: asset,
       code: this.generateCode(),
@@ -129,12 +126,12 @@ export class InvitationService {
       created: now
     } as ContributorInvitation
 
-    let token:string = this.generateToken(invitation)
-    let link:string = environment.base_url + '/' +
+    const token: string = this.generateToken(invitation)
+    const link: string = environment.base_url + '/' +
       this.location.prepareExternalUrl(
         this.router.createUrlTree(['/detail', asset.ethAddress, {invitation: token}]).toString())
-    
-    let href_mailto = new URLSearchParams()
+
+    const href_mailto = new URLSearchParams()
     href_mailto.set('subject', 'You were invited to contribute on a Paper!')
     href_mailto.set('body', link)
 
@@ -144,5 +141,5 @@ export class InvitationService {
 
     return invitation
   }
-  
+
 }

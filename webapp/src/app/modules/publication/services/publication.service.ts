@@ -1,75 +1,56 @@
-import { Injectable } from '@angular/core';
-import { Paper, Comment, Contributor } from "../models"
-import { EthereumService, IpfsService, AlertService, HashService, AuthenticationService } from "@app/core/services";
-import * as TruffleContract from "truffle-contract";
-import { Observable, merge } from "rxjs";
-import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
-import { Contract } from 'ethers';
+import { Injectable } from '@angular/core'
+import { Paper, Comment, Contributor } from '../models'
+import { EthereumService, IpfsService, HashService, AuthenticationService } from '@app/core/services'
+import { Observable, merge } from 'rxjs'
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
+import { Contract } from 'ethers'
 
-declare let require: any;
+declare let require: any
 
-let tokenAbiPeerReviewWorkflow = require('@contracts/PeerReviewWorkflow.json');
-let tokenAbiAssetFactory = require('@contracts/AssetFactory.json');
-let tokenAbiPaper = require('@contracts/Paper.json');
+const tokenAbiPeerReviewWorkflow = require('@contracts/PeerReviewWorkflow.json')
+const tokenAbiAssetFactory = require('@contracts/AssetFactory.json')
+const tokenAbiPaper = require('@contracts/Paper.json')
 
 @Injectable({
   providedIn: 'root'
 })
 export class PublicationService {
 
-  readonly WF_SC = TruffleContract(tokenAbiPeerReviewWorkflow); // TODO A Paper may be associated to a different workflows. Just now this by default but should be dynamic.
-  readonly ASSET_FACTORY_SC = TruffleContract(tokenAbiAssetFactory);
-  readonly PAPER_SC = TruffleContract(tokenAbiPaper);
-
-  WF_SC_INSTANCE;
-  ASSET_FACTORY_SC_INSTANCE;
-
   constructor(
     private ethereumService: EthereumService,
     private ipfsService: IpfsService,
-    private alertService: AlertService,
     private hashService: HashService,
     private authService: AuthenticationService
   ) {
-    this.WF_SC.setProvider(ethereumService.web3Provider);
-    this.ASSET_FACTORY_SC.setProvider(ethereumService.web3Provider);
-    this.PAPER_SC.setProvider(ethereumService.web3Provider);
+    this.PROVIDER = this.ethereumService.getProvider()
 
-    // Init defaults
-    this.ethereumService.getAccountInfo().then((acctInfo: any) => {
-      this.WF_SC.defaults({
-        from: acctInfo.fromAccount
-      });
-      this.ASSET_FACTORY_SC.defaults({
-        from: acctInfo.fromAccount
-      });
-      this.PAPER_SC.defaults({
-        from: acctInfo.fromAccount
-      });
-
-      this.ASSET_FACTORY_SC.deployed().then(instance => this.ASSET_FACTORY_SC_INSTANCE = instance);
-      this.WF_SC.deployed().then(instance => this.WF_SC_INSTANCE = instance);
-    }).catch((e) => {
-      this.alertService.error(e);
-    });
+    // Workaround issue: https://github.com/ethers-io/ethers.js/issues/386
+    this.PROVIDER.getBlockNumber().then(number => this.PROVIDER.resetEventsBlock(number + 1))
   }
 
+
+  private readonly PROVIDER: any
+
+  stateChanged: Observable<AssetStateChanged>
+
+  commentAdded: Observable<AssetCommentAdded>
+
   async getPaper(address: string): Promise<Paper> {
-    let paper_sc = await this.PAPER_SC.at(address);
-    let values = await Promise.all([
-      paper_sc.title.call(),
-      paper_sc.summary.call(),
-      paper_sc.getFile.call(0),
-      paper_sc.getKeywordsCount.call(),
-      paper_sc.getContributors.call(),
-      paper_sc.owner.call()
-    ]);
-    let keywords_count = parseInt(values[3],10)
-    let keywords_promises: any = []
-    for(let i = 0; i < keywords_count; i++) {
-      keywords_promises.push(paper_sc.keywords.call(i));
+    const instance = new Contract(address, tokenAbiPaper.abi, this.PROVIDER)
+    const values = await Promise.all([
+      instance.title(),
+      instance.summary(),
+      instance.getFile(0),
+      instance.getKeywordsCount(),
+      instance.getContributors(),
+      instance.owner()
+    ])
+    const keywords_count = parseInt(values[3], 10)
+    const keywords_promises: any = []
+    for (let i = 0; i < keywords_count; i++) {
+      keywords_promises.push(instance.keywords(i))
     }
-    let keywords = await Promise.all(keywords_promises)
+    const keywords = await Promise.all(keywords_promises)
     return new Paper(
       values[0],
       values[1],
@@ -79,158 +60,137 @@ export class PublicationService {
       values[2][1],
       values[2][2],
       values[2][3],
-      keywords.map(item => {return item}) as string[],
-      values[4].map(c => { return {ethAddress: c} }) as Contributor[],
+      keywords.map(item => item) as string[],
+      values[4].map(c => ({ethAddress: c})) as Contributor[],
       values[5]
-    );
+    )
   }
 
-  stateChanged:Observable<AssetStateChanged>;
-  
   getStateChangedPapers(): Observable<AssetStateChanged> {
-    if(!this.stateChanged) {
-      this.stateChanged = Observable.create(observer => {
-        this.WF_SC.deployed().then(instance => {
-          // TODO Filter by asset type
-          const event = instance.AssetStateChanged({});
-          event.on('data', (data) => {
-            this.getPaper(data['args']['assetAddress']).then(paper => {
-              let e = {
-                assetAddress: data['args']['assetAddress'],
-                state: data['args']['state'],
-                oldState: data['args']['oldState'],
-                transition: data['args']['transition'],
-                asset: paper
-              } as AssetStateChanged;
-              observer.next(e);
-            });
-          });
+    if (!this.stateChanged) {
+      this.stateChanged = Observable.create(async observer => {
+        const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+        const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
+
+        // TODO Filter by asset type
+        const filter = instance.filters.AssetStateChanged()
+        instance.on(filter, async (assetAddress, state, oldState, transition) => {
+          console.log('Asset state changed (' + assetAddress + ', ' + state + ', ' + oldState + ', ' + transition + ')')
+          const paper = await this.getPaper(assetAddress)
+          observer.next({
+            assetAddress: assetAddress,
+            state: state,
+            oldState: oldState,
+            transition: transition,
+            asset: paper
+          } as AssetStateChanged)
         })
-      });
+      })
     }
-    
-    return this.stateChanged;
+
+    return this.stateChanged
   }
 
-  commentAdded:Observable<AssetCommentAdded>;
-  
   getCommentsChangedPapers(): Observable<AssetCommentAdded> {
-    if(!this.commentAdded) {
-      this.commentAdded = Observable.create(observer => {
-        this.WF_SC.deployed().then(instance => {
-          // TODO Filter by asset type
-          const event = instance.AssetCommentAdded({});
-          event.on('data', (data) => {
-            let e = {
-              assetAddress: data['args']['assetAddress'],
-              message: data['args']['message'],
-              authorAddress: data['args']['author'],
-              timestamp: data['args']['timestamp'],
-              state: data['args']['state']
-            } as AssetCommentAdded;
-            observer.next(e);
-          });
+    if (!this.commentAdded) {
+      this.commentAdded = Observable.create(async observer => {
+        const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+        const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
+        const filter = instance.filters.AssetStateChanged()
+        instance.on(filter, async (assetAddress, message, authorAddress, timestamp, state) => {
+          console.log('Comment Added (' + assetAddress + ', ' + message + ', ' + authorAddress + ', '
+          + timestamp + ', ' + state + ')')
+          observer.next({
+            assetAddress: assetAddress,
+            message: message,
+            authorAddress: authorAddress,
+            timestamp: timestamp,
+            state: state
+          } as AssetCommentAdded)
         })
-      });
+      })
     }
-    
-    return this.commentAdded;
+    return this.commentAdded
   }
 
   getAllPapersOnState(state: string): Observable<Paper> {
-    return Observable.create(observer => {
-      this.WF_SC.deployed().then(instance => {
-        // TODO Filter by asset type
-        return instance.findAssetsByState.call(state);
-      }).then(addresses => {
-        addresses.forEach((address) => this.getPaper(address).then((paper) => observer.next(paper)));
-      });
-    });
+    return Observable.create(async observer => {
+      const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+      const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
+      // TODO Filter by asset type
+      const addresses = await instance.findAssetsByState(state)
+      addresses.forEach(async address => {
+        const paper = await this.getPaper(address)
+        observer.next(paper)
+      })
+    })
   }
 
   getComments(paper: Paper): Observable<Comment> {
-    return Observable.create(observer => {
-      let wf;
-      this.WF_SC.deployed().then(instance => {
-        wf = instance;
-        return Promise.all([
-          wf.name.call(),
-          wf.getCommentsCount.call(paper.ethAddress)
-        ])
-      }).then(values => {
-        let wf_name = values[0];
-        let count = values[1];
+    return Observable.create(async observer => {
+      const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+      const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
+      const values = await Promise.all([
+        instance.name(),
+        instance.getCommentsCount(paper.ethAddress)
+      ])
+      const wf_name = values[0]
+      const count = values[1]
 
-        // Get current comments
-        for(let i = 0; i < count; i++) {
-          wf.getComment(paper.ethAddress,i).then(value => 
-            observer.next({
-              workflow: { name: wf_name, state: value[3] },
-              message: value[0],
-              author: value[1],
-              timestamp: parseInt(value[2],10)
-            } as Comment)
-          )
-        }
+      // Get current comments
+      for (let i = 0; i < count; i++) {
+        const comment = await instance.getComment(paper.ethAddress, i)
+        observer.next({
+          workflow: { name: wf_name, state: comment[3] },
+          message: comment[0],
+          author: comment[1],
+          timestamp: parseInt(comment[2], 10)
+        } as Comment)
+      }
 
-        // Update observable from event
-        const event = wf.AssetCommentAdded({});
-        event.on('data', (data) => {
-          let e = {
-            workflow: { name: wf_name, state: data['args']['state'] },
-            message: data['args']['message'],
-            author: data['args']['author'],
-            timestamp: parseInt(data['args']['timestamp'],10)
-          } as Comment;
-          observer.next(e);
-        });
-      });
-    });
+      // Update observable from event
+      const filter = instance.filters.AssetCommentAdded(paper.ethAddress, null, null, null, null)
+      instance.on(filter, (asset, message, author, timestamp, state) => {
+        console.log('Asset Comment Added (' + asset + ', ' + state + ', ' + message + ', ' + author + ', ' + timestamp + ')')
+        observer.next({
+          workflow: { name: wf_name, state: state },
+          message: message,
+          author: author,
+          timestamp: parseInt(timestamp, 10)
+        } as Comment)
+      })
+    })
   }
 
-  getWorkflowsState(paper:Paper): Promise<WorkflowState[]> {
-    return new Promise<WorkflowState[]>((resolve, reject) => {
-      // TODO A Paper may be associated to a differente workflows. Just now this by default.
-      let wf;
-      let workflowsState: WorkflowState[] = [];
-      this.WF_SC.deployed().then(workflow => {
-        wf = workflow;
-        return Promise.all([
-          wf.name.call(),
-          wf.findStateByAsset.call(paper.ethAddress)
-        ]);
-      }).then(values => {
-        workflowsState.push({name: values[0], state: values[1]} as WorkflowState)
-        resolve(workflowsState);
-      });
-    });
-  };
-
-  getWorkflowTransitions(paper: Paper): Promise<WorkflowTransition[]> {
-    return new Promise<WorkflowTransition[]>((resolve, reject) => {
-      let wf;
-      let workflowTransitions: WorkflowTransition[] = [];
-      let workflowsState: WorkflowState[] = [];
-      Promise.all([
-        this.getWorkflowsState(paper),
-        this.WF_SC.deployed()
-      ]).then(values => {
-        workflowsState = values[0];
-        wf = values[1];
-        return wf.getTransitionsCount.call();
-      }).then(count => {
-        let length = parseInt(count,10);
-        let promises: any = [];
-        for(let i = 0; i < length; i++) {
-          promises.push(wf.getTransition(i));
-        }
-        return Promise.all(promises);
-      }).then(values => {
-        let transitionsFiltered = values.filter(transition => transition[1] === workflowsState[0]['state'] && transition[0].toLowerCase() !== 'publish');
-        transitionsFiltered.forEach(transition => workflowTransitions.push({name: transition[0], sourceState: transition[1], targetState: transition[2]}))
-        resolve(workflowTransitions);
-      })
-    });
+  async getWorkflowsState(paper: Paper): Promise<WorkflowState[]> {
+    // TODO A Paper may be associated to a differente workflows. Just now this by default.
+    const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+    const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
+    const values = await Promise.all([
+      instance.name(),
+      instance.findStateByAsset(paper.ethAddress)
+    ])
+    const workflowsState: WorkflowState[] = []
+    workflowsState.push({name: values[0], state: values[1]} as WorkflowState)
+    return workflowsState
+  }
+  async getWorkflowTransitions(paper: Paper): Promise<WorkflowTransition[]> {
+    // TODO A Paper may be associated to a differente workflows. Just now this by default.
+    const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+    const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
+    const workflowsState = await this.getWorkflowsState(paper)
+    const count = await instance.getTransitionsCount()
+    const length = parseInt(count, 10)
+    const promises: any = []
+    for (let i = 0; i < length; i++) {
+      promises.push(instance.getTransition(i))
+    }
+    const values = await Promise.all(promises)
+    const transitionsFiltered = values.filter(
+      transition => transition[1] === workflowsState[0]['state'] && transition[0].toLowerCase() !== 'publish')
+    const workflowTransitions: WorkflowTransition[] = transitionsFiltered.map(
+      transition => ({name: transition[0], sourceState: transition[1], targetState: transition[2]}))
+    return workflowTransitions
   }
 
   async submit(title: string, abstract: string, keywords: string[], file: File): Promise<Paper> {
@@ -239,55 +199,52 @@ export class PublicationService {
     return this.submitToEth(paper)
   }
 
-  private submitToIpfs(title:string, abstract: string, file: File): Promise<Paper> {
+  private submitToIpfs(title: string, abstract: string, file: File): Promise<Paper> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-      }, 10000);
+      }, 10000)
 
-      let reader = new FileReader();
+      const reader = new FileReader()
       reader.onload = (event) => {
         Promise.all([
           this.ipfsService.upload(event.target['result']),
           this.hashService.hash(file)
         ]).then(values => {
-          let ipfsObject = values[0];
-          let h = values[1];
-          
-          let paper = new Paper(
+          const ipfsObject = values[0]
+          const h = values[1]
+
+          const paper = new Paper(
             title,
             abstract,
             null,
-            file.name, //TODO check this, ipfsObject (ipfs hash) is not better?
+            file.name, // TODO check this, ipfsObject (ipfs hash) is not better?
             'IPFS',
             'https://ipfs.io/ipfs/' + ipfsObject,
             h.hashAlgorithm,
             h.hash,
             null,
             null,
-            null);
-            
-          resolve(paper);
-        }).catch(error => {
-          reject(error);
-        });
-      };
+            null)
 
-      reader.readAsArrayBuffer(file);
+          resolve(paper)
+        }).catch(error => {
+          reject(error)
+        })
+      }
+
+      reader.readAsArrayBuffer(file)
     })
   }
 
   private submitToEth(paper: Paper): Promise<Paper> {
     return new Promise<Paper>(async (resolve, reject) => {
-      const abi = tokenAbiAssetFactory.abi;
-      let provider = this.ethereumService.getProvider();
-      let truffle_instance = await this.ASSET_FACTORY_SC.deployed()
-      let address = truffle_instance.address
       // Uses ethers.js because ABIEncoderV2 does not work with truffle-contract and web3js
-      let signer = provider.getSigner()
-      let instance = new Contract(address, abi, signer)
-      let profile = await this.authService.getProfile()
-      let account = await signer.getAddress()
-      let filter = instance.filters.AssetCreated(null, null, account)
+      const address = await this.ethereumService.getSCAddress(tokenAbiAssetFactory)
+      const signer = this.PROVIDER.getSigner()
+      const instance = new Contract(address, tokenAbiAssetFactory.abi, signer)
+      const profile = await this.authService.getProfile()
+      const account = await signer.getAddress()
+      const filter = instance.filters.AssetCreated(null, null, account)
       instance.on(filter, (asset, type, sender) => {
         console.log('Asset created (' + asset.toString() + '), type: ' + type + ' from sender: ' + sender)
         resolve(new Paper(
@@ -302,10 +259,11 @@ export class PublicationService {
           paper.keywords,
           paper.contributors,
           paper.ownerAddress
-        ));
+        ))
       })
-  
+
       try {
+        const address_wf = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
         await instance.createPaper(
           paper.title,
           paper.abstract,
@@ -314,53 +272,60 @@ export class PublicationService {
           paper.summaryHashAlgorithm,
           paper.summaryHash,
           paper.keywords,
-          this.WF_SC_INSTANCE.address, // Creates Paper with PeerReviewWorkflow by default
+          address_wf, // Creates Paper with PeerReviewWorkflow by default
           profile.sub // user_id
-        );
-      } catch(error) {
+        )
+      } catch (error) {
         console.log('Failed TX:', error.transactionHash)
         console.error(error)
-        reject("Error creating the Paper on Ethereum or procesing the response")
+        reject('Error creating the Paper on Ethereum or procesing the response')
       }
-    });
+    })
   }
 
-  review(paper: Paper, comment: string): Promise<any> {
-    return this.WF_SC.deployed().then(instance => instance.review(paper.ethAddress, comment));
+  async review(paper: Paper, comment: string): Promise<any> {
+    const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+    const signer = this.PROVIDER.getSigner()
+    const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, signer)
+    return instance.review(paper.ethAddress, comment)
   }
 
-  accept(paper: Paper, comment: string): Promise<any> {
-    return this.WF_SC.deployed().then(instance => instance.accept(paper.ethAddress, comment));
+  async accept(paper: Paper, comment: string): Promise<any> {
+    const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+    const signer = this.PROVIDER.getSigner()
+    const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, signer)
+    return instance.accept(paper.ethAddress, comment)
   }
 
-  reject(paper: Paper, comment: string): Promise<any> {
-    return this.WF_SC.deployed().then(instance => instance.reject(paper.ethAddress, comment));
+  async reject(paper: Paper, comment: string): Promise<any> {
+    const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+    const signer = this.PROVIDER.getSigner()
+    const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, signer)
+    return instance.reject(paper.ethAddress, comment)
   }
 
-  addComment(paper: Paper, message: string): Promise<void> {
-    return this.WF_SC.deployed().then(instance => instance.addComment(paper.ethAddress, message));
+  async addComment(paper: Paper, message: string): Promise<void> {
+    const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+    const signer = this.PROVIDER.getSigner()
+    const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, signer)
+    return instance.addComment(paper.ethAddress, message)
   }
 
-  getPapersByKeywords(keywords:string[]): Observable<Paper> {
+  getPapersByKeywords(keywords: string[]): Observable<Paper> {
     return Observable.create(async observer => {
-      const abi = tokenAbiAssetFactory.abi;
-      let provider = this.ethereumService.getProvider();
-      let truffle_instance = await this.ASSET_FACTORY_SC.deployed()
-      let address = truffle_instance.address
       // Uses ethers.js because ABIEncoderV2 does not work with truffle-contract and web3js
-      let signer = provider.getSigner()
-      let instance = new Contract(address, abi, signer)
-      let assets = await instance.getAssetsByKeywords(keywords)
-      assets.forEach(asset => {
-        this.getPaper(asset).then(paper => {
-          observer.next(paper)
-        });
-      });
-    });
+      const address = await this.ethereumService.getSCAddress(tokenAbiAssetFactory)
+      const instance = new Contract(address, tokenAbiAssetFactory.abi, this.PROVIDER)
+      const assets = await instance.getAssetsByKeywords(keywords)
+      assets.forEach(async asset => {
+        const paper = await this.getPaper(asset)
+        observer.next(paper)
+      })
+    })
   }
 
   search(terms: Observable<string>): Observable<Paper> {
-    // TODO Refactor: Search on all papers
+    // TODO Refactor: Search on title and abstract
     return terms.pipe(
       debounceTime(400),
       distinctUntilChanged(),
@@ -369,7 +334,7 @@ export class PublicationService {
           this.getAllPapersOnState(term)
         )
       )
-    );
+    )
   }
 }
 
@@ -378,7 +343,7 @@ export interface AssetStateChanged {
   state: string,
   oldState: string,
   transition: string
-  asset: any;
+  asset: any
 }
 
 export interface AssetCommentAdded {
@@ -392,8 +357,8 @@ export interface AssetCommentAdded {
 export interface WorkflowState {
   name: string,
   state: string
-  transitions: WorkflowTransition[];
-  comments: Comment[];
+  transitions: WorkflowTransition[]
+  comments: Comment[]
 }
 
 export interface WorkflowTransition {

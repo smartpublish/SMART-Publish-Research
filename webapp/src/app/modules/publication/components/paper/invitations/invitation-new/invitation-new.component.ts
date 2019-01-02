@@ -1,5 +1,5 @@
-import { Component, Output, EventEmitter, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core'
+import { FormBuilder, FormGroup, Validators } from '@angular/forms'
 
 @Component({
   selector: 'app-invitation-new',
@@ -8,7 +8,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 })
 export class InvitationNewComponent implements OnInit {
 
-  @Output() email:EventEmitter<string> = new EventEmitter<string>();
+  @Output() email: EventEmitter<string> = new EventEmitter<string>()
   form: FormGroup
 
   constructor(
@@ -22,7 +22,7 @@ export class InvitationNewComponent implements OnInit {
   }
 
   onSubmit() {
-    let emailFormControl = this.form.get('email')
+    const emailFormControl = this.form.get('email')
     this.email.emit(emailFormControl.value)
     emailFormControl.reset()
   }

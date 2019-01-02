@@ -1,43 +1,41 @@
-import { Injectable } from '@angular/core';
-import { Paper } from '@app/modules/publication/models';
-import { Observable } from 'rxjs';
-import { EthereumService } from '@app/core/services';
-import * as TruffleContract from "truffle-contract";
-import { PublicationService } from '@app/modules/publication/services/publication.service';
+import { Injectable } from '@angular/core'
+import { Paper } from '@app/modules/publication/models'
+import { Observable } from 'rxjs'
+import { EthereumService } from '@app/core/services'
+import { PublicationService } from '@app/modules/publication/services/publication.service'
+import { Contract } from 'ethers'
 
-declare let require: any;
-let tokenAbiAssetFactory = require('@contracts/AssetFactory.json');
+declare let require: any
+const tokenAbiAssetFactory = require('@contracts/AssetFactory.json')
 
 @Injectable({
   providedIn: 'root'
 })
 export class MyWorkService {
 
-  readonly ASSET_FACTORY_SC = TruffleContract(tokenAbiAssetFactory);
+  private readonly PROVIDER: any
 
   constructor(
     private ethereumService: EthereumService,
     private publicationService: PublicationService
-  ) { 
-    this.ASSET_FACTORY_SC.setProvider(ethereumService.web3Provider);
-    // Init defaults
-    this.ethereumService.getAccountInfo().then((acctInfo: any) => {
-      this.ASSET_FACTORY_SC.defaults({
-        from: acctInfo.fromAccount
-      });
-    });
+  ) {
+    this.PROVIDER = this.ethereumService.getProvider()
+
+    // Workaround issue: https://github.com/ethers-io/ethers.js/issues/386
+    this.PROVIDER.getBlockNumber().then(number => this.PROVIDER.resetEventsBlock(number + 1))
   }
 
   getMyPapers(): Observable<Paper> {
-    return Observable.create(observer => {
-      this.ASSET_FACTORY_SC.deployed().then(async instance => {
-        let acctInfo:any = await this.ethereumService.getAccountInfo()
-        let assetsAddress:string[] = await instance.getAssetsByCreator.call(acctInfo.fromAccount)
-        assetsAddress.forEach(async address => {
-          let paper = await this.publicationService.getPaper(address)
-          observer.next(paper)
-        })
-      });
-    });
+    return Observable.create(async observer => {
+      const address = await this.ethereumService.getSCAddress(tokenAbiAssetFactory)
+      const instance = new Contract(address, tokenAbiAssetFactory.abi, this.PROVIDER)
+      const signer = await this.PROVIDER.getSigner()
+      const account = await signer.getAddress()
+      const assetsAddress: string[] = await instance.getAssetsByCreator(account)
+      assetsAddress.forEach(async address => {
+        const paper = await this.publicationService.getPaper(address)
+        observer.next(paper)
+      })
+    })
   }
 }

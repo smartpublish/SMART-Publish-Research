@@ -1,5 +1,5 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-comment-list',
@@ -9,13 +9,13 @@ import { Observable } from 'rxjs';
 })
 export class CommentListComponent implements OnInit {
 
-  @Input() comments$:Observable<Comment[]>;
+  @Input() comments$: Observable<Comment[]>
 
   constructor() {
   }
 
   ngOnInit() {
-    
+
   }
 
 }

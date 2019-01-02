@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Observable } from "rxjs";
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
+import { Observable } from 'rxjs'
 
 @Component({
   selector: 'app-cardlist',
@@ -8,12 +8,12 @@ import { Observable } from "rxjs";
 })
 export class CardlistComponent implements OnInit, OnDestroy {
 
-  @Input() title: string;
-  @Input() description: string;
-  @Input() items$: Observable<DataCard[]>;
+  @Input() title: string
+  @Input() description: string
+  @Input() items$: Observable<DataCard[]>
 
-  @Output() clickActionCard: EventEmitter<any> = new EventEmitter();
-  @Output() clickCard: EventEmitter<any> = new EventEmitter();
+  @Output() clickActionCard: EventEmitter<any> = new EventEmitter()
+  @Output() clickCard: EventEmitter<any> = new EventEmitter()
 
   constructor() { }
 
@@ -23,25 +23,25 @@ export class CardlistComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
   }
 
-  onClickCard(item:DataCard, $event) {
-    $event.stopPropagation();
-    this.clickCard.emit(item);
+  onClickCard(item: DataCard, $event) {
+    $event.stopPropagation()
+    this.clickCard.emit(item)
   }
 
-  onClickAction(number:number, item:DataCard, $event) {
-    $event.stopPropagation();
+  onClickAction(number: number, item: DataCard, $event) {
+    $event.stopPropagation()
     this.clickActionCard.emit({
-      "action_number": number,
-      "item": item.model
-    });
+      'action_number': number,
+      'item': item.model
+    })
   }
 }
 
 export interface DataCard {
-  model:any;
-  title:string;
-  subtitle:string;
-  description:string,
-  action_1_name:string;
-  action_2_name:string;
+  model: any
+  title: string
+  subtitle: string
+  description: string,
+  action_1_name: string
+  action_2_name: string
 }

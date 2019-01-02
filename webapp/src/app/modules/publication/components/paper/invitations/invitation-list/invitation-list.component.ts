@@ -1,7 +1,7 @@
-import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core';
-import { Observable } from 'rxjs';
-import { ContributorInvitation } from '@app/modules/publication/models';
-import { DomSanitizer } from '@angular/platform-browser';
+import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core'
+import { Observable } from 'rxjs'
+import { ContributorInvitation } from '@app/modules/publication/models'
+import { DomSanitizer } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-invitation-list',
@@ -11,14 +11,14 @@ import { DomSanitizer } from '@angular/platform-browser';
 })
 export class InvitationListComponent implements OnInit {
 
-  @Input() invitations$:Observable<ContributorInvitation[]>;
+  @Input() invitations$: Observable<ContributorInvitation[]>
 
   constructor(
     private sanitizeService: DomSanitizer
   ) { }
 
-  sanitize(url:string){
-    return this.sanitizeService.bypassSecurityTrustUrl(url);
+  sanitize(url: string) {
+    return this.sanitizeService.bypassSecurityTrustUrl(url)
   }
 
   ngOnInit() {

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from '@app/core/services';
+import { Component, OnInit } from '@angular/core'
+import { AuthenticationService } from '@app/core/services'
 
 @Component({
   selector: 'app-navbar',
@@ -8,7 +8,7 @@ import { AuthenticationService } from '@app/core/services';
 })
 export class NavbarComponent implements OnInit {
 
-  isCollapsed: boolean = true
+  isCollapsed = true
 
   constructor(public authService: AuthenticationService) { }
 

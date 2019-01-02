@@ -1,10 +1,10 @@
-import { NgModule } from '@angular/core';
-import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';
-import { BrowserModule } from '@angular/platform-browser';
-import { CoreModule } from "@app/core/core.module";
-import { SharedModule } from '@app/shared/shared.module';
-import { HomeModule, PublicationModule, MyWorkModule} from "@app/modules";
+import { NgModule } from '@angular/core'
+import { AppComponent } from './app.component'
+import { AppRoutingModule } from './app-routing.module'
+import { BrowserModule } from '@angular/platform-browser'
+import { CoreModule } from '@app/core/core.module'
+import { SharedModule } from '@app/shared/shared.module'
+import { HomeModule, PublicationModule, MyWorkModule} from '@app/modules'
 
 @NgModule({
   declarations: [
@@ -24,7 +24,7 @@ import { HomeModule, PublicationModule, MyWorkModule} from "@app/modules";
     HomeModule,
     PublicationModule,
     MyWorkModule,
-    
+
     // app
     AppRoutingModule
   ],

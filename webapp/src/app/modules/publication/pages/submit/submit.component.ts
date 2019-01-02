@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { AuthenticationService } from '@app/core/services';
+import { Component, OnInit } from '@angular/core'
+import { AuthenticationService } from '@app/core/services'
 
 @Component({
   selector: 'app-submit',

@@ -1,12 +1,12 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing'
 
-import { IpfsService } from './ipfs.service';
+import { IpfsService } from './ipfs.service'
 
 describe('IpfsService', () => {
-  beforeEach(() => TestBed.configureTestingModule({}));
+  beforeEach(() => TestBed.configureTestingModule({}))
 
   it('should be created', () => {
-    const service: IpfsService = TestBed.get(IpfsService);
-    expect(service).toBeTruthy();
-  });
-});
+    const service: IpfsService = TestBed.get(IpfsService)
+    expect(service).toBeTruthy()
+  })
+})

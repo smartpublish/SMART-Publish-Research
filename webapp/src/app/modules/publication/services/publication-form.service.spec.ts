@@ -1,12 +1,12 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing'
 
-import { PublicationFormService } from './publication-form.service';
+import { PublicationFormService } from './publication-form.service'
 
 describe('PublicationFormService', () => {
-  beforeEach(() => TestBed.configureTestingModule({}));
+  beforeEach(() => TestBed.configureTestingModule({}))
 
   it('should be created', () => {
-    const service: PublicationFormService = TestBed.get(PublicationFormService);
-    expect(service).toBeTruthy();
-  });
-});
+    const service: PublicationFormService = TestBed.get(PublicationFormService)
+    expect(service).toBeTruthy()
+  })
+})
