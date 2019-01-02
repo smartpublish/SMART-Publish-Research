@@ -1,5 +1,6 @@
-import { Injectable } from '@angular/core';
-import { ethers } from 'ethers';
+import { Injectable } from '@angular/core'
+import { ethers } from 'ethers'
+import { AlertService } from './alert.service';
 
 declare let window: any;
 
@@ -10,11 +11,23 @@ export class EthereumService {
 
   readonly ethersProvider;
 
-  constructor() {
-    // MetaMask injects a Web3 Provider as "web3.currentProvider"
-    if (typeof window.web3 !== 'undefined') {
+  constructor(private alertService: AlertService) {
+    // New MetaMask injects a Web3 Provider as "window.ethereum"
+    if (window.ethereum) {
+      this.ethersProvider = new ethers.providers.Web3Provider(window.ethereum)
+      try {
+        window.ethereum.enable()
+      } catch (error) {
+        console.error(error)
+        this.alertService.error("You must allow access Metamask in order to use this application")
+      }
+    } 
+    // Old MetaMask injects a Web3 Provider as "web3.currentProvider"
+    else if (window.web3) { 
       this.ethersProvider = new ethers.providers.Web3Provider(window.web3.currentProvider)
-    } else {
+    } 
+    // Non-dapp browsers...
+    else {
       this.ethersProvider = new ethers.providers.JsonRpcProvider('http://localhost:8545')
     }
   }
