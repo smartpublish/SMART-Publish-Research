@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef } from '@angular/core'
 import { Router } from '@angular/router'
 import { AssetStateChanged, PublicationService } from '@app/modules/publication/services/publication.service'
-import { BehaviorSubject, Subscription} from 'rxjs'
+import { Subscription, Observable} from 'rxjs'
 import { DataCard } from '@app/shared/layout/cardlist/cardlist.component'
 import { Paper } from '@app/modules/publication/models/paper.model'
-import { map, filter, scan } from 'rxjs/operators'
+import { map, filter, scan, take } from 'rxjs/operators'
 
 @Component({
   selector: 'app-home',
@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private cd: ChangeDetectorRef) {
   }
 
+  lastPaper$: Observable<Paper>
 
   papersCardByState$ = {
     'Submitted': null,
@@ -38,6 +39,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     } as DataCard
   }
   ngOnInit() {
+    this.lastPaper$ = this.publicationService.getAllPapersOnState('Published').pipe(take(1))
+
     // TODO Refactor
     this.papersCardByState$['Submitted'] = this.publicationService.getAllPapersOnState('Submitted').pipe(
       map(paper => HomeComponent.paperToCard(paper, 'Read')),

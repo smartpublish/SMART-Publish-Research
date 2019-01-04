@@ -1,85 +1,145 @@
 import { Contributor } from './contributor.model'
+import { Set } from 'immutable'
 
 export interface IAsset {
   readonly ethAddress: string
-  readonly contributors: Contributor[]
+  readonly contributors: Set<Contributor>
   readonly ownerAddress: string
 }
 
-class Asset implements IAsset {
-  public readonly ethAddress: string
-  public readonly fileName: string
-  public readonly fileSystemName: string
-  public readonly publicLocation: string
-  public readonly summaryHashAlgorithm: string
-  public readonly summaryHash: string
-  public readonly keywords: string[]
-  public readonly contributors: Contributor[]
-  public readonly ownerAddress: string
-
-  constructor(
-    ethAddress: string,
-    fileName: string,
-    fileSystemName: string,
-    publicLocation: string,
-    hashAlgorithm: string,
-    hash: string,
-    keywords: string[],
-    contributors: Contributor[],
-    ownerAddress: string) {
-
-    this.ethAddress = ethAddress
-    this.fileName = fileName
-    this.fileSystemName = fileSystemName
-    this.publicLocation = publicLocation
-    this.summaryHashAlgorithm = hashAlgorithm
-    this.summaryHash = hash
-    this.keywords = keywords
-    this.contributors = contributors
-    this.ownerAddress = ownerAddress
-  }
-
+export type PaperJson = {
+  ethAddress: string
+  title: string
+  summary: string
+  abstract: string
+  fileName: string
+  fileSystemName: string
+  publicLocation: string
+  summaryHashAlgorithm: string
+  summaryHash: string
+  topic: string
+  keywords: Set<string>
+  contributors: Set<Contributor>
+  ownerAddress: string
 }
 
-export class Paper extends Asset {
-  public readonly title: string
-  public readonly abstract: string
+class PaperBuilder {
+  private json: PaperJson
+  constructor(paper?: Paper) {
+    this.json = paper ? paper.toJSON() : <PaperJson>{}
+  }
+  ethAddress(ethAddress: string): PaperBuilder {
+    this.json.ethAddress = ethAddress
+    return this
+  }
+  title(title: string): PaperBuilder {
+    this.json.title = title
+    return this
+  }
+  summary(summary: string): PaperBuilder {
+    this.json.summary = summary
+    return this
+  }
+  abstract(abstract: string): PaperBuilder {
+    this.json.abstract = abstract
+    return this
+  }
+  fileName(fileName: string): PaperBuilder {
+    this.json.fileName = fileName
+    return this
+  }
+  fileSystemName(fileSystemName: string): PaperBuilder {
+    this.json.fileSystemName = fileSystemName
+    return this
+  }
+  publicLocation(publicLocation: string): PaperBuilder {
+    this.json.publicLocation = publicLocation
+    return this
+  }
+  summaryHashAlgorithm(summaryHashAlgorithm: string): PaperBuilder {
+    this.json.summaryHashAlgorithm = summaryHashAlgorithm
+    return this
+  }
+  summaryHash(summaryHash: string): PaperBuilder {
+    this.json.summaryHash = summaryHash
+    return this
+  }
+  topic(topic: string): PaperBuilder {
+    this.json.topic = topic
+    return this
+  }
+  keywords(keywords: Set<string>): PaperBuilder {
+    this.json.keywords = keywords
+    return this
+  }
+  contributors(contributors: Set<Contributor>): PaperBuilder {
+    this.json.contributors = contributors
+    return this
+  }
+  ownerAddress(ownerAddress: string): PaperBuilder {
+    this.json.ownerAddress = ownerAddress
+    return this
+  }
+  build(): Paper {
+    return Paper.fromJSON(this.json)
+  }
+}
 
-  constructor(
-    title: string,
-    abstract: string,
-    ethAddress: string,
-    fileName: string,
-    fileSystemName: string,
-    publicLocation: string,
-    hashAlgorithm: string,
-    hash: string,
-    keywords: string[],
-    contributors: Contributor[],
-    ownerAddress: string) {
+export class Paper implements IAsset {
 
-    super(ethAddress, fileName, fileSystemName, publicLocation, hashAlgorithm, hash, keywords, contributors, ownerAddress)
-    this.title = title
-    this.abstract = abstract
+  private constructor (
+    readonly ethAddress: string,
+    readonly title: string,
+    readonly summary: string,
+    readonly abstract: string,
+    readonly fileName: string,
+    readonly fileSystemName: string,
+    readonly publicLocation: string,
+    readonly summaryHashAlgorithm: string,
+    readonly summaryHash: string,
+    readonly topic: string,
+    readonly keywords: Set<string>,
+    readonly contributors: Set<Contributor>,
+    readonly ownerAddress: string
+  ) { }
+  
+  toJSON(): PaperJson {
+    return {
+      ethAddress: this.ethAddress,
+      title: this.title,
+      summary: this.summary,
+      abstract: this.abstract,
+      fileName: this.fileName,
+      fileSystemName: this.fileSystemName,
+      publicLocation: this.publicLocation,
+      summaryHashAlgorithm: this.summaryHashAlgorithm,
+      summaryHash: this.summaryHash,
+      topic: this.topic,
+      keywords: this.keywords,
+      contributors: this.contributors,
+      ownerAddress: this.ownerAddress
+    }
+  }
+    
+  static fromJSON(json: PaperJson): Paper {
+    return new Paper(
+      json.ethAddress,
+      json.title,
+      json.summary,
+      json.abstract,
+      json.fileName,
+      json.fileSystemName,
+      json.publicLocation,
+      json.summaryHashAlgorithm,
+      json.summaryHash,
+      json.topic,
+      json.keywords,
+      json.contributors,
+      json.ownerAddress
+    )
   }
 
-  copy(
-    fileSystemName?: string,
-    publicLocation?: string,
-    keywords?: string[],
-  ): Paper {
-    return new Paper(
-      this.title,
-      this.abstract,
-      this.ethAddress,
-      this.fileName,
-      fileSystemName ? fileSystemName : this.fileSystemName,
-      publicLocation ? publicLocation : this.publicLocation,
-      this.summaryHashAlgorithm,
-      this.summaryHash,
-      keywords ? keywords : this.keywords,
-      this.contributors,
-      this.ownerAddress
-    )
+  static builder(paper?: Paper): PaperBuilder {
+    return new PaperBuilder(paper)
   }
 }

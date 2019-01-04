@@ -7,7 +7,7 @@ contract('PeerReviewWorkflowTest', function(accounts) {
     var asset, workflow;
     beforeEach(async function() {
         workflow = await PeerReviewWorkflow.deployed()
-        asset = await Paper.new(accounts[0], accounts[0], 'Title', 'Summary')
+        asset = await Paper.new(accounts[0], accounts[0], 'Title', 'Summary','Abstract','Topic')
     });
 
     it("should has a workflow name", async function() {

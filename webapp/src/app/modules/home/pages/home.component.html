@@ -1,3 +1,16 @@
+<div *ngIf="lastPaper$ | async as paper" class="row my-4">
+  <div class="col-lg-8">
+    <img class="img-fluid rounded" src="http://placehold.it/900x400" alt="">
+  </div>
+  <!-- /.col-lg-8 -->
+  <div class="col-lg-4">
+    <h1>{{paper.title}}</h1>
+    <p>{{paper.abstract}}</p>
+    <a class="btn btn-primary btn-lg" href="{{paper.publicLocation}}" target='_blank'>Read!</a>
+  </div>
+  <!-- /.col-md-4 -->
+</div>
+
 <app-cardlist #published
   [title]="'Published'"
   [description]="'Last science papers published. Yay!'"

@@ -4,6 +4,7 @@ import { EthereumService, IpfsService, HashService, AuthenticationService } from
 import { Observable, merge } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { Contract } from 'ethers'
+import { Set } from 'immutable'
 
 declare let require: any
 
@@ -40,30 +41,33 @@ export class PublicationService {
     const values = await Promise.all([
       instance.title(),
       instance.summary(),
+      instance.abstrakt(),
       instance.getFile(0),
+      instance.topic(),
       instance.getKeywordsCount(),
       instance.getContributors(),
       instance.owner()
     ])
-    const keywords_count = parseInt(values[3], 10)
+    const keywords_count = parseInt(values[5], 10)
     const keywords_promises: any = []
     for (let i = 0; i < keywords_count; i++) {
       keywords_promises.push(instance.keywords(i))
     }
     const keywords = await Promise.all(keywords_promises)
-    return new Paper(
-      values[0],
-      values[1],
-      address,
-      null,
-      values[2][0],
-      values[2][1],
-      values[2][2],
-      values[2][3],
-      keywords.map(item => item) as string[],
-      values[4].map(c => ({ethAddress: c})) as Contributor[],
-      values[5]
-    )
+    return Paper.builder()
+      .ethAddress(address)
+      .title(values[0])
+      .summary(values[1])
+      .abstract(values[2])
+      .fileSystemName(values[3][0])
+      .publicLocation(values[3][1])
+      .summaryHashAlgorithm(values[3][2])
+      .summaryHash(values[3][3])
+      .topic(values[4])
+      .keywords(Set(keywords.map(item => item) as string[]))
+      .contributors(Set(values[6].map(c => ({ethAddress: c})) as Contributor[]))
+      .ownerAddress(values[7])
+      .build()
   }
 
   getStateChangedPapers(): Observable<AssetStateChanged> {
@@ -193,13 +197,19 @@ export class PublicationService {
     return workflowTransitions
   }
 
-  async submit(title: string, abstract: string, keywords: string[], file: File): Promise<Paper> {
-    let paper = await this.submitToIpfs(title, abstract, file)
-    paper = paper.copy(paper.fileSystemName, paper.publicLocation, keywords.map(item => item['value']))
+  async submit(paper:Paper, file: File): Promise<Paper> {
+    let ipfs:FileDefinition = await this.submitToIpfs(file)
+    paper = Paper.builder(paper)
+      .fileName(ipfs.fileName)
+      .fileSystemName(ipfs.fileSystemName)
+      .summaryHashAlgorithm(ipfs.summaryHashAlgorithm)
+      .summaryHash(ipfs.summaryHash)
+      .publicLocation(ipfs.publicLocation)
+      .build()
     return this.submitToEth(paper)
   }
-
-  private submitToIpfs(title: string, abstract: string, file: File): Promise<Paper> {
+  
+  private submitToIpfs(file: File): Promise<FileDefinition> {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
       }, 10000)
@@ -212,21 +222,13 @@ export class PublicationService {
         ]).then(values => {
           const ipfsObject = values[0]
           const h = values[1]
-
-          const paper = new Paper(
-            title,
-            abstract,
-            null,
-            file.name, // TODO check this, ipfsObject (ipfs hash) is not better?
-            'IPFS',
-            'https://ipfs.io/ipfs/' + ipfsObject,
-            h.hashAlgorithm,
-            h.hash,
-            null,
-            null,
-            null)
-
-          resolve(paper)
+          resolve({
+            fileName: file.name, // TODO check this, ipfsObject (ipfs hash) is not better?
+            fileSystemName: 'IPFS',
+            publicLocation: 'https://ipfs.io/ipfs/' + ipfsObject,
+            summaryHashAlgorithm: h.hashAlgorithm,
+            summaryHash: h.hash 
+          } as FileDefinition)
         }).catch(error => {
           reject(error)
         })
@@ -247,31 +249,21 @@ export class PublicationService {
       const filter = instance.filters.AssetCreated(null, null, account)
       instance.on(filter, (asset, type, sender) => {
         console.log('Asset created (' + asset.toString() + '), type: ' + type + ' from sender: ' + sender)
-        resolve(new Paper(
-          paper.title,
-          paper.abstract,
-          asset,
-          paper.fileName,
-          paper.fileSystemName,
-          paper.publicLocation,
-          paper.summaryHashAlgorithm,
-          paper.summaryHash,
-          paper.keywords,
-          paper.contributors,
-          paper.ownerAddress
-        ))
+        resolve(Paper.builder(paper).ethAddress(asset).build())
       })
 
       try {
         const address_wf = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
         await instance.createPaper(
           paper.title,
+          paper.summary,
           paper.abstract,
           paper.fileSystemName,
           paper.publicLocation,
           paper.summaryHashAlgorithm,
           paper.summaryHash,
-          paper.keywords,
+          paper.topic,
+          paper.keywords.toArray(),
           address_wf, // Creates Paper with PeerReviewWorkflow by default
           profile.sub // user_id
         )
@@ -370,4 +362,12 @@ export interface WorkflowTransition {
 export interface Workflow {
   workflowAddress: string,
   name: string
+}
+
+export interface FileDefinition {
+  fileName: string
+  fileSystemName: string
+  publicLocation: string
+  summaryHashAlgorithm: string
+  summaryHash: string
 }

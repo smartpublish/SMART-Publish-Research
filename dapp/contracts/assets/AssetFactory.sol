@@ -38,16 +38,18 @@ contract AssetFactory {
     function createPaper(
         string memory _title,
         string memory _summary,
+        string memory _abstract,
         string memory _fileSystemName,
         string memory _publicLocation,
         string memory _summaryHashAlgorithm,
         string memory _summaryHash,
+        string memory _topic,
         string[] memory _keywords,
         AssetWorkflow _workflow,
         string memory _contributorId) public returns(Paper) {
         
         Contributor contributor = contributors.getOrCreateContributor(msg.sender, _contributorId);
-        Paper paper = new Paper(contributors, contributor, _title, _summary);
+        Paper paper = new Paper(contributors, contributor, _title, _summary, _abstract, _topic);
         paper.addFile(_fileSystemName, _publicLocation, _summaryHashAlgorithm, _summaryHash);
         paper.addWorkflow(_workflow);
         _workflow.start(paper);

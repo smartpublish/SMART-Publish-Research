@@ -28,6 +28,7 @@
     "buffer": "5.2.1",
     "core-js": "^2.6.1",
     "ethers": "^4.0.20",
+    "immutable": "^4.0.0-rc.12",
     "ipfs": "^0.33.1",
     "ngx-bootstrap": "^3.1.4",
     "ngx-chips": "^2.0.0-beta.0",

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Observable, BehaviorSubject } from 'rxjs'
-import { FormGroup, FormBuilder, FormArray, Validators } from '@angular/forms'
-import { Paper, PaperForm, Contributor, ContributorForm } from '../models'
+import { FormGroup, FormBuilder, FormArray } from '@angular/forms'
+import { PaperForm, ContributorForm } from '../models'
 
 @Injectable({
   providedIn: 'root'
@@ -33,4 +33,9 @@ export class PublicationFormService {
     this.paperForm.next(currentPaper)
   }
 
+  getTopicsOption(): string[] {
+    return ['Astronomy', 'Biology', 'Chemistry', 'Cognitive Science', 
+    'Computer Science', 'Ecology', 'Geography', 'Geology', 'Linguistics', 'Physics',
+    'Psychology', 'Sociology', 'Scatology', 'Zoology']
+  }
 }

@@ -4,8 +4,10 @@ import { Paper } from './paper.model'
 export class PaperForm {
   ethAddress = new FormControl()
   title = new FormControl()
+  summary = new FormControl()
   abstract = new FormControl()
   file = new FormControl()
+  topic = new FormControl()
   keywords = new FormControl()
   // contributors = new FormArray([])
 
@@ -18,6 +20,11 @@ export class PaperForm {
     }
     this.title.setValidators([Validators.required])
 
+    if (paper && paper.summary) {
+      this.summary.setValue(paper.summary)
+    }
+    this.summary.setValidators([Validators.required])
+
     if (paper && paper.abstract) {
       this.abstract.setValue(paper.abstract)
     }
@@ -27,6 +34,11 @@ export class PaperForm {
       this.file.setValue(paper.fileName)
     }
     this.file.setValidators([Validators.required])
+
+    if (paper && paper.topic) {
+      this.topic.setValue(paper.topic)
+    }
+    this.topic.setValidators([Validators.required])
 
     if (paper && paper.keywords) {
       this.keywords.setValue(paper.keywords)

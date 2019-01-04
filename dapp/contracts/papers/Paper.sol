@@ -7,17 +7,23 @@ import "../contributors/Contributors.sol";
 
 contract Paper is Asset {
 
+    // @dev abstract is a Solidity reserved keyword
+    string public abstrakt;
+    string public topic;
+
     constructor(
         Contributors _contributors,
         Contributor _contributor,
         string memory _title,
-        string memory _summary) Asset(_contributors, _contributor, _title, _summary) public {}
+        string memory _summary,
+        string memory _abstract,
+        string memory _topic) Asset(_contributors, _contributor, _title, _summary) public {
+            abstrakt = _abstract;
+            topic = _topic;
+        }
 
     function setAbstract(string calldata _abstract) external {
-        summary = _abstract;
+        abstrakt = _abstract;
     }
 
-    function getAbstract() external view returns(string memory) {
-        return summary;
-    }
 }
