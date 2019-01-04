@@ -1,79 +1,102 @@
 <div *ngIf="(paper)">
   <app-invitation-join></app-invitation-join>
 
-  <div class="card">
-    <article class="card-body p-5">
-      <div class="row">
-        <div class="col-sm-7">
-            <h3 class="title mb-3">{{paper.title}}</h3>
-            <dl class="item-property">
-              <dt>Summary</dt>
-              <dd><p>{{paper.summary}}</p></dd>
-            </dl>
-            <dl class="item-property">
-              <dt>Abstract</dt>
-              <dd><p>{{paper.abstract}}</p></dd>
-            </dl>
-            <dl class="item-property">
-              <dt>Contributors</dt>
-              <dd>
-                <ul class="list-unstyled">
-                  <li *ngFor="let contributor of paper.contributors">{{contributor.ethAddress}}</li>
-                </ul>
-              </dd>
-              <app-invitations [paper]="paper"></app-invitations>
-            </dl>
-            <dl class="item-property">
-              <dt>Topic</dt>
-              <dd><p>{{paper.topic}}</p></dd>
-            </dl>
-            <dl class="item-property">
-              <dt>Keywords</dt>
-              <dd><p>{{paper.keywords.join(', ')}}</p></dd>
-            </dl>
-        </div>
-        <div class="col-sm-3">
-          <app-workflows [paper]="paper"></app-workflows>
-        </div>
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <article class="card-body p-5">
+          <div class="row">
+            <div class="col-sm-12">
+              <h3 class="title mb-3">{{paper.title}}</h3>
+              <dl class="item-property">
+                <dt>Summary</dt>
+                <dd><p>{{paper.summary}}</p></dd>
+              </dl>
+              <dl class="item-property">
+                <dt>Abstract</dt>
+                <dd><p>{{paper.abstract}}</p></dd>
+              </dl>
+              <dl class="item-property">
+                <dt>Contributors</dt>
+                <dd>
+                  <app-invitations [paper]="paper"></app-invitations>
+                </dd>
+              </dl>
+            </div>
+            <div class="col-sm-4">
+              <dl class="item-property">
+                <dt>Topic</dt>
+                <dd><p>{{paper.topic}}</p></dd>
+              </dl>
+            </div>
+            <div class="col-sm-8">
+              <dl class="item-property">
+                <dt>Keywords</dt>
+                <dd><p>{{paper.keywords.join(', ')}}</p></dd>
+              </dl>
+            </div>
+          </div>
+          <a href="{{paper.publicLocation}}" target="_blank" class="btn btn-lg btn-primary"> Read </a>
+        </article>
       </div>
-      <a href="{{paper.publicLocation}}" target="_blank" class="btn btn-lg btn-primary"> Read </a>
-    </article>
-  </div>
 
-  <div class="card mt-4">
-    <article class="card-body p-5">
-      <h5 class="card-title">System properties</h5>
-      <div class="row">
-        <div class="col-sm-12">
-            <dl class="item-property">
-              <dt>Ethereum Address</dt>
-              <dd>{{paper.ethAddress}}</dd>
-            </dl>
-            <dl class="item-property">
-              <dt>File System Name</dt>
-              <dd>{{paper.fileSystemName}}</dd>
-            </dl>
-            <dl class="item-property">
-              <dt>Public location</dt>
-              <dd><a href="{{paper.publicLocation}}" target='_blank'>{{paper.publicLocation}}</a></dd>
-            </dl> 
-            <dl class="item-property">
-              <dt>Summary Hash Algortihm</dt>
-              <dd>{{paper.summaryHashAlgorithm}}</dd>
-            </dl>
-            <dl class="item-property">
-              <dt>Summary Hash</dt>
-              <dd>{{paper.summaryHash}}</dd>
-            </dl>
+      <div class="card mt-4">
+          <article class="card-body p-5">
+            <h5 class="card-title">Comments</h5>
+            <app-comments [paper]="paper"></app-comments>
+          </article>
         </div>
+    </div>
+ 
+    <div class="col-lg-4">
+      <div class="card">
+          <article class="card-body p-4">
+            <h5 class="card-title">Workflows</h5>
+            <div class="row">
+              <div class="col-sm-12">
+                <app-workflows [paper]="paper"></app-workflows>
+              </div>
+            </div>
+          </article>
       </div>
-    </article>
-  </div>
 
-  <div class="card mt-4">
-      <article class="card-body p-5">
-        <h5 class="card-title">Comments</h5>
-        <app-comments [paper]="paper"></app-comments>
-      </article>
+      <div class="card mt-4">
+        <article class="card-body p-4">
+          <h5 class="card-title">System properties</h5>
+          <div class="row">
+            <div class="col-sm-12">
+                <dl class="item-property">
+                  <dt>Ethereum Address</dt>
+                  <dd>{{paper.ethAddress}}</dd>
+                </dl>
+                <dl class="item-property">
+                  <dt>Contributors</dt>
+                  <dd>
+                    <ul class="list-unstyled">
+                      <li *ngFor="let contributor of paper.contributors">{{contributor.ethAddress}}</li>
+                    </ul>
+                  </dd>
+                </dl>
+                <dl class="item-property">
+                  <dt>File System Name</dt>
+                  <dd>{{paper.fileSystemName}}</dd>
+                </dl>
+                <dl class="item-property">
+                  <dt>Public location</dt>
+                  <dd><a href="{{paper.publicLocation}}" target='_blank'>{{paper.publicLocation}}</a></dd>
+                </dl> 
+                <dl class="item-property">
+                  <dt>Summary Hash Algortihm</dt>
+                  <dd>{{paper.summaryHashAlgorithm}}</dd>
+                </dl>
+                <dl class="item-property">
+                  <dt>Summary Hash</dt>
+                  <dd>{{paper.summaryHash}}</dd>
+                </dl>
+              </div>
+            </div>
+          </article>
+      </div>
+    </div>
   </div>
 </div>
