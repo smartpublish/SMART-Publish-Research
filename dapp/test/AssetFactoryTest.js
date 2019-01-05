@@ -86,7 +86,7 @@ contract('AssetFactoryTest', function(accounts) {
         assert.strictEqual(summary,'Short summary','Summaries are different');
 
         let abstract = await paper.abstrakt.call()
-        assert.strictEqual(abstrakt,'Abstract lore ipsum ipsum ipsum','Abstracts are different');
+        assert.strictEqual(abstract,'Abstract lore ipsum ipsum ipsum','Abstracts are different');
 
         let topic = await paper.topic.call()
         assert.strictEqual(topic,'Astronomy','Topics are different');

@@ -6,7 +6,7 @@ import { EthereumService } from '../../../core/services/ethereum.service'
 import { Router } from '@angular/router'
 import { Location } from '@angular/common'
 import { AuthenticationService } from '@app/core/services'
-import { Contract } from 'ethers'
+import { Contract, utils } from 'ethers'
 
 declare let require: any
 const tokenAbiContributable = require('@contracts/Contributable.json')
@@ -82,12 +82,13 @@ export class InvitationService {
   }
 
   private async createInvitationOnEthereum(invitation: ContributorInvitation): Promise<ContributorInvitation> {
-    const web3 = this.ethereumService.getWeb3()
-    const hashedCode = await web3.utils.soliditySha3(invitation.token)
+    const hashedCode = await utils.solidityKeccak256(['string'], [invitation.token])
     invitation.hashCode = hashedCode
     const signer = this.PROVIDER.getSigner()
     const instance = new Contract(invitation.asset.ethAddress, tokenAbiContributable.abi, signer)
-    await instance.addInvitation(hashedCode, invitation.expires.getTime() / 1000)
+    let expires = invitation.expires.getTime() / 1000
+    console.log(expires)
+    await instance.addInvitation(hashedCode, expires)
     return invitation
   }
 
@@ -107,8 +108,8 @@ export class InvitationService {
   }
 
   private async getTimestampFromEthereum(): Promise<Date> {
-    const web3 = this.ethereumService.getWeb3()
-    const block = await web3.eth.getBlockNumber().then(web3.eth.getBlock)
+    const lastBlockNumber = await this.PROVIDER.getBlockNumber()
+    let block = await this.PROVIDER.getBlock(lastBlockNumber)
     const expires = block.timestamp + 24 * 60 * 60
     return new Date(expires * 1000)
   }

@@ -29,12 +29,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   stateChangedSubscription: Subscription
 
   // TODO Refactor
-  private static paperToCard(paper, action_1_name): DataCard {
+  private static paperToCard(paper: Paper, action_1_name): DataCard {
     return {
       model: paper,
-      title: paper['title'],
+      title: paper.title,
       subtitle: '',
-      description: paper['abstract'],
+      description: paper.summary,
       action_1_name: action_1_name
     } as DataCard
   }
