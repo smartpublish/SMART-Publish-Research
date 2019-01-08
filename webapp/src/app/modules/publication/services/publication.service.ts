@@ -178,6 +178,7 @@ export class PublicationService {
     workflowsState.push({name: values[0], state: values[1]} as WorkflowState)
     return workflowsState
   }
+  
   async getWorkflowTransitions(paper: Paper): Promise<WorkflowTransition[]> {
     // TODO A Paper may be associated to a differente workflows. Just now this by default.
     const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
@@ -190,11 +191,35 @@ export class PublicationService {
       promises.push(instance.getTransition(i))
     }
     const values = await Promise.all(promises)
-    const transitionsFiltered = values.filter(
-      transition => transition[1] === workflowsState[0]['state'] && transition[0].toLowerCase() !== 'publish')
+    // Filter transitions of current state and not INTERNAL 
+    const transitionsFiltered = values.filter(transition => transition[1] === workflowsState[0]['state'] && transition[3] !== 3)
     const workflowTransitions: WorkflowTransition[] = transitionsFiltered.map(
       transition => ({name: transition[0], sourceState: transition[1], targetState: transition[2]}))
     return workflowTransitions
+  }
+
+  async getMyWorkflowApproval(paper: Paper): Promise<Approval> {
+    // TODO A Paper may be associated to a differente workflows. Just now this by default.
+    const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+    const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
+    const workflowsState = await this.getWorkflowsState(paper)
+    const account = await this.PROVIDER.getSigner()
+    let values: any[] = await instance.getApprovalByApprover(paper.ethAddress, workflowsState[0]['state'], account.getAddress())
+    let status = 'Pending'
+    if(values[2] === 1 ) { 
+      status = 'Approved'
+    } else if(values[2] === 2) {
+      status = 'Rejected'
+    }
+    let approval: Approval = {
+      approver : values[0],
+      approvalType: values[1],
+      status: status,
+      actions: [values[3], values[4]]
+    } as Approval
+    console.log(approval)
+    // When action does not exist, it returns an empty approval
+    return approval.approver === "0x0000000000000000000000000000000000000000"? null : approval;
   }
 
   async submit(paper:Paper, file: File): Promise<Paper> {
@@ -275,11 +300,11 @@ export class PublicationService {
     })
   }
 
-  async review(paper: Paper, comment: string): Promise<any> {
+  async review(paper: Paper): Promise<any> {
     const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
     const signer = this.PROVIDER.getSigner()
     const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, signer)
-    return instance.review(paper.ethAddress, comment)
+    return instance.review(paper.ethAddress)
   }
 
   async accept(paper: Paper, comment: string): Promise<any> {
@@ -370,4 +395,11 @@ export interface FileDefinition {
   publicLocation: string
   summaryHashAlgorithm: string
   summaryHash: string
+}
+
+export interface Approval {
+  approver: string;
+  approvalType: string,
+  status: string,
+  actions: string[]
 }

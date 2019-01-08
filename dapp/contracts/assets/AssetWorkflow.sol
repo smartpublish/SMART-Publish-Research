@@ -7,16 +7,27 @@ contract AssetWorkflow is IWorkflow {
 
     string public name;
 
+    enum ApprovalState { PENDING, APPROVED, REJECTED }
+    struct Approval {
+        bool exist; // Just to check on array if exists
+        address approver;
+        string approvalType;
+        ApprovalState status;
+        string[] actions;
+    }
+
     struct State {
         bool exist; // Just to check on array if exists
         string name;
     }
 
+    enum Permission { EVERYBODY, OWNER, NOTOWNER, INTERNAL }
     struct Transition {
         bool exist; // Just to check on array if exists
         string name;
         State sourceState;
         State targetState;
+        Permission permission;
     }
 
     struct Comment {
@@ -30,6 +41,7 @@ contract AssetWorkflow is IWorkflow {
     mapping (string => Transition) private transitionsByName;
     mapping (string => IAsset[]) private assetsByState;
     mapping (address => Comment[]) private commentsByAsset;
+    mapping (string => mapping(address => Approval[])) private approvalsByAssetAndState;
 
     State[] private states;
     Transition[] private transitions;
@@ -60,7 +72,57 @@ contract AssetWorkflow is IWorkflow {
         return states[index].name;
     }
 
-    function addTransition(string memory _name, string memory _sourceState, string memory _targetState) public {
+    function addApproval(IAsset _asset, string memory _state, address _approver, string memory _approvalType) internal {
+        State storage state = statesByName[_state];
+        require(state.exist, 'State does not exist');
+        require(!isApproval(_asset, _state, _approver), 'This approver already has an approval on this state for this asset');
+        
+        string[] memory actions = new string[](2);
+        actions[0] = "Accept";
+        actions[1] = "Reject";
+        Approval memory approval = Approval(true, _approver, _approvalType, ApprovalState.PENDING, actions);
+        approvalsByAssetAndState[_state][address(_asset)].push(approval);
+    }
+
+    function getApprovalsCount(IAsset _asset, string memory _state) public view returns(uint) {
+        return approvalsByAssetAndState[_state][address(_asset)].length;
+    }
+
+    function getApproval(IAsset _asset, string memory _state, uint _index) public view returns(address, string memory, ApprovalState, string memory, string memory) {
+        Approval memory approval = approvalsByAssetAndState[_state][address(_asset)][_index];
+        return (approval.approver, approval.approvalType, approval.status, approval.actions[0], approval.actions[1]);
+    }
+
+    function getApprovalByApprover(IAsset _asset, string memory _state, address _approver) public view returns(address, string memory, ApprovalState, string memory, string memory) {
+        int index = indexOfApprovalsByAssetAndState(_asset, _state, _approver);
+        if(index > -1) {
+            return getApproval(_asset, _state, uint(index));
+        }
+        return (address(0), "", ApprovalState.PENDING, "", "");
+    }
+
+    function updateApproval(IAsset _asset, string memory _state, address _approver, ApprovalState _status) public {
+        require(statesByName[_state].exist, 'State does not exist');
+        int index = indexOfApprovalsByAssetAndState(_asset, _state, _approver);
+        require(index > -1, 'Approval does not exist');
+        approvalsByAssetAndState[_state][address(_asset)][uint(index)].status = _status; 
+    }
+
+    function isApproval(IAsset _asset, string memory _state, address _approver) internal view returns (bool) {
+        return indexOfApprovalsByAssetAndState(_asset, _state, _approver) > -1;
+    }
+
+    function indexOfApprovalsByAssetAndState(IAsset _asset, string memory _state, address _approver) internal view returns(int) {
+        Approval[] memory approvals = approvalsByAssetAndState[_state][address(_asset)];
+        for(uint i = 0; i < approvals.length; i++) {
+            if(approvals[i].exist && approvals[i].approver == _approver) {
+                return int(i);
+            }
+        }
+        return -1;
+    }
+
+    function addTransition(string memory _name, string memory _sourceState, string memory _targetState, Permission _permission) public {
         require(bytes(_name).length > 1, 'Transition must have a name');
 
         addState(_sourceState);
@@ -69,7 +131,7 @@ contract AssetWorkflow is IWorkflow {
         // Avoid duplicates
         Transition memory transition = transitionsByName[_name];
         if(!transition.exist) {
-            transition = Transition(true,_name,statesByName[_sourceState],statesByName[_targetState]);
+            transition = Transition(true, _name, statesByName[_sourceState], statesByName[_targetState], _permission);
             transitionsByName[_name] = transition;
             transitions.push(transition);
         }
@@ -79,9 +141,9 @@ contract AssetWorkflow is IWorkflow {
         return transitions.length;
     }
 
-    function getTransition(uint256 index) public view returns (string memory, string memory, string memory) {
+    function getTransition(uint256 index) public view returns (string memory, string memory, string memory, Permission) {
         Transition memory transaction = transitions[index];
-        return (transaction.name, transaction.sourceState.name, transaction.targetState.name);
+        return (transaction.name, transaction.sourceState.name, transaction.targetState.name, transaction.permission);
     }
 
     function findAssetsByState(string memory state) public view returns (IAsset[] memory) {

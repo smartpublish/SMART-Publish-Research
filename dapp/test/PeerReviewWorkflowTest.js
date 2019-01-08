@@ -4,103 +4,56 @@ var Paper = artifacts.require('Paper')
 
 contract('PeerReviewWorkflowTest', function(accounts) {
 
+    const STATE_SUMBITTED = 'Submitted'
+    const STATE_PUBLISHED = 'Published'
+    const STATE_REJECTED = 'Rejected'
+
+    const TRANSITION_SUBMIT = 'Submit'
+    const TRANSITION_REVIEW = 'Review'
+    const TRANSITION_PUBLISH = 'Publish'
+    const TRANSITION_REJECT = 'Reject'
+
+    const APPROVAL_TYPE_REVIEW = 'Review'
+
     var asset, workflow;
     beforeEach(async function() {
-        workflow = await PeerReviewWorkflow.deployed()
+        workflow = await PeerReviewWorkflow.new()
         asset = await Paper.new(accounts[0], accounts[0], 'Title', 'Summary','Abstract','Topic')
     });
 
     it("should has a workflow name", async function() {
-        let instance = await PeerReviewWorkflow.deployed();
-        let name = await instance.name.call();
+        let name = await workflow.name.call();
         assert.strictEqual(name, 'Peer Review', 'Workflow name does not match')
     });
 
     it("should initialize states", async function() {
         let count = await workflow.getStatesCount.call()
-        assert.strictEqual(parseInt(count, 10), 4, 'States count does not match')
+        assert.strictEqual(parseInt(count, 10), 3, 'States count does not match')
         let state = await workflow.getState.call(0)
-        assert.strictEqual(state, 'Submitted', 'Submitted state does not exists')
+        assert.strictEqual(state, STATE_SUMBITTED, STATE_SUMBITTED + ' state does not exists')
         state = await workflow.getState.call(1)
-        assert.strictEqual(state, 'OnReview', 'OnReview state does not exists')
+        assert.strictEqual(state, STATE_PUBLISHED, STATE_PUBLISHED + ' state does not exists')
         state = await workflow.getState.call(2)
-        assert.strictEqual(state, 'Published', 'Published state does not exists')
-        state = await workflow.getState.call(3)
-        assert.strictEqual(state, 'Rejected', 'Rejected state does not exists')
+        assert.strictEqual(state, STATE_REJECTED, STATE_REJECTED + ' state does not exists')
     });
 
     it("should initialize transitions", async function() {
         let count = await workflow.getTransitionsCount.call()
-        assert.strictEqual(parseInt(count, 10), 5, 'Transitions count does not match')
+        assert.strictEqual(parseInt(count, 10), 4, 'Transitions count does not match')
         let transition = await workflow.getTransition.call(0)
-        assert.strictEqual(transition[0], 'Submit', 'Submit transition does not exists')
+        assert.strictEqual(transition[0], TRANSITION_SUBMIT, TRANSITION_SUBMIT + ' transition does not exists')
         transition = await workflow.getTransition.call(1)
-        assert.strictEqual(transition[0], 'Review', 'Review transition does not exists')
+        assert.strictEqual(transition[0], TRANSITION_REVIEW, TRANSITION_REVIEW + ' transition does not exists')
         transition = await workflow.getTransition.call(2)
-        assert.strictEqual(transition[0], 'Accept', 'Accept transition does not exists')
+        assert.strictEqual(transition[0], TRANSITION_PUBLISH, TRANSITION_PUBLISH + ' transition does not exists')
         transition = await workflow.getTransition.call(3)
-        assert.strictEqual(transition[0], 'Publish', 'Publish transition does not exists')
-        transition = await workflow.getTransition.call(4)
-        assert.strictEqual(transition[0], 'Reject', 'Reject transition does not exists')
-    });
-
-
-    it("should run transitions from Submit to Publish", async function() {
-        let tx = await workflow.submit(asset.address)
-        truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {
-            return e.asset === asset.address && e.state === 'Submitted'
-        });
-
-        let assetArray = await workflow.findAssetsByState.call('Submitted')
-        assert.strictEqual(assetArray.length, 1, 'Assets on state Submitted must be 1')
-
-        tx = await workflow.review(asset.address, 'This is a comment for Review')
-        truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {
-            return e.asset === asset.address && e.state === 'OnReview'
-        });
-
-        assetArray = await workflow.findAssetsByState.call('Submitted')
-        assert.strictEqual(assetArray.length, 0, 'Assets on state Submitted must be 0')
-        assetArray = await workflow.findAssetsByState.call('OnReview')
-        assert.strictEqual(assetArray.length, 1, 'Assets on state OnReview must be 1')
-
-        // Not change state automatically
-        for(let i = 1; i < 3; i++) {
-            tx = await workflow.accept(asset.address, 'Comment ' + i + ' on Accept')
-            truffleAssert.eventNotEmitted(tx, 'AssetStateChanged')
-            assetArray = await workflow.findAssetsByState.call('Published')
-            assert.strictEqual(assetArray.length, 0, 'Assets on state Published must be 0')
-            assetArray = await workflow.findAssetsByState.call('OnReview')
-            assert.strictEqual(assetArray.length, 1, 'Assets on state OnReview must be 1')
-            let count = await workflow.getAcceptedCount.call(asset.address)
-            assert.strictEqual(parseInt(count, 10), i, 'Asset accept count is not ' + i)
-        }
-
-        // Changed state automatically: Third time accept > Published
-        tx = await workflow.accept(asset.address, 'Third comment on Accept')
-        truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {
-            return e.asset === asset.address && e.state === 'Published'
-        });
-        assetArray = await workflow.findAssetsByState.call('Published')
-        assert.strictEqual(assetArray.length, 1, 'Assets on state Published must be 1')
-        assetArray = await workflow.findAssetsByState.call('OnReview')
-        assert.strictEqual(assetArray.length, 0, 'Assets on state OnReview must be 0')
-        let count = await workflow.getAcceptedCount.call(asset.address)
-        assert.strictEqual(parseInt(count, 10), 3, 'Asset accept count is not 3')
-    });
-
-    it("should fail on not applicable transitions", async function() {
-        await truffleAssert.fails(
-            workflow.accept(asset.address, 'This is a comment'),
-            truffleAssert.ErrorType.REVERT,
-            'The current state not allow to Accept.'
-        )
+        assert.strictEqual(transition[0], TRANSITION_REJECT, TRANSITION_REJECT + ' transition does not exists')
     });
 
     it("should find an asset by state", async function() {
         await workflow.submit(asset.address)
         let state = await workflow.findStateByAsset.call(asset.address)
-        assert.strictEqual(state, 'Submitted', "Asset's state does not match or not found")
+        assert.strictEqual(state, STATE_SUMBITTED, "Asset's state does not match or not found")
     });
 
     it("should add comments to an asset", async function() {
@@ -133,6 +86,90 @@ contract('PeerReviewWorkflowTest', function(accounts) {
         assert.strictEqual(comment[0], 'This is my first comment','Messages comments not match')
         comment = await workflow.getComment.call(asset.address,1)
         assert.strictEqual(comment[0], 'This is a second comment','Messages comments not match')
+    });
+
+    const ApprovalState_PENDING = 0
+    const ApprovalState_APPROVED = 1
+    const ApprovalState_REJECTED = 2
+
+    it("should add approvals to asset on review", async function() {
+        await workflow.submit(asset.address)
+
+        // Add 2 reviewers
+        for(let i = 1; i < 3; i++) {
+            await workflow.review(asset.address, { from: accounts[i] })
+            let count = await workflow.getApprovalsCount.call(asset.address, STATE_SUMBITTED)
+            assert.strictEqual(parseInt(count,10), i, 'Must be ' + i + ' approval after a review transtion')
+            let approval = await workflow.getApproval(asset.address, STATE_SUMBITTED, i - 1)
+            assert.strictEqual(approval[0], accounts[i], 'Approver must be who did review action')
+            assert.strictEqual(approval[1], APPROVAL_TYPE_REVIEW, 'Approval types not match')
+            assert.strictEqual(parseInt(approval[2],10), ApprovalState_PENDING, 'Approval state not match')    
+        }
+    })
+
+    it("should reviewer update its approval", async function() {
+        await workflow.submit(asset.address)
+        let approval;
+        for(let i = 1; i < 3; i++) {
+            await workflow.review(asset.address, { from: accounts[i] })
+            await workflow.accept(asset.address, 'This is an accept comment', { from: accounts[i] }) // Approval
+            approval = await workflow.getApproval(asset.address, STATE_SUMBITTED, i - 1)
+            assert.strictEqual(parseInt(approval[2],10), ApprovalState_APPROVED, 'Approval state not match')
+        }
+        await workflow.review(asset.address, { from: accounts[3] })
+        await workflow.reject(asset.address, 'This is a rejected comment', { from: accounts[3] })
+        approval = await workflow.getApproval(asset.address, STATE_SUMBITTED, 2)
+        assert.strictEqual(parseInt(approval[2],10), ApprovalState_REJECTED, 'Approval state not match')
+    })
+
+    it("should fire an event when you submit an asset", async function() {
+        let tx = await workflow.submit(asset.address, { from: accounts[0] })
+        truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {
+            return e.asset === asset.address && e.state === STATE_SUMBITTED
+        });
+    })
+
+    it("should run transitions from Submit to Publish", async function() {
+        let assetArray = await workflow.findAssetsByState.call(STATE_SUMBITTED)
+        assert.strictEqual(assetArray.length, 0, 'Assets on state ' + STATE_SUMBITTED + ' must be 0')
+
+        let tx = await workflow.submit(asset.address, { from: accounts[0] })
+        assetArray = await workflow.findAssetsByState.call(STATE_SUMBITTED)
+        assert.strictEqual(assetArray.length, 1, 'Assets on state ' + STATE_SUMBITTED + ' must be 1')
+        state = await workflow.findStateByAsset.call(asset.address)
+        assert.strictEqual(state, STATE_SUMBITTED, "Asset's state does not match or not found")
+
+        // Add 3 reviewer
+        let count;
+        for(let i = 1; i < 4; i++) {
+            await workflow.review(asset.address, { from: accounts[i] })
+            count = await workflow.getApprovalsCount.call(asset.address, STATE_SUMBITTED)
+            assert.strictEqual(parseInt(count,10), i, 'Must be ' + i + ' approval after a accept transtion')
+        }
+        
+        // Not change state automatically
+        for(let i = 1; i < 3; i++) {
+            tx = await workflow.accept(asset.address, 'Comment on Accept: ' + i, { from: accounts[i] }) // Approval
+            truffleAssert.eventNotEmitted(tx, 'AssetStateChanged')
+            state = await workflow.findStateByAsset.call(asset.address)
+            assert.strictEqual(state, STATE_SUMBITTED, "Asset's state does not match or not found")
+            count = await workflow.getAcceptedCount.call(asset.address)
+            assert.strictEqual(parseInt(count, 10), i, 'Asset accept count is not ' + i)
+        }
+
+        // Changed state automatically: Third time accept > Published
+        tx = await workflow.accept(asset.address, 'Comment on Accept: 3', { from: accounts[3] })
+        truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {
+            return e.asset === asset.address && e.state === STATE_PUBLISHED
+        });
+        state = await workflow.findStateByAsset.call(asset.address)
+        assert.strictEqual(state, STATE_PUBLISHED, "Asset's state does not match or not found")
+        count = await workflow.getAcceptedCount.call(asset.address)
+        assert.strictEqual(parseInt(count, 10), 3, 'Asset accept count is not 3')
+        assetArray = await workflow.findAssetsByState.call(STATE_PUBLISHED)
+        assert.strictEqual(assetArray.length, 1, 'Assets on state ' + STATE_PUBLISHED + ' must be 1')
+        assetArray = await workflow.findAssetsByState.call(STATE_SUMBITTED)
+        assert.strictEqual(assetArray.length, 0, 'Assets on state ' + STATE_SUMBITTED + ' must be 0')
     });
 
 });
