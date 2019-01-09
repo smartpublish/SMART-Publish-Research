@@ -10,9 +10,11 @@
 </div>
 
 <ng-template #transitions>
-  <ul class="list-inline">
-    <li *ngFor="let transition of transitions$ | async" class="list-inline-item">
-      <button (click)="onWorkflowTransition(transition, $event)" class="btn btn-primary">{{transition.name}}</button>
-    </li>
+  <ul class="list-inline">    
+    <ng-container *ngFor="let transition of transitions$ | async">
+      <li *ngIf="transition.allowed" class="list-inline-item">
+        <button (click)="onWorkflowTransition(transition, $event)" class="btn btn-primary">{{transition.name}}</button>
+      </li>
+    </ng-container>
   </ul>
 </ng-template>

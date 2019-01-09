@@ -15,7 +15,7 @@ export class WorkflowTransitionComponent implements OnInit {
   @Input() workflowState: WorkflowState[]
   transitions$: Promise<WorkflowTransition[]>
   approval$: Promise<Approval>
-  @ViewChild('transitionModal') modalRef: ModalComponent
+  @ViewChild('approvalModal') modalRef: ModalComponent
 
   constructor(
     private publicationService: PublicationService,
@@ -23,8 +23,9 @@ export class WorkflowTransitionComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.transitions$ = this.publicationService.getWorkflowTransitions(this.paper)
     this.approval$ = this.publicationService.getMyWorkflowApproval(this.paper)
+    this.transitions$ = this.publicationService.getWorkflowTransitions(this.paper)
+      .then(transitions => this.checkPermission(transitions))
   }
 
   onWorkflowTransition(transition: any) {
@@ -32,7 +33,10 @@ export class WorkflowTransitionComponent implements OnInit {
     switch (transition.name.toLowerCase()) {
       case 'review': 
         this.publicationService.review(this.paper)
-        .then(() => this.alertService.success("Congratulations! You are now a reviewer"))
+        .then(() => {
+          this.ngOnInit()
+          this.alertService.success("Congratulations! You are now a reviewer")
+        })
         .catch(error => this.alertService.error(error))
         break
       default: this.alertService.error('Transition: ' + transition.name + ' is not valid.')
@@ -45,6 +49,7 @@ export class WorkflowTransitionComponent implements OnInit {
         this.publicationService.accept(this.paper, comment)
         .then(() => {
           this.modalRef.close()
+          this.ngOnInit()
           this.alertService.success("Yay! You accepted this paper")
         })
         .catch(error => this.alertService.error(error))
@@ -53,6 +58,7 @@ export class WorkflowTransitionComponent implements OnInit {
         this.publicationService.reject(this.paper, comment)
         .then(() => {
           this.modalRef.close()
+          this.ngOnInit()
           this.alertService.success("You rejected this paper")
         })
         .catch(error => this.alertService.error(error))
@@ -60,4 +66,37 @@ export class WorkflowTransitionComponent implements OnInit {
       default: this.alertService.error('Approval action: ' + action + ' failed.')
     }
   }
+
+  // TODO Refactory by other global permission solution. 
+  // Eg: https://github.com/AlexKhymenko/ngx-permissions
+  async checkPermission(transitions: WorkflowTransition[]): Promise<WorkflowTransition[]> {
+    let transitionsAllowed: WorkflowTransitionPermissionsChecked[] = []
+    for(let transition of transitions) {
+      let t:WorkflowTransitionPermissionsChecked = {...transition, allowed: false}
+      switch(transition.permission) {
+        case 0: {
+          t.allowed = true
+          break
+        }
+        case 1: {
+          t.allowed = await this.publicationService.isOwner(this.paper)
+          break
+        }
+        case 2: {
+          t.allowed = !await this.publicationService.isOwner(this.paper)
+          break
+        }
+        default: { 
+          t.allowed = false
+          break
+        }
+      }
+      transitionsAllowed.push(t)
+    }
+    return transitionsAllowed
+  }
+}
+
+interface WorkflowTransitionPermissionsChecked extends WorkflowTransition {
+  allowed:boolean;
 }

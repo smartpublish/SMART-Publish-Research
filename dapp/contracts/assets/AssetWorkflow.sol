@@ -14,6 +14,7 @@ contract AssetWorkflow is IWorkflow {
         string approvalType;
         ApprovalState status;
         string[] actions;
+        IAsset asset;
     }
 
     struct State {
@@ -42,6 +43,7 @@ contract AssetWorkflow is IWorkflow {
     mapping (string => IAsset[]) private assetsByState;
     mapping (address => Comment[]) private commentsByAsset;
     mapping (string => mapping(address => Approval[])) private approvalsByAssetAndState;
+    mapping (address => Approval[]) private approvalsByApprover;
 
     State[] private states;
     Transition[] private transitions;
@@ -80,7 +82,8 @@ contract AssetWorkflow is IWorkflow {
         string[] memory actions = new string[](2);
         actions[0] = "Accept";
         actions[1] = "Reject";
-        Approval memory approval = Approval(true, _approver, _approvalType, ApprovalState.PENDING, actions);
+        Approval memory approval = Approval(true, _approver, _approvalType, ApprovalState.PENDING, actions, _asset);
+        approvalsByApprover[_approver].push(approval);
         approvalsByAssetAndState[_state][address(_asset)].push(approval);
     }
 
@@ -88,20 +91,38 @@ contract AssetWorkflow is IWorkflow {
         return approvalsByAssetAndState[_state][address(_asset)].length;
     }
 
-    function getApproval(IAsset _asset, string memory _state, uint _index) public view returns(address, string memory, ApprovalState, string memory, string memory) {
+    function getApproval(IAsset _asset, string memory _state, uint _index) public view 
+        returns(address, string memory, ApprovalState, string memory, string memory, address) {
+        
         Approval memory approval = approvalsByAssetAndState[_state][address(_asset)][_index];
-        return (approval.approver, approval.approvalType, approval.status, approval.actions[0], approval.actions[1]);
+        return (approval.approver, approval.approvalType, approval.status, approval.actions[0], 
+                approval.actions[1], address(approval.asset));
     }
 
-    function getApprovalByApprover(IAsset _asset, string memory _state, address _approver) public view returns(address, string memory, ApprovalState, string memory, string memory) {
+    function getApprovalsByApproverCount(address _approver) public view returns(uint) {
+        return approvalsByApprover[_approver].length;
+    }
+    
+    function getApprovalByApprover(address _approver, uint _index) public view 
+        returns(address approver, string memory approvalType, ApprovalState status, 
+                string memory action1, string memory action2, address asset) {
+        
+        Approval memory approval = approvalsByApprover[_approver][_index];
+        return (approval.approver, approval.approvalType, approval.status, approval.actions[0], 
+                approval.actions[1], address(approval.asset));
+    }
+
+    function getApprovalByAsset(IAsset _asset, string memory _state, address _approver) public view 
+        returns(address, string memory, ApprovalState, string memory, string memory, address) {
+        
         int index = indexOfApprovalsByAssetAndState(_asset, _state, _approver);
         if(index > -1) {
             return getApproval(_asset, _state, uint(index));
         }
-        return (address(0), "", ApprovalState.PENDING, "", "");
+        return (address(0), "", ApprovalState.PENDING, "", "", address(0));
     }
 
-    function updateApproval(IAsset _asset, string memory _state, address _approver, ApprovalState _status) public {
+    function updateApprovalStatus(IAsset _asset, string memory _state, address _approver, ApprovalState _status) public {
         require(statesByName[_state].exist, 'State does not exist');
         int index = indexOfApprovalsByAssetAndState(_asset, _state, _approver);
         require(index > -1, 'Approval does not exist');
@@ -113,9 +134,9 @@ contract AssetWorkflow is IWorkflow {
     }
 
     function indexOfApprovalsByAssetAndState(IAsset _asset, string memory _state, address _approver) internal view returns(int) {
-        Approval[] memory approvals = approvalsByAssetAndState[_state][address(_asset)];
-        for(uint i = 0; i < approvals.length; i++) {
-            if(approvals[i].exist && approvals[i].approver == _approver) {
+        Approval[] memory approvalsArray = approvalsByAssetAndState[_state][address(_asset)];
+        for(uint i = 0; i < approvalsArray.length; i++) {
+            if(approvalsArray[i].exist && approvalsArray[i].approver == _approver) {
                 return int(i);
             }
         }

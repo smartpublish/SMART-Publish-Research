@@ -22,7 +22,7 @@ contract PeerReviewWorkflow is AssetWorkflow {
         name = "Peer Review";
 
         addTransition(TRANSITION_SUBMIT, "", STATE_SUMBITTED, Permission.INTERNAL);
-        addTransition(TRANSITION_REVIEW, STATE_SUMBITTED, STATE_SUMBITTED, Permission.EVERYBODY);
+        addTransition(TRANSITION_REVIEW, STATE_SUMBITTED, STATE_SUMBITTED, Permission.NOTOWNER);
         addTransition(TRANSITION_PUBLISH, STATE_SUMBITTED, STATE_PUBLISHED, Permission.INTERNAL);
         addTransition(TRANSITION_REJECT, STATE_SUMBITTED, STATE_REJECTED, Permission.INTERNAL);
     }
@@ -40,7 +40,7 @@ contract PeerReviewWorkflow is AssetWorkflow {
     // @dev Approval function
     function accept(IAsset _asset, string memory _comment) public {
         // require(isOn(STATE_ONREVIEW, _asset), "The current state not allow to Accept.");
-        updateApproval(_asset, STATE_SUMBITTED, msg.sender, ApprovalState.APPROVED);
+        updateApprovalStatus(_asset, STATE_SUMBITTED, msg.sender, ApprovalState.APPROVED);
         addComment(_asset, _comment);
         uint sucessful = successfulReviewsByAsset[address(_asset)] + 1;
         successfulReviewsByAsset[address(_asset)] = sucessful;
@@ -55,7 +55,7 @@ contract PeerReviewWorkflow is AssetWorkflow {
 
     // @dev Approval function
     function reject(IAsset _asset, string memory _comment) public {
-        updateApproval(_asset, STATE_SUMBITTED, msg.sender, ApprovalState.REJECTED);
+        updateApprovalStatus(_asset, STATE_SUMBITTED, msg.sender, ApprovalState.REJECTED);
         addComment(_asset, _comment);
         run(TRANSITION_REJECT, _asset);
     }

@@ -18,12 +18,6 @@
   [items$]="papersCardByState$['Published']"
   (clickCard)="clickCardHandle($event)"
   (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>
-<app-cardlist #onReview
-  [title]="'On Review'"
-  [description]="'Last papers on review. On publish way!'"
-  [items$]="papersCardByState$['OnReview']"
-  (clickCard)="clickCardHandle($event)"
-  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>
 <app-cardlist #submitted
   [title]="'Submitted'"
   [description]="'Last papers submitted for reviewing. Be the first one to check them!'"

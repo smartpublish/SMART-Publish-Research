@@ -122,6 +122,25 @@ contract('PeerReviewWorkflowTest', function(accounts) {
         assert.strictEqual(parseInt(approval[2],10), ApprovalState_REJECTED, 'Approval state not match')
     })
 
+    it("should get assets by approver", async function() {
+        let approver = accounts[5]
+        let assetsAddress = []
+        let asset;
+        for(let i = 0; i < 4; i++) {
+            asset = await Paper.new(accounts[0], accounts[0], 'Title ' + i, 'Summary ' + i, 'Abstract ' + i, 'Topic ' + i)
+            await workflow.submit(asset.address)
+            await workflow.review(asset.address, { from: approver })
+            assetsAddress[i] = asset.address
+        }
+        let count = await workflow.getApprovalsByApproverCount.call(approver);
+        let approvals = [];
+        for(let i = 0; i < count; i++) {
+            approvals.push(await workflow.getApprovalByApprover.call(approver, i))
+        }
+        let approverAssetsAddress = approvals.map(approval => approval.asset)
+        assert.deepEqual(approverAssetsAddress, assetsAddress, 'Assets by approver not match')
+    })
+
     it("should fire an event when you submit an asset", async function() {
         let tx = await workflow.submit(asset.address, { from: accounts[0] })
         truffleAssert.eventEmitted(tx, 'AssetStateChanged', function(e) {

@@ -194,7 +194,7 @@ export class PublicationService {
     // Filter transitions of current state and not INTERNAL 
     const transitionsFiltered = values.filter(transition => transition[1] === workflowsState[0]['state'] && transition[3] !== 3)
     const workflowTransitions: WorkflowTransition[] = transitionsFiltered.map(
-      transition => ({name: transition[0], sourceState: transition[1], targetState: transition[2]}))
+      transition => ({name: transition[0], sourceState: transition[1], targetState: transition[2], permission: transition[3]}))
     return workflowTransitions
   }
 
@@ -204,7 +204,7 @@ export class PublicationService {
     const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
     const workflowsState = await this.getWorkflowsState(paper)
     const account = await this.PROVIDER.getSigner()
-    let values: any[] = await instance.getApprovalByApprover(paper.ethAddress, workflowsState[0]['state'], account.getAddress())
+    let values: any[] = await instance.getApprovalByAsset(paper.ethAddress, workflowsState[0]['state'], account.getAddress())
     let status = 'Pending'
     if(values[2] === 1 ) { 
       status = 'Approved'
@@ -217,7 +217,6 @@ export class PublicationService {
       status: status,
       actions: [values[3], values[4]]
     } as Approval
-    console.log(approval)
     // When action does not exist, it returns an empty approval
     return approval.approver === "0x0000000000000000000000000000000000000000"? null : approval;
   }
@@ -304,21 +303,21 @@ export class PublicationService {
     const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
     const signer = this.PROVIDER.getSigner()
     const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, signer)
-    return instance.review(paper.ethAddress)
+    return await instance.review(paper.ethAddress)
   }
 
   async accept(paper: Paper, comment: string): Promise<any> {
     const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
     const signer = this.PROVIDER.getSigner()
     const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, signer)
-    return instance.accept(paper.ethAddress, comment)
+    return await instance.accept(paper.ethAddress, comment)
   }
 
   async reject(paper: Paper, comment: string): Promise<any> {
     const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
     const signer = this.PROVIDER.getSigner()
     const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, signer)
-    return instance.reject(paper.ethAddress, comment)
+    return await instance.reject(paper.ethAddress, comment)
   }
 
   async addComment(paper: Paper, message: string): Promise<void> {
@@ -353,6 +352,12 @@ export class PublicationService {
       )
     )
   }
+
+  async isOwner(paper: Paper): Promise<boolean> {
+    const signer = await this.PROVIDER.getSigner()
+    const account = await signer.getAddress()
+    return account.toUpperCase() === paper.ownerAddress.toUpperCase()
+  }
 }
 
 export interface AssetStateChanged {
@@ -381,7 +386,8 @@ export interface WorkflowState {
 export interface WorkflowTransition {
   name: string,
   sourceState: string,
-  targetState: string
+  targetState: string,
+  permission: number
 }
 
 export interface Workflow {

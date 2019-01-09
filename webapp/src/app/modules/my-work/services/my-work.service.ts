@@ -6,6 +6,7 @@ import { PublicationService } from '@app/modules/publication/services/publicatio
 import { Contract } from 'ethers'
 
 declare let require: any
+const tokenAbiPeerReviewWorkflow = require('@contracts/PeerReviewWorkflow.json')
 const tokenAbiAssetFactory = require('@contracts/AssetFactory.json')
 
 @Injectable({
@@ -36,6 +37,25 @@ export class MyWorkService {
         const paper = await this.publicationService.getPaper(address)
         observer.next(paper)
       })
+    })
+  }
+
+  getPapersPendingOfMyApproval(): Observable<Paper> {
+    return Observable.create(async observer => {
+      const address = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+      const instance = new Contract(address, tokenAbiPeerReviewWorkflow.abi, this.PROVIDER)
+      const signer = await this.PROVIDER.getSigner()
+      const account = await signer.getAddress()
+      const count:number = await instance.getApprovalsByApproverCount(account)
+      let approvals = [];
+      for(let i = 0; i < count; i++) {
+        approvals.push(await instance.getApprovalByApprover(account, i))
+      }
+      approvals.filter(approval => approval.status === 0)
+        .forEach(async approval => {
+          const paper = await this.publicationService.getPaper(approval.asset)
+          observer.next(paper)
+        })
     })
   }
 }
