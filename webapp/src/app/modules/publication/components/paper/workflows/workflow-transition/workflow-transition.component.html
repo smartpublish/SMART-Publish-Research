@@ -1,7 +1,20 @@
-<ul class="list-inline">
-  <li *ngFor="let transition of transitions$ | async" class="list-inline-item">
-      <app-modal [title]="'Transition: ' + transition.name" [openButtonName]="transition.name">
-        <app-comment-new (comment)="onWorkflowTransition(transition, $event)"></app-comment-new>
-      </app-modal>
-  </li>
-</ul>
+<div *ngIf="(approval$ | async) as approval; else transitions">
+  <h6>Approval: {{approval.status}} by you</h6>
+  <ul *ngIf="approval.status === 'Pending'" class="list-inline">
+      <li *ngFor="let action of approval.actions" class="list-inline-item">
+        <app-modal #approvalModal [title]="'Approval: ' + action" [openButtonName]="action">
+          <app-comment-new #commentForm (comment)="onWorkflowApproval(action, $event)"></app-comment-new>
+        </app-modal>
+      </li>
+    </ul>
+</div>
+
+<ng-template #transitions>
+  <ul class="list-inline">    
+    <ng-container *ngFor="let transition of transitions$ | async">
+      <li *ngIf="transition.allowed" class="list-inline-item">
+        <button (click)="onWorkflowTransition(transition, $event)" class="btn btn-primary">{{transition.name}}</button>
+      </li>
+    </ng-container>
+  </ul>
+</ng-template>

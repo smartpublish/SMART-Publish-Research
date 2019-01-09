@@ -40,8 +40,4 @@ export class EthereumService {
     throw new Error('Blockchain network could not be detected')
   }
 
-  getWeb3() {
-    return window.web3
-  }
-
 }

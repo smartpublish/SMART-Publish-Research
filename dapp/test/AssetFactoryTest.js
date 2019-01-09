@@ -17,11 +17,13 @@ contract('AssetFactoryTest', function(accounts) {
         await contributors.createContributor("0000-0002-1825-0097",{ from: accounts[1] })
         let tx = await factory.createPaper(
             'Awesome Title paper',
-            'Best abstract',
+            'Short summary',
+            'Abstract lore ipsum ipsum ipsum',
             'IPFS',
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            'Astronomy',
             ['tag1','tag2'],
             workflow.address,
             '0000-0002-1825-0097',
@@ -41,11 +43,13 @@ contract('AssetFactoryTest', function(accounts) {
     it("should create a new Paper using PeerReviewWorkflow", async function() {
         let tx = await factory.createPaper(
             'Awesome Title paper',
-            'Best abstract',
+            'Short summary',
+            'Abstract lore ipsum ipsum ipsum',
             'IPFS',
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            'Astronomy',
             ['tag1','tag2'],
             workflow.address,
             'google-oauth2|129380127374018398127'
@@ -54,14 +58,16 @@ contract('AssetFactoryTest', function(accounts) {
     });
 
 
-    it("should get properties: title and abstract from a Paper after be submitted", async function() {
+    it("should get properties from a Paper after be submitted", async function() {
         let tx = await factory.createPaper(
             'Awesome Title paper',
-            'Best abstract',
+            'Short summary',
+            'Abstract lore ipsum ipsum ipsum',
             'IPFS',
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            'Astronomy',
             ['tag1','tag2'],
             workflow.address,
             'google-oauth2|129380127374018398127'
@@ -77,7 +83,13 @@ contract('AssetFactoryTest', function(accounts) {
         assert.strictEqual(title,'Awesome Title paper','Titles are different');
         
         let summary = await paper.summary.call()
-        assert.strictEqual(summary,'Best abstract','Abstracts are different');
+        assert.strictEqual(summary,'Short summary','Summaries are different');
+
+        let abstract = await paper.abstrakt.call()
+        assert.strictEqual(abstract,'Abstract lore ipsum ipsum ipsum','Abstracts are different');
+
+        let topic = await paper.topic.call()
+        assert.strictEqual(topic,'Astronomy','Topics are different');
         
         let file = await paper.getFile(0)
         assert.strictEqual(file[0],'IPFS','File System Names are different');
@@ -89,11 +101,13 @@ contract('AssetFactoryTest', function(accounts) {
     it("should get contributor: Author from Paper after be submitted", async function() {
         let tx = await factory.createPaper(
             'Awesome Title paper',
-            'Best abstract',
+            'Short summary',
+            'Abstract lore ipsum ipsum ipsum',
             'IPFS',
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            'Astronomy',
             ['tag1','tag2'],
             workflow.address,
             'google-oauth2|129380127374018398127',
@@ -115,11 +129,13 @@ contract('AssetFactoryTest', function(accounts) {
     it("should CRUD keywords", async function() {
         let tx = await factory.createPaper(
             'Awesome Title paper',
-            'Best abstract',
+            'Short summary',
+            'Abstract lore ipsum ipsum ipsum',
             'IPFS',
             'https://ipfs.io/test',
             'blake2b',
             'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+            'Astronomy',
             ['tag-origin'],
             workflow.address,
             'google-oauth2|129380127374018398127'

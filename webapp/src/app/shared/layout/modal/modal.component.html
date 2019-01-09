@@ -1,7 +1,7 @@
 <ng-template #template>
   <div class="modal-header">
     <h4 class="modal-title pull-left">{{title}}</h4>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="close()">
       <span aria-hidden="true">&times;</span>
     </button>
   </div>
@@ -14,4 +14,4 @@
   </div>
   -->
 </ng-template>
-<button type="button" class="btn btn-primary" (click)="openModal(template)">{{openButtonName}}</button>
+<button type="button" class="btn btn-primary" (click)="open(template)">{{openButtonName}}</button>

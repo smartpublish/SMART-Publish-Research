@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, TemplateRef  } from '@angular/core'
+import { Component, Input, TemplateRef  } from '@angular/core'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service'
 
@@ -7,7 +7,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service'
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.scss']
 })
-export class ModalComponent implements OnInit {
+export class ModalComponent {
 
   @Input() title
   @Input() openButtonName
@@ -15,10 +15,14 @@ export class ModalComponent implements OnInit {
   modalRef: BsModalRef
   constructor(private modalService: BsModalService) {}
 
-  openModal(template: TemplateRef<any>) {
+  open(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template)
   }
 
+  close() {
+    this.modalRef.hide()
+  }
+  
   ngOnInit() {
   }
 

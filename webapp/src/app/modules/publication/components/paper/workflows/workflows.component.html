@@ -1,7 +1,4 @@
-<h5>Workflows</h5>
-<dl *ngFor="let workflowState of workflowsState" class="item-property">
-  <dd>
-    <h6>{{workflowState.name}}     <span class="badge badge-pill badge-secondary">{{workflowState.state}}</span></h6>
-    <app-workflow-transition [paper]="paper" [workflowState]="workflowState"></app-workflow-transition>
-  </dd>
+<dl *ngFor="let workflowState of workflowsState" class="item-property"> 
+  <dt>{{workflowState.name}}<span class="badge badge-pill badge-secondary ml-1">{{workflowState.state}}</span></dt>
+  <dd><app-workflow-transition [paper]="paper" [workflowState]="workflowState"></app-workflow-transition></dd>
 </dl>
