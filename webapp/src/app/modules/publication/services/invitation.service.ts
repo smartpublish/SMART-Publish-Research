@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { environment } from '@env/environment'
 import { Observable, Subject } from 'rxjs'
-import { IAsset, Paper, ContributorInvitation } from '@app/modules/publication/models'
+import { IAsset, Paper, ContributorInvitation } from '@app/shared/models'
 import { EthereumService } from '../../../core/services/ethereum.service'
 import { Router } from '@angular/router'
 import { Location } from '@angular/common'

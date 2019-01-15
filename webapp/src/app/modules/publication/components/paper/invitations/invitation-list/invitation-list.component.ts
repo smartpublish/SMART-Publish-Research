@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, ChangeDetectionStrategy } from '@angular/core'
 import { Observable } from 'rxjs'
-import { ContributorInvitation } from '@app/modules/publication/models'
+import { ContributorInvitation } from '@app/shared/models'
 import { DomSanitizer } from '@angular/platform-browser'
 
 @Component({

@@ -1,13 +1,13 @@
-<div *ngIf="lastPaper$ | async as paper" class="row my-4">
+<div *ngIf="lastPaper as item" class="row my-4">
   <div class="col-lg-8">
-    <img class="img-fluid rounded" src="http://placehold.it/900x400" alt="">
+    <img class="img-fluid rounded" [src]="this.sanitizer.bypassSecurityTrustUrl(item['image'])" alt="">
   </div>
   <!-- /.col-lg-8 -->
   <div class="col-lg-4">
-    <h1>{{paper.title}}</h1>
-    <p>{{paper.summary}}</p>
-    <p><span class="badge badge-info">{{paper.topic}}</span></p>
-    <a class="btn btn-primary btn-lg" href="{{paper.publicLocation}}" target='_blank'>Read!</a>
+    <h1>{{item['title']}}</h1>
+    <p>{{item['description']}}</p>
+    <p><span class="badge badge-info">{{item.model.topic}}</span></p>
+    <a class="btn btn-primary btn-lg" href="{{item.model.publicLocation}}" target='_blank'>Read!</a>
   </div>
   <!-- /.col-md-4 -->
 </div>

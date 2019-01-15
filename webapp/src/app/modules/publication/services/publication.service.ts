@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Paper, Comment, Contributor } from '../models'
+import { Paper, Comment, Contributor } from '@app/shared/models'
 import { EthereumService, IpfsService, HashService, AuthenticationService } from '@app/core/services'
 import { Observable, merge } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core'
-import { DataCard } from '@app/shared/layout/cardlist/cardlist.component'
+import { DataCard, CardlistComponent } from '@app/shared/layout/cardlist/cardlist.component'
 import { Observable } from 'rxjs'
 import { MyWorkService } from '@app/modules/my-work/services/my-work.service'
-import { Paper } from '@app/modules/publication/models'
+import { Paper } from '@app/shared/models'
 import { Router } from '@angular/router'
 import { map, scan } from 'rxjs/operators'
 import { PublicationService } from '@app/modules/publication/services/publication.service';
@@ -22,23 +22,13 @@ export class PaperListComponent implements OnInit {
   papers_submitted_by_me$: Observable<DataCard[]>
   papers_pending_of_my_approval$: Observable<DataCard[]>
 
-  // TODO Refactor
-  private static paperToCard(paper, action_1_name): DataCard {
-    return {
-      model: paper,
-      title: paper['title'],
-      subtitle: '',
-      description: paper['summary'],
-      action_1_name: action_1_name
-    } as DataCard
-  }
   ngOnInit() {
     this.papers_submitted_by_me$ = this.myWorkService.getMyPapers().pipe(
-      map(paper => PaperListComponent.paperToCard(paper, 'Read')),
+      map(paper => CardlistComponent.paperToCard(paper, 'Read')),
       scan<DataCard>((acc, value, index) => [value, ...acc], [])
     )
     this.papers_pending_of_my_approval$ = this.myWorkService.getPapersPendingOfMyApproval().pipe(
-      map(paper => PaperListComponent.paperToCard(paper, 'Read')),
+      map(paper => CardlistComponent.paperToCard(paper, 'Read')),
       scan<DataCard>((acc, value, index) => [value, ...acc], [])
     )
   }

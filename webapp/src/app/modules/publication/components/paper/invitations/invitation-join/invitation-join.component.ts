@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core'
-import { ContributorInvitation } from '@app/modules/publication/models'
+import { ContributorInvitation } from '@app/shared/models'
 import { ActivatedRoute } from '@angular/router'
 import { AlertService, AuthenticationService } from '@app/core/services'
 import { InvitationService } from '@app/modules/publication/services/invitation.service'
