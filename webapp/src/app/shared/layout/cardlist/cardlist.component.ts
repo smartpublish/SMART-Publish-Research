@@ -47,7 +47,7 @@ export class CardlistComponent implements OnInit, OnDestroy {
       case 'Astronomy': image = 'http://www.astronomy.com/-/media/Images/Homepage/Sliders/PIA10231_hires2.png?mw=600'; break;
       case 'Biology': image = 'http://blogs.biomedcentral.com/on-biology/wp-content/uploads/sites/5/2017/12/DNA.png'; break;
       case 'Chemistry': image = 'https://www.scitecheuropa.eu/wp-content/uploads/2018/06/ST27-McGillU1-image-%C2%A9-iStock-Garsya-696x392.jpg'; break;
-      case 'Cognitive Science': image = 'http://arts-sciences.buffalo.edu/content/arts-sciences/cognitive-science/_jcr_content/top/image_1597374749.img.926.auto.jpg/1507041140648.jpg'; break;
+      case 'Cognitive Science': image = '//cdn.shopify.com/s/files/1/0756/3867/files/harness-plasticity_large.png?v=1527101232'; break;
       case 'Computer Science': image = 'https://nwc.edu/academics/photos/program-photos/computer-science.jpg'; break;
       case 'Ecology': image = 'https://cdn1.byjus.com/biology/2017/10/22121159/1-min-1.jpg'; break;
       case 'Geography': image = 'https://www.thoughtco.com/thmb/H1iqHnWHrppoMHOEy4aKEtEJgng=/768x0/filters:no_upscale():max_bytes(150000):strip_icc()/171720729-58b9d1473df78c353c38c2b1.jpg'; break;

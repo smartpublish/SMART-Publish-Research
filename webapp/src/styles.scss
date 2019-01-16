@@ -9,6 +9,9 @@ body {
     font-family: "Baskerville";
     margin-bottom: 60px;
 }
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+}
 .clickable:hover {
     cursor: pointer;
 }
