@@ -5,7 +5,7 @@ import { Subscription, Observable} from 'rxjs'
 import { DataCard, CardlistComponent } from '@app/shared/layout/cardlist/cardlist.component'
 import { Paper } from '@app/shared/models'
 import { map, filter, scan, take } from 'rxjs/operators'
-import { DomSanitizer } from '@angular/platform-browser';
+import { MediaService } from '@app/core/services';
 
 @Component({
   selector: 'app-home',
@@ -18,10 +18,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     private publicationService: PublicationService,
     private router: Router,
     private cd: ChangeDetectorRef,
-    private sanitizer: DomSanitizer ) {
+    private mediaService: MediaService) {
   }
 
-  lastPaper: DataCard
+  lastPaper: Paper
   lastPaperSubsription: Subscription
 
   papersCardByState$ = {
@@ -33,17 +33,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     // TODO Refactor
     this.papersCardByState$['Submitted'] = this.publicationService.getAllPapersOnState('Submitted').pipe(
-      map(paper => CardlistComponent.paperToCard(paper, 'Read')),
+      map(paper => this.paperToCard(paper, 'Read')),
       scan<DataCard>((acc, value, index) => [value, ...acc], [])
     )
 
     this.papersCardByState$['Published'] = this.publicationService.getAllPapersOnState('Published').pipe(
-      map(paper => CardlistComponent.paperToCard(paper, 'Read')),
+      map(paper => this.paperToCard(paper, 'Read')),
       scan<DataCard>((acc, value, index) => [value, ...acc], [])
     )
 
-    this.papersCardByState$['Published'].subscribe(papers => {
-      this.lastPaper = papers[0];
+    this.lastPaperSubsription = this.papersCardByState$['Published'].subscribe(papers => {
+      this.lastPaper = papers[0].model;
+      this.lastPaperSubsription.unsubscribe()
     })
 
     this.stateChangedSubscription = this.publicationService.getStateChangedPapers()
@@ -54,7 +55,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         switch (event.state) {
           case 'Published': {
             this.papersCardByState$['Published'] = this.publicationService.getAllPapersOnState('Published').pipe(
-              map(paper => CardlistComponent.paperToCard(paper, 'Read')),
+              map(paper => this.paperToCard(paper, 'Read')),
               scan<DataCard>((acc, value, index) => [value, ...acc], [])
             )
             break
@@ -66,14 +67,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       switch (event.oldState) {
         case 'OnReview': {
           this.papersCardByState$['OnReview'] = this.publicationService.getAllPapersOnState('OnReview').pipe(
-            map(paper => CardlistComponent.paperToCard(paper, 'Read')),
+            map(paper => this.paperToCard(paper, 'Read')),
             scan<DataCard>((acc, value, index) => [value, ...acc], [])
           )
           break
         }
         case 'Submitted': {
           this.papersCardByState$['Submitted'] = this.publicationService.getAllPapersOnState('Submitted').pipe(
-            map(paper => CardlistComponent.paperToCard(paper, 'Read')),
+            map(paper => this.paperToCard(paper, 'Read')),
             scan<DataCard>((acc, value, index) => [value, ...acc], [])
           )
           break
@@ -103,6 +104,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (event.action_number === 1) {
       window.open(paper['publicLocation'], '_blank')
     }
+  }
+
+  public paperToCard(paper: Paper, action_1_name): DataCard {
+    let image = this.mediaService.searchImage([paper.topic])
+    return {
+      model: paper,
+      title: paper.title,
+      subtitle: '',
+      image: image,
+      description: paper.summary,
+      action_1_name: action_1_name
+    } as DataCard
   }
 
 }

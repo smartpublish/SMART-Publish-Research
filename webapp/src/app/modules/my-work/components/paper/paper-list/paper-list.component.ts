@@ -5,7 +5,7 @@ import { MyWorkService } from '@app/modules/my-work/services/my-work.service'
 import { Paper } from '@app/shared/models'
 import { Router } from '@angular/router'
 import { map, scan } from 'rxjs/operators'
-import { PublicationService } from '@app/modules/publication/services/publication.service';
+import { MediaService } from '@app/core/services';
 
 @Component({
   selector: 'app-my-paper-list',
@@ -16,6 +16,7 @@ export class PaperListComponent implements OnInit {
 
   constructor(
     private myWorkService: MyWorkService,
+    private mediaService: MediaService,
     private router: Router) { }
 
 
@@ -24,11 +25,11 @@ export class PaperListComponent implements OnInit {
 
   ngOnInit() {
     this.papers_submitted_by_me$ = this.myWorkService.getMyPapers().pipe(
-      map(paper => CardlistComponent.paperToCard(paper, 'Read')),
+      map(paper => this.paperToCard(paper, 'Read')),
       scan<DataCard>((acc, value, index) => [value, ...acc], [])
     )
     this.papers_pending_of_my_approval$ = this.myWorkService.getPapersPendingOfMyApproval().pipe(
-      map(paper => CardlistComponent.paperToCard(paper, 'Read')),
+      map(paper => this.paperToCard(paper, 'Read')),
       scan<DataCard>((acc, value, index) => [value, ...acc], [])
     )
   }
@@ -43,5 +44,17 @@ export class PaperListComponent implements OnInit {
     if (event.action_number === 1) {
       window.open(paper['publicLocation'], '_blank')
     }
+  }
+
+  public paperToCard(paper: Paper, action_1_name): DataCard {
+    let image = this.mediaService.searchImage([paper.topic])
+    return {
+      model: paper,
+      title: paper.title,
+      subtitle: '',
+      image: image,
+      description: paper.summary,
+      action_1_name: action_1_name
+    } as DataCard
   }
 }
