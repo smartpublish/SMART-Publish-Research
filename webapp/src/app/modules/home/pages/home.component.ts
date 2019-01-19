@@ -3,7 +3,7 @@ import { Router, Data } from '@angular/router'
 import { AssetStateChanged, PublicationService } from '@app/modules/publication/services/publication.service'
 import { Subscription, Observable} from 'rxjs'
 import { DataCard, CardlistComponent } from '@app/shared/layout/cardlist/cardlist.component'
-import { Paper } from '@app/shared/models'
+import { Paper, Contributor } from '@app/shared/models'
 import { map, filter, scan, take } from 'rxjs/operators'
 import { MediaService } from '@app/core/services';
 
@@ -108,13 +108,18 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   public paperToCard(paper: Paper, action_1_name): DataCard {
     let image = this.mediaService.searchImage([paper.topic])
+    let tags:string[] = paper.keywords.toArray()
+    tags.unshift(paper.topic)
+    
     return {
       model: paper,
       title: paper.title,
       subtitle: '',
       image: image,
       description: paper.summary,
-      action_1_name: action_1_name
+      action_1_name: action_1_name,
+      action_2_name: undefined,
+      tags: tags
     } as DataCard
   }
 

@@ -6,8 +6,11 @@
   <div class="col-lg-6">
     <h1>{{paperImage.paper.title}}</h1>
     <p>{{paperImage.paper.summary}}</p>
-    <p><span class="badge badge-info">{{paperImage.paper.topic}}</span></p>
-    <a class="btn btn-primary btn-lg" href="{{paperImage.paper.publicLocation}}" target='_blank'>Read!</a>
+    <ul class="list-inline">
+      <li class="list-inline-item"><span class="badge badge-info">{{paperImage.paper.topic}}</span></li>
+      <li class="list-inline-item" *ngFor="let keyword of paperImage.paper.keywords.toArray()"><span class="badge badge-info">{{keyword}}</span></li>
+    </ul>
+    <a href="{{paperImage.paper.publicLocation}}" target='_blank'>Read</a>
   </div>
   <!-- /.col-md-4 -->
 </section>

@@ -44,4 +44,5 @@ export interface DataCard {
   description: string,
   action_1_name: string
   action_2_name: string
+  tags: string[]
 }
