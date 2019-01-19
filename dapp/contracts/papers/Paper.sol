@@ -26,4 +26,8 @@ contract Paper is Asset {
         abstrakt = _abstract;
     }
 
+    function data() external view returns(string memory _title, string memory _summary, 
+        string memory _abstrakt, string memory _topic, address _owner) {
+        return (title, summary, abstrakt, topic, this.owner());
+    }
 }
