@@ -1,17 +1,23 @@
 <h4>{{title}}</h4>
 <h6>{{description}}</h6>
 <div class="card-columns">
-  <div href="#" *ngFor="let item of items$ | async" class="card clickable" style="width: 18rem;">
-    <div (click)="onClickCard(item, $event)" class="card-body">
+  <div *ngFor="let item of items$ | async" class="card clickable">
+    <img class="card-img-top" [src]="item['image']" alt="Card image cap">
+    <div class="card-body" (click)="onClickCard(item, $event)">
       <h5 class="card-title">{{item['title']}}</h5>
       <h6 class="card-subtitle mb-2 text-muted">{{item['subtitle']}}</h6>
+      <ul class="list-inline">
+        <li class="list-inline-item" *ngFor="let tag of item.tags"><span class="badge badge-info">{{tag}}</span></li>
+      </ul>
       <p class="card-text">{{item['description']}}</p>
       <a href="#" (click)="onClickAction(1, item, $event)" class="card-link">{{item['action_1_name']}}</a>
     </div>
   </div>
 </div>
+<!--
 <div class="row">
   <div class="col-12 py-3 text-center">
     <a href="" class="btn btn-outline-primary">Browse all</a>
   </div>
 </div>
+-->

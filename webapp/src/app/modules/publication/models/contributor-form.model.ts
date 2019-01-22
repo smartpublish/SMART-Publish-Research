@@ -1,5 +1,5 @@
 import { FormControl, Validators } from '@angular/forms'
-import { Contributor } from './contributor.model'
+import { Contributor } from '@app/shared/models'
 
 export class ContributorForm {
   email = new FormControl()

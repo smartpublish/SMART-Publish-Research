@@ -1,12 +1,14 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core'
 import { Observable } from 'rxjs'
+import { Paper } from '@app/shared/models';
+import { MediaService } from '@app/core/services';
 
 @Component({
   selector: 'app-cardlist',
   templateUrl: './cardlist.component.html',
   styleUrls: ['./cardlist.component.scss'],
 })
-export class CardlistComponent implements OnInit, OnDestroy {
+export class CardlistComponent {
 
   @Input() title: string
   @Input() description: string
@@ -15,13 +17,9 @@ export class CardlistComponent implements OnInit, OnDestroy {
   @Output() clickActionCard: EventEmitter<any> = new EventEmitter()
   @Output() clickCard: EventEmitter<any> = new EventEmitter()
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
-  ngOnDestroy() {
-  }
+  constructor(
+    private mediaService: MediaService
+  ) { }
 
   onClickCard(item: DataCard, $event) {
     $event.stopPropagation()
@@ -35,13 +33,16 @@ export class CardlistComponent implements OnInit, OnDestroy {
       'item': item.model
     })
   }
+
 }
 
 export interface DataCard {
   model: any
   title: string
   subtitle: string
+  image: string,
   description: string,
   action_1_name: string
   action_2_name: string
+  tags: string[]
 }

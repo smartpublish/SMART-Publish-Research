@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core'
-import { Paper } from '@app/modules/publication/models/paper.model'
+import { Paper } from '@app/shared/models'
 import { PublicationService, WorkflowTransition, WorkflowState, Approval } from '@app/modules/publication/services/publication.service'
 import { AlertService } from '@app/core/services/alert.service'
 import { ModalComponent } from '@app/shared/layout/modal/modal.component';

@@ -12,10 +12,7 @@
   },
   "author": "SMART Publish",
   "license": "GPL-3.0",
-  "dependencies": {
-    "@optionality.io/clone-factory": "^0.1.6",
-    "openzeppelin-solidity": "^1.12.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "truffle-assertions": "^0.5.0"
   }

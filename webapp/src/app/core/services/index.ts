@@ -5,6 +5,7 @@ import { EthereumService } from './ethereum.service'
 import { FileService } from './file.service'
 import { HashService } from './hash.service'
 import { IpfsService } from './ipfs.service'
+import { MediaService } from './media.service'
 
 export const services = [
   AlertService,
@@ -13,7 +14,8 @@ export const services = [
   EthereumService,
   FileService,
   HashService,
-  IpfsService
+  IpfsService,
+  MediaService
 ]
 
 export * from './alert.service'
@@ -23,3 +25,4 @@ export * from './ethereum.service'
 export * from './file.service'
 export * from './hash.service'
 export * from './ipfs.service'
+export * from './media.service'

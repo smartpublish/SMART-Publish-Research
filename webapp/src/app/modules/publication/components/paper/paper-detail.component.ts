@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Paper } from '../../models/paper.model'
+import { Paper } from '@app/shared/models'
 import { PublicationService } from '../../services/publication.service'
 import { AlertService } from '@app/core/services/alert.service'
 import { Subscription } from 'rxjs'

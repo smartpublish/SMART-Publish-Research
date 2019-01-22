@@ -187,7 +187,13 @@ contract AssetWorkflow is IWorkflow {
             if(assets[0] == _asset && i == 0) {
                 delete assetsByState[_state.name];
             } else if (i > 0) {
-                delete assetsByState[_state.name][uint(i)];
+                // Remove sorted
+                uint index = uint(i);  
+                for (uint j = index; j < assetsByState[_state.name].length - 1; j++) {
+                    assetsByState[_state.name][j] = assetsByState[_state.name][j + 1];
+                }
+                delete assetsByState[_state.name][assetsByState[_state.name].length - 1];
+                assetsByState[_state.name].length--;
             } else {
                 revert('The asset is not on that state');
             }

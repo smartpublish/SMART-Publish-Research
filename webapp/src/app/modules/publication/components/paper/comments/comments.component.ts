@@ -1,10 +1,9 @@
 import { Component, OnInit, Input } from '@angular/core'
 import { AlertService } from '@app/core/services/alert.service'
 import { PublicationService } from '@app/modules/publication/services/publication.service'
-import { Paper } from '@app/modules/publication/models/paper.model'
-import { Comment } from '@app/modules/publication/models/comment.model'
-import { Observable, zip } from 'rxjs'
-import { scan, mergeMap } from 'rxjs/operators'
+import { Paper, Comment } from '@app/shared/models'
+import { Observable } from 'rxjs'
+import { scan } from 'rxjs/operators'
 
 @Component({
   selector: 'app-comments',

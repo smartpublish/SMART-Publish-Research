@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Paper } from '@app/modules/publication/models'
+import { Paper } from '@app/shared/models'
 import { Observable } from 'rxjs'
 import { EthereumService } from '@app/core/services'
 import { PublicationService } from '@app/modules/publication/services/publication.service'

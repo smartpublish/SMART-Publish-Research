@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Paper, Comment, Contributor } from '../models'
+import { Paper, Comment, Contributor } from '@app/shared/models'
 import { EthereumService, IpfsService, HashService, AuthenticationService } from '@app/core/services'
 import { Observable, merge } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
@@ -39,16 +39,12 @@ export class PublicationService {
   async getPaper(address: string): Promise<Paper> {
     const instance = new Contract(address, tokenAbiPaper.abi, this.PROVIDER)
     const values = await Promise.all([
-      instance.title(),
-      instance.summary(),
-      instance.abstrakt(),
+      instance.data(),
       instance.getFile(0),
-      instance.topic(),
       instance.getKeywordsCount(),
       instance.getContributors(),
-      instance.owner()
     ])
-    const keywords_count = parseInt(values[5], 10)
+    const keywords_count = parseInt(values[2], 10)
     const keywords_promises: any = []
     for (let i = 0; i < keywords_count; i++) {
       keywords_promises.push(instance.keywords(i))
@@ -56,17 +52,17 @@ export class PublicationService {
     const keywords = await Promise.all(keywords_promises)
     return Paper.builder()
       .ethAddress(address)
-      .title(values[0])
-      .summary(values[1])
-      .abstract(values[2])
-      .fileSystemName(values[3][0])
-      .publicLocation(values[3][1])
-      .summaryHashAlgorithm(values[3][2])
-      .summaryHash(values[3][3])
-      .topic(values[4])
+      .title(values[0][0])
+      .summary(values[0][1])
+      .abstract(values[0][2])
+      .fileSystemName(values[1][0])
+      .publicLocation(values[1][1])
+      .summaryHashAlgorithm(values[1][2])
+      .summaryHash(values[1][3])
+      .topic(values[0][3])
       .keywords(Set(keywords.map(item => item) as string[]))
-      .contributors(Set(values[6].map(c => ({ethAddress: c})) as Contributor[]))
-      .ownerAddress(values[7])
+      .contributors(Set(values[3].map(c => ({ethAddress: c})) as Contributor[]))
+      .ownerAddress(values[0][4])
       .build()
   }
 

@@ -1,9 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core'
 import { InvitationService } from '@app/modules/publication/services/invitation.service'
-import { ContributorInvitation } from '@app/modules/publication/models'
+import { Paper, ContributorInvitation } from '@app/shared/models'
 import { Observable, of } from 'rxjs'
 import { scan, catchError } from 'rxjs/operators'
-import { Paper } from '@app/modules/publication/models'
 import { AlertService } from '@app/core/services'
 
 @Component({

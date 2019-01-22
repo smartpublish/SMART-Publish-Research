@@ -1,7 +1,7 @@
 import { Component, OnInit, } from '@angular/core'
 import { Subject, Observable } from 'rxjs'
 import { scan } from 'rxjs/operators'
-import { Paper } from '@app/modules/publication/models'
+import { Paper } from '@app/shared/models'
 import { PublicationService } from '@app/modules/publication/services/publication.service'
 import { Router } from '@angular/router'
 

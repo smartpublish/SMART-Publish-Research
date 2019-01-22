@@ -11,7 +11,7 @@
     <li *ngFor="let paper of results$ | async" (click)="onClickResult(paper, $event)"
       class="list-group-item list-group-item-action flex-column align-items-start clickable">
         <h4>{{paper.title}}</h4>
-        <p>{{paper.abstract}}</p>
+        <p>{{paper.summary}}</p>
         <p><a href="{{paper.publicLocation}}" target="_blank" class="btn btn-default" role="button">Read</a></p>
     </li>
   </ul>

@@ -1,5 +1,5 @@
 import { FormControl, FormArray, Validators } from '@angular/forms'
-import { Paper } from './paper.model'
+import { Paper } from '@app/shared/models'
 
 export class PaperForm {
   ethAddress = new FormControl()
