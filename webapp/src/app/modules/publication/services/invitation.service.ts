@@ -87,7 +87,6 @@ export class InvitationService {
     const signer = this.PROVIDER.getSigner()
     const instance = new Contract(invitation.asset.ethAddress, tokenAbiContributable.abi, signer)
     let expires = invitation.expires.getTime() / 1000
-    console.log(expires)
     await instance.addInvitation(hashedCode, expires)
     return invitation
   }
@@ -128,7 +127,7 @@ export class InvitationService {
     } as ContributorInvitation
 
     const token: string = this.generateToken(invitation)
-    const link: string = environment.base_url + '/' +
+    const link: string = window.location.origin + '/' +
       this.location.prepareExternalUrl(
         this.router.createUrlTree(['/detail', asset.ethAddress, {invitation: token}]).toString())
 

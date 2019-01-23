@@ -4,7 +4,6 @@
 
 export const environment = {
   production: false,
-  base_url: 'http://localhost:4200',
   auth0_config: {
     clientID: 'h1YtDN7KnKnxXixef8ZaJJbHPBEa9ZC1',
     domain: 'smartpublish.eu.auth0.com',

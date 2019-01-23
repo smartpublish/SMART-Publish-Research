@@ -4,7 +4,7 @@ export const environment = {
     clientID: 'h1YtDN7KnKnxXixef8ZaJJbHPBEa9ZC1',
     domain: 'smartpublish.eu.auth0.com',
     responseType: 'token id_token',
-    redirectUri: 'http://localhost:3000/callback',
+    redirectUri: 'https://smartpublish.github.io/SMART-Publish-Research/demo/#/home',
     scope: 'openid'
   }
 }

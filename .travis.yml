@@ -35,18 +35,23 @@ jobs:
       - truffle test
     - stage: test
       name: "Web app"
-      before_install:
-      - cd webapp
-      - npm install -g @angular/cli
-      install:
-      - npm install
+      script: echo "Web test will go here ..."
     - stage: deploy
-      script: skip
-      if: branch = dev
       script: echo "Deploy demo ..."
-      name: "Deploy demo"
+      on:
+        branch: dev
+      name: "Demo smart contracts"
       before_install:
       - cd dapp
       - npm install -g truffle
       script:
       - truffle migrate --network ropsten
+    - stage: deploy
+      name: "Demo web"
+      on:
+        branch: dev
+      provider: pages
+      skip_cleanup: true
+      github_token: $GITHUB_TOKEN
+      keep-history: true
+      local_dir: docs/demo
