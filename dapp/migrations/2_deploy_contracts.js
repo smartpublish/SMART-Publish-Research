@@ -1,4 +1,5 @@
-var ArrayList = artifacts.require('ArrayList');
+var ArrayAddress = artifacts.require('ArrayAddress');
+var SetAddress = artifacts.require('SetAddress');
 var HashSet = artifacts.require('HashSet');
 var AssetFactory = artifacts.require("AssetFactory");
 var PeerReviewWorkflow = artifacts.require('PeerReviewWorkflow');
@@ -8,12 +9,13 @@ var Contributable = artifacts.require('Contributable');
 
 module.exports = function(deployer) {
     // Libraries
-    deployer.deploy(ArrayList);
-    deployer.link(ArrayList, HashSet);
+    deployer.deploy(ArrayAddress);
+    deployer.link(ArrayAddress, HashSet);
     deployer.deploy(HashSet);
+    deployer.deploy(SetAddress);
     
     // Application
-    deployer.link(HashSet, PeerReviewWorkflow);
+    deployer.link(SetAddress, PeerReviewWorkflow);
     deployer.link(HashSet, Contributable);
     deployer.link(HashSet, Paper);
     deployer.link(HashSet, AssetFactory);

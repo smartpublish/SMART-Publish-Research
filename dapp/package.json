@@ -1,19 +1,30 @@
 {
-  "name": "SMART-Papers",
+  "name": "smart-papers",
   "version": "0.0.1",
-  "description": "Create clone contracts with 96 bytes deployed on chain.",
-  "repository": "github:smartpublish/SMART-Publish-Research",
+  "description": "Register papers research",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartpublish/SMART-Publish-Research.git"
+  },
   "main": "init.js",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test"
+    "test": "truffle test",
+    "coverage": "solidity-coverage"
   },
   "author": "SMART Publish",
   "license": "GPL-3.0",
-  "dependencies": {},
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "truffle-hdwallet-provider": "^1.0.2"
+  },
   "devDependencies": {
     "truffle-assertions": "^0.5.0"
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/smartpublish/SMART-Publish-Research/issues"
+  },
+  "homepage": "https://github.com/smartpublish/SMART-Publish-Research#readme"
 }

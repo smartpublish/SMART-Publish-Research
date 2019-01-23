@@ -2,6 +2,7 @@ pragma solidity ^0.5.0;
 
 import "./IAsset.sol";
 import "./IWorkflow.sol";
+import "../../libraries/SetAddress.sol";
 
 contract AssetWorkflow is IWorkflow {
 
@@ -38,9 +39,11 @@ contract AssetWorkflow is IWorkflow {
         State state;
     }
 
+    using SetAddress for address[];
+
     mapping (string => State) private statesByName;
     mapping (string => Transition) private transitionsByName;
-    mapping (string => IAsset[]) private assetsByState;
+    mapping (string => address[]) private assetsByState;
     mapping (address => Comment[]) private commentsByAsset;
     mapping (string => mapping(address => Approval[])) private approvalsByAssetAndState;
     mapping (address => Approval[]) private approvalsByApprover;
@@ -77,7 +80,8 @@ contract AssetWorkflow is IWorkflow {
     function addApproval(IAsset _asset, string memory _state, address _approver, string memory _approvalType) internal {
         State storage state = statesByName[_state];
         require(state.exist, 'State does not exist');
-        require(!isApproval(_asset, _state, _approver), 'This approver already has an approval on this state for this asset');
+        int index = indexOfApprovalsByAssetAndState(_asset, _state, _approver);
+        require(index < 0, 'This approver already has an approval on this state for this asset');
         
         string[] memory actions = new string[](2);
         actions[0] = "Accept";
@@ -129,10 +133,6 @@ contract AssetWorkflow is IWorkflow {
         approvalsByAssetAndState[_state][address(_asset)][uint(index)].status = _status; 
     }
 
-    function isApproval(IAsset _asset, string memory _state, address _approver) internal view returns (bool) {
-        return indexOfApprovalsByAssetAndState(_asset, _state, _approver) > -1;
-    }
-
     function indexOfApprovalsByAssetAndState(IAsset _asset, string memory _state, address _approver) internal view returns(int) {
         Approval[] memory approvalsArray = approvalsByAssetAndState[_state][address(_asset)];
         for(uint i = 0; i < approvalsArray.length; i++) {
@@ -167,13 +167,12 @@ contract AssetWorkflow is IWorkflow {
         return (transaction.name, transaction.sourceState.name, transaction.targetState.name, transaction.permission);
     }
 
-    function findAssetsByState(string memory state) public view returns (IAsset[] memory) {
+    function findAssetsByState(string memory state) public view returns (address[] memory) {
         return assetsByState[state];
     }
 
     function findStateByAsset(IAsset _asset) public view returns (string memory) {
-        uint length = states.length;
-        for(uint i = 0; i < length; i++) {
+        for(uint i = 0; i < states.length; i++) {
             if(isOn(states[i].name, _asset)) {
                 return states[i].name;
             }
@@ -182,18 +181,11 @@ contract AssetWorkflow is IWorkflow {
 
     function removeAssetFromState(State memory _state, IAsset _asset) private {
         if(bytes(_state.name).length > 0) {
-            IAsset[] memory assets = assetsByState[_state.name];
-            int i = getPossitionOnAssetByState(_state, _asset);
-            if(assets[0] == _asset && i == 0) {
+            int i = assetsByState[_state.name].indexOf(address(_asset));
+            if(i == 0 && assetsByState[_state.name].length == 1) {
                 delete assetsByState[_state.name];
             } else if (i > 0) {
-                // Remove sorted
-                uint index = uint(i);  
-                for (uint j = index; j < assetsByState[_state.name].length - 1; j++) {
-                    assetsByState[_state.name][j] = assetsByState[_state.name][j + 1];
-                }
-                delete assetsByState[_state.name][assetsByState[_state.name].length - 1];
-                assetsByState[_state.name].length--;
+                assetsByState[_state.name].removeSorted(address(_asset));
             } else {
                 revert('The asset is not on that state');
             }
@@ -201,18 +193,7 @@ contract AssetWorkflow is IWorkflow {
     }
 
     function isOn(string memory _stateName, IAsset _asset) internal view returns (bool) {
-        return getPossitionOnAssetByState(statesByName[_stateName], _asset) > -1;
-    }
-
-    function getPossitionOnAssetByState(State memory _state, IAsset _asset) internal view returns(int) {
-        IAsset[] memory assets = assetsByState[_state.name];
-        uint length = assets.length;
-        for(uint i = 0; i < length; i++) {
-            if(assets[i] == _asset) {
-                return int(i);
-            }
-        }
-        return -1;
+        return assetsByState[_stateName].indexOf(address(_asset)) > -1;
     }
 
     function run(string memory _transitionName, IAsset _asset) internal {
@@ -229,7 +210,7 @@ contract AssetWorkflow is IWorkflow {
         removeAssetFromState(currentTransition.sourceState, _asset);
 
         // Move to new state
-        assetsByState[currentTransition.targetState.name].push(_asset);
+        assetsByState[currentTransition.targetState.name].add(address(_asset));
 
         // Notify
         emit AssetStateChanged(address(_asset), currentTransition.targetState.name, currentTransition.sourceState.name, currentTransition.name);

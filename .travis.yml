@@ -21,15 +21,36 @@ addons:
       - g++-4.8
 
 before_install:
-  - cd dapp
   - export CXX="g++-4.8"
   - npm install -g npm@latest
   - npm install -g ganache-cli
-  - npm install -g truffle@beta
+  - npm install -g truffle
+  - npm install -g @angular/cli
 
-install:
-  - npm install 
-
-script:
-  - ganache-cli -l 10000000 &
-  - truffle test
+jobs:
+  include:
+    - stage: test
+      name: "Test smart contract (Dapp)"
+      script: echo "Testing smart contracts ..."
+      before_install:
+      - cd dapp
+      install:
+      - npm install
+      script:
+      - ganache-cli -l 8000000 &
+      - truffle test
+      script: echo "Testing webapp ..."
+      name: "Test web (Webapp)"
+      before_install:
+      - cd webapp
+      install:
+      - npm install
+    - stage: deploy
+      script: skip
+      if: branch = dev
+      script: echo "Deploy demo ..."
+      name: "Deploy demo"
+      before_install:
+      - cd dapp
+      script:
+      - truffle migrate --network ropsten
