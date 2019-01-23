@@ -46,15 +46,15 @@ jobs:
       - truffle test
 
     - stage: deploy demo
-      - provider: script
-        script:
-        - cd dapp && npm run migrate:ropsten
-        on:
-          branch: dev
-      - provider: pages
-        on:
-          branch: dev
-        skip_cleanup: true
-        github_token: $GITHUB_TOKEN
-        keep-history: true
-        local_dir: docs/demo
+      provider: script
+      script:
+      - cd dapp && npm run migrate:ropsten
+      on:
+        branch: dev
+      provider: pages
+      on:
+        branch: dev
+      skip_cleanup: true
+      github_token: $GITHUB_TOKEN
+      keep-history: true
+      local_dir: docs/demo
