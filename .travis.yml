@@ -20,25 +20,27 @@ addons:
       - build-essential
       - g++-4.8
 
-before_install:
-  - npm install -g ganache-cli
-  - npm install -g truffle
-  - npm install -g @angular/cli
-
-install:
-  - npm --prefix ./dapp/ install ./dapp/
-  - npm --prefix ./webapp/ install ./webapp/
-
 jobs:
   include:
     - stage: test
       name: "Smart contracts"
+      before_install:
+      - cd dapp
+      - npm install -g ganache-cli
+      - npm install -g truffle
+      install:
+      - npm install
       script:
-      - cd dapp &&
       - ganache-cli -l 8000000 &
       - truffle test
 
     - stage: deploy demo
+      name: "Deploy smart contracts on Ropsten"
+      before_install:
+      - cd dapp
+      - npm install -g truffle
+      install:
+      - npm install
       provider: script
       script:
       - cd dapp && npm run migrate:ropsten
@@ -46,6 +48,7 @@ jobs:
         branch: dev
     
     - stage: deploy demo
+      name: "Deploy web on Github Pages"
       provider: pages
       on:
         branch: dev
