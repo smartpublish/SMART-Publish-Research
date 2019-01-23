@@ -34,6 +34,7 @@ jobs:
     - stage: compile
       name: "Web"
       script:
+      - cd webapp
       - ng build --prod --output-path ../docs/demo --base-href /SMART-Publish-Research/demo --deploy-url /SMART-Publish-Research/demo
       - mv ../docs/demo/index.html ../docs/demo/404.html
 
@@ -44,21 +45,16 @@ jobs:
       - ganache-cli -l 8000000 &
       - truffle test
 
-    - stage: test
-      name: "Web app"
-      script: echo "Web test will go here ..."
+    - stage: deploy demo
+      - provider: script
+        script:
+        - cd dapp && npm run migrate:ropsten
+        on:
+          branch: dev
 
-    - stage: deploy
-      provider: script
-      name: "Demo smart contracts"
-      script:
-      - cd dapp && truffle migrate --network ropsten
-      on:
-        branch: dev
-
-    - stage: deploy
+    - stage: deploy demo
       provider: pages
-      name: "Demo web"
+      name: "web"
       on:
         branch: dev
       skip_cleanup: true
