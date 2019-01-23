@@ -12,8 +12,11 @@
   },
   "scripts": {
     "test": "truffle test",
-    "coverage": "solidity-coverage"
+    "migrate:ropsten": "truffle migrate --network ropsten"
   },
+  "files": [
+    "build/"
+  ],
   "author": "SMART Publish",
   "license": "GPL-3.0",
   "dependencies": {

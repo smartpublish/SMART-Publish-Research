@@ -20,37 +20,54 @@ addons:
       - build-essential
       - g++-4.8
 
+before_install:
+  - npm install -g ganache-cli
+  - npm install -g truffle
+  - npm install -g @angular/cli
+
+install:
+  - npm --prefix ./dapp/ install ./dapp/
+  - npm --prefix ./webapp/ install ./webapp/
+
 jobs:
   include:
+    - stage: compile
+      name: "Web"
+      before_install: skip
+      script:
+      - ng build --prod --output-path ../docs/demo --base-href /SMART-Publish-Research/demo --deploy-url /SMART-Publish-Research/demo
+      - mv ../docs/demo/index.html ../docs/demo/404.html
+
     - stage: test
       name: "Smart contracts"
-      before_install:
-      - cd dapp
-      - npm install -g ganache-cli
-      - npm install -g truffle
-      install:
-      - npm install
+      before_install: skip
+      install: skip
       script:
+      - cd dapp &&
       - ganache-cli -l 8000000 &
       - truffle test
+
     - stage: test
       name: "Web app"
       script: echo "Web test will go here ..."
+
     - stage: deploy
-      script: echo "Deploy demo ..."
+      provider: script
+      name: "Demo smart contracts"
+      before_install: skip
+      install: skip
+      script:
+      - cd dapp && truffle migrate --network ropsten
       on:
         branch: dev
-      name: "Demo smart contracts"
-      before_install:
-      - cd dapp
-      - npm install -g truffle
-      script:
-      - truffle migrate --network ropsten
+
     - stage: deploy
+      before_install: skip
+      install: skip
+      provider: pages
       name: "Demo web"
       on:
         branch: dev
-      provider: pages
       skip_cleanup: true
       github_token: $GITHUB_TOKEN
       keep-history: true
