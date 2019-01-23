@@ -31,14 +31,6 @@ install:
 
 jobs:
   include:
-    - stage: compile
-      name: "Web"
-      script:
-      - cd webapp
-      - npm run ng-high-memory
-      - ng build --prod --output-path ../docs/demo --base-href /SMART-Publish-Research/demo --deploy-url /SMART-Publish-Research/demo
-      - mv ../docs/demo/index.html ../docs/demo/404.html
-
     - stage: test
       name: "Smart contracts"
       script:
