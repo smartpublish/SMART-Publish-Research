@@ -33,15 +33,12 @@ jobs:
   include:
     - stage: compile
       name: "Web"
-      before_install: skip
       script:
       - ng build --prod --output-path ../docs/demo --base-href /SMART-Publish-Research/demo --deploy-url /SMART-Publish-Research/demo
       - mv ../docs/demo/index.html ../docs/demo/404.html
 
     - stage: test
       name: "Smart contracts"
-      before_install: skip
-      install: skip
       script:
       - cd dapp &&
       - ganache-cli -l 8000000 &
@@ -54,16 +51,12 @@ jobs:
     - stage: deploy
       provider: script
       name: "Demo smart contracts"
-      before_install: skip
-      install: skip
       script:
       - cd dapp && truffle migrate --network ropsten
       on:
         branch: dev
 
     - stage: deploy
-      before_install: skip
-      install: skip
       provider: pages
       name: "Demo web"
       on:
