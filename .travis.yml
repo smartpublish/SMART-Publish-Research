@@ -51,13 +51,10 @@ jobs:
         - cd dapp && npm run migrate:ropsten
         on:
           branch: dev
-
-    - stage: deploy demo
-      provider: pages
-      name: "web"
-      on:
-        branch: dev
-      skip_cleanup: true
-      github_token: $GITHUB_TOKEN
-      keep-history: true
-      local_dir: docs/demo
+      - provider: pages
+        on:
+          branch: dev
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN
+        keep-history: true
+        local_dir: docs/demo
