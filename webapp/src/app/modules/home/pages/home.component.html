@@ -1,0 +1,14 @@
+<app-hero [paper]="lastPaper"></app-hero>
+
+<app-cardlist #published
+  [title]="'Published'"
+  [description]="'Last science papers published. Yay!'"
+  [items$]="papersCardByState$['Published']"
+  (clickCard)="clickCardHandle($event)"
+  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>
+<app-cardlist #submitted
+  [title]="'Submitted'"
+  [description]="'Last papers submitted for reviewing. Be the first one to check them!'"
+  [items$]="papersCardByState$['Submitted']"
+  (clickCard)="clickCardHandle($event)"
+  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>

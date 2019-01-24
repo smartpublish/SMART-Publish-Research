@@ -1,0 +1,13 @@
+<app-cardlist
+  [title]="'Submitted by me'"
+  [description]="'Papers submitted by me'"
+  [items$]="papers_submitted_by_me$"
+  (clickCard)="clickCardHandle($event)"
+  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>
+
+<app-cardlist
+  [title]="'Pending of my approval'"
+  [description]="'Papers submitted by me'"
+  [items$]="papers_pending_of_my_approval$"
+  (clickCard)="clickCardHandle($event)"
+  (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>

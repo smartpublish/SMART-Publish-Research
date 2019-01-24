@@ -1,0 +1,16 @@
+<section *ngIf="paperImage$ | async as paperImage" class="row clickable my-4" (click)="onClickHandle()">
+  <div class="col-lg-6">
+    <img class="img-fluid rounded" [src]="paperImage.imageUrl" alt="">
+  </div>
+  <!-- /.col-lg-8 -->
+  <div class="col-lg-6">
+    <h1>{{paperImage.paper.title}}</h1>
+    <p>{{paperImage.paper.summary}}</p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><span class="badge badge-info">{{paperImage.paper.topic}}</span></li>
+      <li class="list-inline-item" *ngFor="let keyword of paperImage.paper.keywords.toArray()"><span class="badge badge-info">{{keyword}}</span></li>
+    </ul>
+    <a href="{{paperImage.paper.publicLocation}}" target='_blank'>Read</a>
+  </div>
+  <!-- /.col-md-4 -->
+</section>

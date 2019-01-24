@@ -1,0 +1,33 @@
+{
+  "name": "smart-papers",
+  "version": "0.0.1",
+  "description": "Register papers research",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smartpublish/SMART-Publish-Research.git"
+  },
+  "main": "init.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "files": [
+    "build/",
+    "contracts"
+  ],
+  "author": "SMART Publish",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "dotenv": "^6.2.0",
+    "truffle-hdwallet-provider": "^1.0.2"
+  },
+  "devDependencies": {
+    "truffle-assertions": "^0.5.0"
+  },
+  "bugs": {
+    "url": "https://github.com/smartpublish/SMART-Publish-Research/issues"
+  },
+  "homepage": "https://github.com/smartpublish/SMART-Publish-Research#readme"
+}

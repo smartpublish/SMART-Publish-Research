@@ -1,0 +1,1 @@
+<alert *ngIf="message$ | async as message" [type]="message.type" [dismissible]="dismissible">{{message.text}}</alert>

@@ -1,0 +1,7 @@
+<h1>Publish</h1>
+<p>Description about the publish general process, steps, ...</p>
+<section *ngIf="!authService.isAuthenticated()">
+    <p>In order to be able to submit a new manuscript you must login first</p>
+    <button class="btn btn-sucess" (click)="authService.login()">Log In / Register</button>
+</section>
+<app-paper-new *ngIf="authService.isAuthenticated()"></app-paper-new>
