@@ -11,11 +11,11 @@
     "test": "test"
   },
   "scripts": {
-    "test": "truffle test",
-    "migrate:ropsten": "truffle migrate --network ropsten"
+    "test": "truffle test"
   },
   "files": [
-    "build/"
+    "build/",
+    "contracts"
   ],
   "author": "SMART Publish",
   "license": "GPL-3.0",

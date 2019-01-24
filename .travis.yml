@@ -3,7 +3,7 @@ language: node_js
 sudo: required
 
 node_js:
-  - "10.10.0"
+  - "10.14.0"
 
 cache:
   directories:
@@ -43,7 +43,8 @@ jobs:
       - npm install
       provider: script
       script:
-      - npm run migrate:ropsten
+      - truffle networks --clean
+      - truffle migrate --reset --network ropsten --interactive
       on:
         branch: dev
     
@@ -53,8 +54,8 @@ jobs:
       before_install:
       - cd webapp
       on:
-        branch: dev
+        branch: master
       skip_cleanup: true
       github_token: $GITHUB_TOKEN
       keep-history: true
-      local_dir: ../docs/demo
+      local_dir: ../docs/demo/
