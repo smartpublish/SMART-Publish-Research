@@ -50,9 +50,12 @@ jobs:
     - stage: deploy demo
       name: "Deploy web on Github Pages"
       provider: pages
+      before_install:
+      - cd webapp
+      script: 'echo "npm test temporarily disabled"'
       on:
         branch: master
       skip_cleanup: true
       github_token: $GITHUB_TOKEN
       keep-history: true
-      local_dir: docs/demo/
+      local_dir: ../docs/demo/
