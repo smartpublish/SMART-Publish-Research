@@ -31,7 +31,7 @@ jobs:
       install:
       - npm install
       script:
-      - ganache-cli -l 8000000 &
+      - ganache-cli -l 8000000 > /dev/null 2>&1 &
       - truffle test
 
     - stage: deploy demo
@@ -44,7 +44,7 @@ jobs:
       provider: script
       script:
       - truffle networks --clean
-      - truffle migrate --reset --network ropsten --interactive
+      - truffle migrate --reset --network ropsten
       on:
         branch: dev
     
@@ -53,6 +53,7 @@ jobs:
       provider: pages
       before_install:
       - cd webapp
+      script: 'true'
       on:
         branch: master
       skip_cleanup: true
