@@ -32,7 +32,7 @@ jobs:
       - npm i --silent --no-optional -g truffle ganache-cli
       - npm i
       script:
-      - ganache-cli -l 8000000 > /dev/null 2>&1 &;
+      - ganache-cli -l 8000000 > /dev/null 2>&1 &
       - sleep 5;
       - truffle test;
 
