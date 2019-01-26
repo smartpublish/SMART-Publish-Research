@@ -10,8 +10,9 @@ cache:
     - node_modules
 
 env:
-  - CXX=g++-4.8
-  - GH_REPO_DEMO="https://$GH_TOKEN@github.com/smartpublish/SMART-Publish-Research-demo.git""
+  global:
+    - CXX=g++-4.8
+    - GH_REPO_DEMO="https://$GH_TOKEN@github.com/smartpublish/SMART-Publish-Research-demo.git"
 
 addons:
   apt:
@@ -32,6 +33,7 @@ jobs:
       - npm i
       script:
       - ganache-cli -l 8000000 > /dev/null 2>&1 &
+      - sleep 5
       - truffle test
 
     - stage: deploy demo
