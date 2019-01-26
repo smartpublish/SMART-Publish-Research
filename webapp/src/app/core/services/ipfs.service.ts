@@ -16,7 +16,7 @@ export class IpfsService {
       repo: 'ipfs-smart-papers'
     })
 
-    this.node.on('ready', () => console.log('Online status: ', this.node.isOnline() ? 'online' : 'offline'))
+    this.node.on('ready', () => console.log('IPFS Node online status: ', this.node.isOnline() ? 'online' : 'offline'))
   }
 
   upload(fileObj: [File]): Promise<any> {
@@ -25,7 +25,8 @@ export class IpfsService {
       const myReadableStreamBuffer = new StreamBuffers.ReadableStreamBuffer({
         chunkSize: 25000   // determines data transfer rate
       })
-      this.stream = this.node.files.addReadableStream()
+      console.log(this.node)
+      this.stream = this.node.addReadableStream()
 
       this.stream.on('data', (file) => {
         resolve(file.hash)
