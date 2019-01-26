@@ -32,9 +32,9 @@ jobs:
       - npm i --silent --no-optional -g truffle ganache-cli
       - npm i
       script:
-      - ganache-cli -l 8000000 > /dev/null 2>&1 &
-      - sleep 5
-      - truffle test
+      - ganache-cli -l 8000000 > /dev/null 2>&1 &;
+      - sleep 5;
+      - truffle test;
 
     - stage: deploy demo
       name: "Deploy demo on Ropsten"
@@ -45,8 +45,8 @@ jobs:
       - npm i --prefix webapp/
       script:
       - cd dapp/ || exit;
-      - truffle networks --clean;
       - truffle migrate --network ropsten;
+      - truffle exec seed.js;
       - cd ../webapp/ || exit;
       - npm run ng-high-memory -- build --prod --base-href /SMART-Publish-Research-demo/ --deploy-url /SMART-Publish-Research-demo/ --source-map=false;
       - npx angular-cli-ghpages --dir=dist/webapp --repo="$GH_REPO_DEMO" --name="$GH_USER" --email="$GH_EMAIL" --branch=master;
