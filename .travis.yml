@@ -47,7 +47,7 @@ jobs:
       - cd dapp/ || exit;
       - truffle migrate --reset --network ropsten;
       - cd ../webapp/ || exit;
-      - ng build --prod --base-href /SMART-Publish-Research-demo/ --deploy-url /SMART-Publish-Research-demo/ --source-map=false;
+      - npm run ng-high-memory -- build --prod --base-href /SMART-Publish-Research-demo/ --deploy-url /SMART-Publish-Research-demo/ --source-map=false;
       - npx angular-cli-ghpages --dir=dist/webapp --repo="$GH_REPO_DEMO" --name="$GH_USER" --email="$GH_EMAIL" --branch=master;
       on:
         branch: dev
