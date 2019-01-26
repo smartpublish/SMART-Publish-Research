@@ -11,6 +11,7 @@ cache:
 
 env:
   - CXX=g++-4.8
+  - GH_REPO_DEMO="https://$GH_TOKEN@github.com/smartpublish/SMART-Publish-Research-demo.git""
 
 addons:
   apt:
@@ -26,37 +27,25 @@ jobs:
       name: "Smart contracts"
       before_install:
       - cd dapp
-      - npm install -g ganache-cli
-      - npm install -g truffle
       install:
-      - npm install
+      - npm i --silent --no-optional -g truffle ganache-cli
+      - npm i
       script:
       - ganache-cli -l 8000000 > /dev/null 2>&1 &
       - truffle test
 
     - stage: deploy demo
-      name: "Deploy smart contracts on Ropsten"
-      before_install:
-      - cd dapp
-      - npm install -g truffle
-      install:
-      - npm install
+      name: "Deploy demo on Ropsten"
       provider: script
+      install:
+      - npm i --silent --no-optional -g truffle @angular/cli
+      - npm i --prefix dapp/
+      - npm i --prefix webapp/
       script:
-      - truffle migrate --reset --network ropsten
-      - truffle exec seed.js --network ropsten
+      - cd dapp/ || exit;
+      - truffle migrate --reset --network ropsten;
+      - cd ../webapp/ || exit;
+      - ng build --prod --base-href /SMART-Publish-Research-demo/ --deploy-url /SMART-Publish-Research-demo/ --source-map=false;
+      - npx angular-cli-ghpages --dir=dist/webapp --repo="$GH_REPO_DEMO" --name="$GH_USER" --email="$GH_EMAIL" --branch=master;
       on:
         branch: dev
-    
-    - stage: deploy demo
-      name: "Deploy web on Github Pages"
-      provider: pages
-      before_install:
-      - cd webapp
-      script: 'echo "npm test temporarily disabled"'
-      on:
-        branch: master
-      skip_cleanup: true
-      github_token: $GITHUB_TOKEN
-      keep-history: true
-      local_dir: ../docs/demo/
