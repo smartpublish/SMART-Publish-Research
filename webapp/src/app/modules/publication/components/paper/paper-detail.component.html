@@ -66,14 +66,16 @@
           <div class="row">
             <div class="col-sm-12">
                 <dl class="item-property">
-                  <dt>Ethereum Address</dt>
-                  <dd>{{paper.ethAddress}}</dd>
+                  <dt>{{paper.ethNetwork | titlecase}} Address</dt>
+                  <dd><small><a href="https://{{paper.ethNetwork}}.etherscan.io/address/{{paper.ethAddress}}" target='_blank'>{{paper.ethAddress}}</a></small></dd>
                 </dl>
                 <dl class="item-property">
                   <dt>Contributors</dt>
                   <dd>
                     <ul class="list-unstyled">
-                      <li *ngFor="let contributor of paper.contributors">{{contributor.ethAddress}}</li>
+                      <li *ngFor="let contributor of paper.contributors">
+                        <small><a href="https://{{paper.ethNetwork}}.etherscan.io/address/{{contributor.ethAddress}}" target='_blank'>{{contributor.ethAddress}}</a></small>
+                      </li>
                     </ul>
                   </dd>
                 </dl>
@@ -83,7 +85,7 @@
                 </dl>
                 <dl class="item-property">
                   <dt>Public location</dt>
-                  <dd><a href="{{paper.publicLocation}}" target='_blank'>{{paper.publicLocation}}</a></dd>
+                  <dd><small><a href="https://ropsten.etherscan.io/address/{{paper.ethAddress}}" target='_blank'>{{paper.publicLocation}}</a></small></dd>
                 </dl> 
                 <dl class="item-property">
                   <dt>Summary Hash Algortihm</dt>
@@ -91,7 +93,7 @@
                 </dl>
                 <dl class="item-property">
                   <dt>Summary Hash</dt>
-                  <dd>{{paper.summaryHash}}</dd>
+                  <dd><small>{{paper.summaryHash}}</small></dd>
                 </dl>
               </div>
             </div>

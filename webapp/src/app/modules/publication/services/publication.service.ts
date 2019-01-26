@@ -43,6 +43,7 @@ export class PublicationService {
       instance.getFile(0),
       instance.getKeywordsCount(),
       instance.getContributors(),
+      this.PROVIDER.getNetwork()
     ])
     const keywords_count = parseInt(values[2], 10)
     const keywords_promises: any = []
@@ -51,6 +52,7 @@ export class PublicationService {
     }
     const keywords = await Promise.all(keywords_promises)
     return Paper.builder()
+      .ethNetwork(values[4].name)
       .ethAddress(address)
       .title(values[0][0])
       .summary(values[0][1])
@@ -261,20 +263,28 @@ export class PublicationService {
   private submitToEth(paper: Paper): Promise<Paper> {
     return new Promise<Paper>(async (resolve, reject) => {
       // Uses ethers.js because ABIEncoderV2 does not work with truffle-contract and web3js
-      const address = await this.ethereumService.getSCAddress(tokenAbiAssetFactory)
       const signer = this.PROVIDER.getSigner()
+      let values = await Promise.all([
+        this.PROVIDER.getNetwork(),
+        this.ethereumService.getSCAddress(tokenAbiAssetFactory),
+        this.authService.getProfile(),
+        signer.getAddress(),
+        this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
+      ])
+      const network = values[0]
+      const address = values[1]
+      const profile = values[2]
+      const account = values[3]
+      const address_wf = values[4]
       const instance = new Contract(address, tokenAbiAssetFactory.abi, signer)
-      const profile = await this.authService.getProfile()
-      const account = await signer.getAddress()
       const filter = instance.filters.AssetCreated(null, null, account)
       instance.on(filter, (asset, type, sender) => {
         console.log('Asset created (' + asset.toString() + '), type: ' + type + ' from sender: ' + sender)
-        resolve(Paper.builder(paper).ethAddress(asset).build())
+        resolve(Paper.builder(paper).ethNetwork(network.name).ethAddress(asset).build())
       })
 
       try {
-        const address_wf = await this.ethereumService.getSCAddress(tokenAbiPeerReviewWorkflow)
-        await instance.createPaper(
+        let tx = await instance.createPaper(
           paper.title,
           paper.summary,
           paper.abstract,
@@ -287,6 +297,7 @@ export class PublicationService {
           address_wf, // Creates Paper with PeerReviewWorkflow by default
           profile.sub // user_id
         )
+        console.log(tx)
       } catch (error) {
         console.log('Failed TX:', error.transactionHash)
         console.error(error)
