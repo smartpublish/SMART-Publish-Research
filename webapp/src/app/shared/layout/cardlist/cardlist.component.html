@@ -1,9 +1,9 @@
 <h4>{{title}}</h4>
 <h6>{{description}}</h6>
 <div class="card-columns">
-  <div *ngFor="let item of items$ | async" class="card clickable">
+  <div *ngFor="let item of items$ | async" (click)="onClickCard(item, $event)" class="card clickable">
     <img class="card-img-top" [src]="item['image']" alt="Card image cap">
-    <div class="card-body" (click)="onClickCard(item, $event)">
+    <div class="card-body">
       <h5 class="card-title">{{item['title']}}</h5>
       <h6 class="card-subtitle mb-2 text-muted">{{item['subtitle']}}</h6>
       <ul class="list-inline">

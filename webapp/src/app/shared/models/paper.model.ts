@@ -2,12 +2,14 @@ import { Contributor } from './contributor.model'
 import { Set } from 'immutable'
 
 export interface IAsset {
+  readonly ethNetwork: string
   readonly ethAddress: string
   readonly contributors: Set<Contributor>
   readonly ownerAddress: string
 }
 
 export type PaperJson = {
+  ethNetwork: string
   ethAddress: string
   title: string
   summary: string
@@ -27,6 +29,10 @@ class PaperBuilder {
   private json: PaperJson
   constructor(paper?: Paper) {
     this.json = paper ? paper.toJSON() : <PaperJson>{}
+  }
+  ethNetwork(ethNetwork: string): PaperBuilder{
+    this.json.ethNetwork = ethNetwork
+    return this
   }
   ethAddress(ethAddress: string): PaperBuilder {
     this.json.ethAddress = ethAddress
@@ -88,6 +94,7 @@ class PaperBuilder {
 export class Paper implements IAsset {
 
   private constructor (
+    readonly ethNetwork: string,
     readonly ethAddress: string,
     readonly title: string,
     readonly summary: string,
@@ -105,6 +112,7 @@ export class Paper implements IAsset {
   
   toJSON(): PaperJson {
     return {
+      ethNetwork: this.ethNetwork,
       ethAddress: this.ethAddress,
       title: this.title,
       summary: this.summary,
@@ -123,6 +131,7 @@ export class Paper implements IAsset {
     
   static fromJSON(json: PaperJson): Paper {
     return new Paper(
+      json.ethNetwork,
       json.ethAddress,
       json.title,
       json.summary,

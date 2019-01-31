@@ -6,6 +6,7 @@
   [items$]="papersCardByState$['Published']"
   (clickCard)="clickCardHandle($event)"
   (clickActionCard)="clickActionCardHandle($event)"></app-cardlist>
+<hr class="m-4">
 <app-cardlist #submitted
   [title]="'Submitted'"
   [description]="'Last papers submitted for reviewing. Be the first one to check them!'"

@@ -1,7 +1,20 @@
 <h1>Publish</h1>
-<p>Description about the publish general process, steps, ...</p>
-<section *ngIf="!authService.isAuthenticated()">
-    <p>In order to be able to submit a new manuscript you must login first</p>
-    <button class="btn btn-sucess" (click)="authService.login()">Log In / Register</button>
-</section>
-<app-paper-new *ngIf="authService.isAuthenticated()"></app-paper-new>
+<p>Welcome to the SMART Paper online manuscript submission and tracking system.</p>
+<div class="row">
+    <div class="col-lg-8">
+        <section *ngIf="!authService.isAuthenticated()">
+            <p>In order to be able to submit a new manuscript you must login first</p>
+            <button class="btn btn-sucess" (click)="authService.login()">Log In / Register</button>
+        </section>
+        <app-paper-new *ngIf="authService.isAuthenticated()"></app-paper-new>                
+    </div>
+    <div class="col-lg-4">
+        <div class="card mt-4">
+            <div class="card-body p-4">
+                <h5 class="card-title">Process</h5>
+                <p class="text-justify">This is diagram displays the process the manuscript will follow for its publishing. Its called Peer Review and you will need that 3 reviewers accpet your work to complete the process. But, your manuscript will be available to read from the submit moment.</p>
+                <img id="diagram" src="assets/images/PeerReviewWorkflow.svg" alt="Peer review workflow">
+            </div>
+        </div>
+    </div>
+</div>
