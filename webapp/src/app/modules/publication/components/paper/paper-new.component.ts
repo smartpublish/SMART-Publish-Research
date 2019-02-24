@@ -1,12 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core'
 import { Router } from '@angular/router'
 import { FormGroup, FormArray } from '@angular/forms'
 import { PublicationService } from '@app/modules/publication/services/publication.service'
-import { Paper, PaperJson } from '@app/shared/models'
+import { Paper, PaperJson, Contributor, ContributorType } from '@app/shared/models'
 import { AlertService } from '@app/core/services/alert.service'
 import { Subscription } from 'rxjs'
 import { PublicationFormService } from '../../services/publication-form.service'
 import { Set } from 'immutable'
+import Stepper from 'bs-stepper'
 
 @Component({
   selector: 'app-paper-new',
@@ -21,6 +22,8 @@ export class PaperNewComponent implements OnInit, OnDestroy {
   formInvalid = false
   file: File
   topics: string[]
+
+  private stepper: Stepper
 
   constructor(
     private publicationService: PublicationService,
@@ -47,6 +50,10 @@ export class PaperNewComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.stepper = new Stepper(document.querySelector('#submitPaperStepper'), {
+      linear: false,
+      animation: true
+    })
     this.topics = this.publicationFormService.getTopicsOption()
     this.paperFormSub = this.publicationFormService.paperForm$
       .subscribe(form => {
@@ -59,12 +66,15 @@ export class PaperNewComponent implements OnInit, OnDestroy {
     this.paperFormSub.unsubscribe()
   }
 
-  addContributor() {
-    this.publicationFormService.addContributor()
+  addContributor(contributor?: Contributor) {
+    this.publicationFormService.addContributor(contributor)
   }
 
   deleteContributor(index: number) {
     this.publicationFormService.deleteContributor(index)
   }
 
+  nextStep() {
+    this.stepper.next()
+  }
 }

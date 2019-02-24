@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core'
-import { ethers } from 'ethers'
+import { ethers, utils } from 'ethers'
 import { AlertService } from './alert.service'
+import { Arrayish, Signature, arrayify, hashMessage } from 'ethers/utils';
+import { JsonRpcProvider } from 'ethers/providers';
 
 declare let window: any
 
@@ -9,7 +11,7 @@ declare let window: any
 })
 export class EthereumService {
 
-  readonly ethersProvider
+  readonly ethersProvider: JsonRpcProvider
 
   constructor(private alertService: AlertService) {
     // New MetaMask injects a Web3 Provider as "window.ethereum"
@@ -28,7 +30,7 @@ export class EthereumService {
     }
   }
 
-  getProvider() {
+  getProvider(): JsonRpcProvider {
     return this.ethersProvider
   }
 
@@ -40,4 +42,14 @@ export class EthereumService {
     throw new Error('Blockchain network could not be detected')
   }
 
+  getPublicKey(message: Arrayish | string, signature: Signature | string): string {
+    let key = utils.recoverPublicKey(utils.arrayify(utils.hashMessage(message)), signature)
+    console.log("Uncompressed Public Key: " + key)
+    let computedKey = '0x' + utils.computePublicKey(key).slice(4)
+    console.log("Compressed Public Key : " + computedKey)
+    console.log("Account (Uncompressed PubKey): " + utils.getAddress('0x' + utils.keccak256(key).substring(26)))
+    console.log("Account (Compressed PubKey): " + utils.getAddress('0x' + utils.keccak256(computedKey).substring(26)))
+    console.log("Verify message: " + utils.verifyMessage(message, signature))
+    return computedKey
+  }
 }

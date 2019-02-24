@@ -11,6 +11,11 @@ exports.config = {
   capabilities: {
     'browserName': 'chrome'
   },
+  chromeOptions: {
+    args: {
+      binary: 'C:\Program Files (x86)\Google\Chrome'
+    }
+  },
   directConnect: true,
   baseUrl: 'http://localhost:4200/',
   framework: 'jasmine',

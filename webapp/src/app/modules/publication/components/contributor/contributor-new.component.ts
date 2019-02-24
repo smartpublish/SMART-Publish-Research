@@ -9,6 +9,7 @@ import { FormGroup } from '@angular/forms'
 })
 export class ContributorNewComponent implements OnInit {
 
+  @Input() options: ContributorNewComponentOptions
   @Input() contributorForm: FormGroup
   @Input() index: number
   @Output() deleteContributor: EventEmitter<number> = new EventEmitter()
@@ -21,4 +22,8 @@ export class ContributorNewComponent implements OnInit {
     this.deleteContributor.emit(this.index)
   }
 
+}
+export interface ContributorNewComponentOptions {
+  disableDelete?
+  hiddenFullName?, hiddenEmail?, hiddenType?, hiddenEthAddress?
 }

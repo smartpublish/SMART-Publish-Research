@@ -2,11 +2,13 @@
 <p>Welcome to the SMART Paper online manuscript submission and tracking system.</p>
 <div class="row">
     <div class="col-lg-8">
-        <section *ngIf="!authService.isAuthenticated()">
+        <section *ngIf="!authService.isAuthenticated(); else submit">
             <p>In order to be able to submit a new manuscript you must login first</p>
             <button class="btn btn-sucess" (click)="authService.login()">Log In / Register</button>
         </section>
-        <app-paper-new *ngIf="authService.isAuthenticated()"></app-paper-new>                
+        <ng-template #submit>
+            <app-paper-new></app-paper-new>                
+        </ng-template>
     </div>
     <div class="col-lg-4">
         <div class="card mt-4">

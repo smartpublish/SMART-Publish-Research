@@ -9,48 +9,26 @@ export class PaperForm {
   file = new FormControl()
   topic = new FormControl()
   keywords = new FormControl()
-  // contributors = new FormArray([])
+  contributors = new FormArray([])
 
   constructor(paper?: Paper) {
-    if (paper && paper.ethAddress) {
-      this.ethAddress.setValue(paper.ethAddress)
+    if (paper) {
+      paper.ethAddress? this.ethAddress.setValue(paper.ethAddress) : null
+      paper.title? this.title.setValue(paper.title) : null
+      paper.summary? this.summary.setValue(paper.summary) : null
+      paper.abstract? this.abstract.setValue(paper.abstract) : null
+      paper.fileName? this.file.setValue(paper.fileName) : null
+      paper.topic? this.topic.setValue(paper.topic) : null
+      paper.keywords? this.keywords.setValue(paper.keywords) : null
+      paper.contributors? this.contributors.setValue([paper.contributors]) : null
     }
-    if (paper && paper.title) {
-      this.title.setValue(paper.title)
-    }
+    
     this.title.setValidators([Validators.required])
-
-    if (paper && paper.summary) {
-      this.summary.setValue(paper.summary)
-    }
     this.summary.setValidators([Validators.required])
-
-    if (paper && paper.abstract) {
-      this.abstract.setValue(paper.abstract)
-    }
     this.abstract.setValidators([Validators.required])
-
-    if (paper && paper.fileName) {
-      this.file.setValue(paper.fileName)
-    }
     this.file.setValidators([Validators.required])
-
-    if (paper && paper.topic) {
-      this.topic.setValue(paper.topic)
-    }
     this.topic.setValidators([Validators.required])
-
-    if (paper && paper.keywords) {
-      this.keywords.setValue(paper.keywords)
-    }
     this.keywords.setValidators([Validators.required])
-
-    /*
-    if(paper && paper.contributors) {
-      this.contributors.setValue([paper.contributors])
-    }
     this.contributors.setValidators([Validators.required])
-    */
-
   }
 }

@@ -1,9 +1,28 @@
-<form [formGroup]="contributorForm" class="form-inline">
-  <div class="form-group mb-2">
-    <label for="email" class="sr-only">Email</label>
-    <input id="email" formControlName="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="eg: co-author@gmail.com" required>
-  </div>
-  <div class="form-group mx-sm-2 mb-2">
-    <button (click)="onDelete()" type="button" class="btn btn-light mx-sm-1 clickable">&times;</button>
+<form [formGroup]="contributorForm">
+  <div class="row">
+    <div class="col-10">
+      <div class="form-group mb-2" [hidden]="options?.hiddenFullName">
+          <label for="fullName">Full name</label>
+          <input id="fullName" formControlName="fullName" type="text" class="form-control" aria-describedby="fullNameHelp" placeholder="eg: Dr. Johan Descartes">
+          <small id="fullNameHelp" class="form-text text-muted">Public name that displays with paper. This data don't be persisted on blockchain, just on this web.</small>
+        </div>    
+        <div class="form-group mb-2" [hidden]="options?.hiddenEmail">
+          <label for="email">Email</label>
+          <input id="email" formControlName="email" type="text" class="form-control" aria-describedby="emailHelp" placeholder="eg: co-author@gmail.com">
+        </div>
+        <div class="form-group mb-2" [hidden]="'true'">
+          <label for="ethAddress">Ethereum Account</label>
+          <input id="ethAddress" formControlName="ethAddress" type="text" class="form-control" aria-describedby="ethAddrssHelp" placeholder="eg: 0x3DE9EE1653F8c8CH7679a316379B7eA02DC0DdEF">
+        </div>
+        <div class="form-group mb-2" [hidden]="'true'">
+          <label for="type">Contributor Type</label>
+          <input id="type" formControlName="type" type="text" class="form-control" aria-describedby="typeHelp" placeholder="eg: Author">
+        </div>
+    </div>
+    <div class="col-2">
+      <div *ngIf="!options?.disableDelete" class="form-group mx-sm-2 mb-2 text-center pt-2">
+        <button (click)="onDelete()" type="button" class="btn btn-light mx-sm-1 mt-4 clickable">&times;</button>
+      </div>
+    </div>
   </div>
 </form>

@@ -5,6 +5,9 @@ import { TimeAgoPipe } from 'time-ago-pipe'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { TagInputModule } from 'ngx-chips'
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faFileInvoice, faUsers, faSave, faUserTimes } from '@fortawesome/free-solid-svg-icons'
 
 @NgModule({
   imports: [
@@ -13,7 +16,8 @@ import { TagInputModule } from 'ngx-chips'
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,
-    LayoutModule
+    LayoutModule,
+    FontAwesomeModule
   ],
   declarations: [
     TimeAgoPipe
@@ -25,8 +29,14 @@ import { TagInputModule } from 'ngx-chips'
     FormsModule,
     ReactiveFormsModule,
     LayoutModule,
-    TimeAgoPipe
+    TimeAgoPipe,
+    FontAwesomeModule
   ],
 
 })
-export class SharedModule { }
+export class SharedModule {
+  constructor() {
+    // Add an icon to the library for convenient access in other components
+    library.add(faFileInvoice, faUsers, faSave, faUserTimes)
+  }
+}

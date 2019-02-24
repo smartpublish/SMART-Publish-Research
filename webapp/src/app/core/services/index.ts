@@ -6,6 +6,8 @@ import { FileService } from './file.service'
 import { HashService } from './hash.service'
 import { IpfsService } from './ipfs.service'
 import { MediaService } from './media.service'
+import { IdentityService } from './identity.service';
+import { HttpErrorHandler } from './http-error-handler.service';
 
 export const services = [
   AlertService,
@@ -15,7 +17,9 @@ export const services = [
   FileService,
   HashService,
   IpfsService,
-  MediaService
+  MediaService,
+  IdentityService,
+  HttpErrorHandler
 ]
 
 export * from './alert.service'
@@ -26,3 +30,5 @@ export * from './file.service'
 export * from './hash.service'
 export * from './ipfs.service'
 export * from './media.service'
+export * from './identity.service'
+export * from './http-error-handler.service'

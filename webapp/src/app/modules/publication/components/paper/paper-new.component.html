@@ -1,52 +1,93 @@
 <div class="card mt-4">
   <div class="card-body p-4">
-      <h5 class="card-title">Submit a manuscript</h5>
-      <form [formGroup]="paperForm">
-        <div class="form-group">
-          <label for="title">Title</label>
-          <input id="title" name="title" type="text" formControlName="title" class="form-control" aria-describedby="titleHelp" placeholder="Enter paper title" required>
-          <small id="titleHelp" class="form-text text-muted">Title will be saved on Blockchain</small>
+    <h5 class="card-title">Submit a manuscript</h5>
+    <div #submitPaperStepper id="submitPaperStepper" class="bs-stepper">
+      <div class="bs-stepper-header">
+        <div class="step" data-target="#test-l-1">
+          <a href="#">
+            <span class="bs-stepper-circle"><fa-icon icon="file-invoice"></fa-icon></span>
+            <span class="bs-stepper-label">Paper</span>
+          </a>
         </div>
-        <div class="form-group">
-          <label for="abstract">Abstract</label>
-          <textarea id="abstract" name="abstract" formControlName="abstract" class="form-control" rows="8" aria-describedby="abstractHelp" placeholder="Enter paper abstract" required></textarea>
-          <small id="abstractHelp" class="form-text text-muted">Abstract will be saved on Blockchain</small>
+        <div class="line"></div>
+        <div class="step" data-target="#test-l-2">
+          <a href="#">
+            <span class="bs-stepper-circle"><fa-icon icon="users"></fa-icon></span>
+            <span class="bs-stepper-label">Authors</span>
+          </a>
         </div>
-        <div class="form-group">
-          <label for="summary">Summary</label>
-          <textarea id="summary" name="summary" formControlName="summary" class="form-control" rows="2" aria-describedby="summaryHelp" placeholder="Enter paper summary" required></textarea>
-          <small id="summaryHelp" class="form-text text-muted">Summary will be saved on Blockchain</small>
+        <div class="line"></div>
+        <div class="step" data-target="#test-l-3">
+          <a href="#">
+            <span class="bs-stepper-circle"><fa-icon icon="save"></fa-icon></span>
+            <span class="bs-stepper-label">Submit</span>
+          </a>
         </div>
-        <div class="form-group">
-          <label>Paper file</label>
-          <div class="custom-file">
-              <input id="file" name="file" type="file" (change)="onFileChange($event)" formControlName="file" class="custom-file-input" aria-describedby="fileHelp" placeholder="Enter paper file" value="" required>
-              <label for="file" class="custom-file-label">{{(file)? file.name : "eg: my-awesome-paper.pdf"}}</label>
-              <small id="fileHelp" class="form-text text-muted">This file will send to IPFS</small>
+      </div>
+      <hr>
+      <div class="bs-stepper-content">
+        <form [formGroup]="paperForm">
+          <div id="test-l-1" class="content">
+            <div class="form-group">
+              <label for="title">Title</label>
+              <input id="title" name="title" type="text" formControlName="title" class="form-control" aria-describedby="titleHelp" placeholder="Enter paper title" required>
+              <small id="titleHelp" class="form-text text-muted">Title will be saved on Blockchain</small>
+            </div>
+            <div class="form-group">
+              <label for="abstract">Abstract</label>
+              <textarea id="abstract" name="abstract" formControlName="abstract" class="form-control" rows="8" aria-describedby="abstractHelp" placeholder="Enter paper abstract" required></textarea>
+              <small id="abstractHelp" class="form-text text-muted">Abstract will be saved on Blockchain</small>
+            </div>
+            <div class="form-group">
+              <label for="summary">Summary</label>
+              <textarea id="summary" name="summary" formControlName="summary" class="form-control" rows="2" aria-describedby="summaryHelp" placeholder="Enter paper summary" required></textarea>
+              <small id="summaryHelp" class="form-text text-muted">Summary will be saved on Blockchain</small>
+            </div>
+            <div class="form-group">
+              <label>Paper file</label>
+              <div class="custom-file">
+                  <input id="file" name="file" type="file" (change)="onFileChange($event)" formControlName="file" class="custom-file-input" aria-describedby="fileHelp" placeholder="Enter paper file" value="" required>
+                  <label for="file" class="custom-file-label">{{(file)? file.name : "eg: my-awesome-paper.pdf"}}</label>
+                  <small id="fileHelp" class="form-text text-muted">This file will send to IPFS</small>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="topic">Topic</label>
+              <select id="topic" name="topic" formControlName="topic" class="form-control" aria-describedby="topicHelp" placeholder="Enter paper topic" required>
+                <option *ngFor="let topic of topics" [value]="topic">{{topic}}</option>
+              </select>
+              <small id="topicHelp" class="form-text text-muted">Topic will be saved on Blockchain</small>
+            </div>
+            <div class="form-group">
+              <label>Keywords</label>
+              <tag-input item-content id="keywords" name="keywords" formControlName="keywords" aria-describedby="keywordsHelp" placeholder="Enter keywords" required></tag-input>
+              <small id="keywordsHelp" class="form-text text-muted">Keywords will be saved on Blockchain</small>
+            </div>  
+            <button (click)="nextStep()" class="btn btn-primary">Next</button>
           </div>
-        </div>
-        <div class="form-group">
-          <label for="topic">Topic</label>
-          <select id="topic" name="topic" formControlName="topic" class="form-control" aria-describedby="topicHelp" placeholder="Enter paper topic" required>
-            <option *ngFor="let topic of topics" [value]="topic">{{topic}}</option>
-          </select>
-          <small id="topicHelp" class="form-text text-muted">Topic will be saved on Blockchain</small>
-        </div>
-        <div class="form-group">
-          <label>Keywords</label>
-          <tag-input item-content id="keywords" name="keywords" formControlName="keywords" aria-describedby="keywordsHelp" placeholder="Enter keywords" required></tag-input>
-          <small id="keywordsHelp" class="form-text text-muted">Keywords will be saved on Blockchain</small>
-        </div>  
-        <!--
-        <div class="form-group">
-          <label>Contributors emails</label>
-          <button (click)="addContributor()" type="button" class="btn btn-outline-secondary mx-sm-1 mb-2 clickable">+</button>
-          <div *ngFor="let contributor of contributorsForm?.controls; let i = index">
-            <app-contributor-new [index]="i" [contributorForm]="contributor" (deleteContributor)="deleteContributor($event)"></app-contributor-new>
+          <div id="test-l-2" class="content">
+            <div class="form-group">
+              <h6>Author</h6>
+              <div *ngFor="let contributor of contributorsForm?.controls | slice:0:1; let i = index">
+                <app-contributor-new [index]="i" [contributorForm]="contributor" [options]="{disableDelete: true, hiddenEmail: true}"></app-contributor-new>
+              </div>
+            </div>
+            <!--
+            <div class="form-group">
+              <h6>Co-Authors <button (click)="addContributor()" type="button" class="btn btn-outline-secondary mx-sm-1 mb-2 clickable">+</button></h6>
+              <div *ngFor="let contributor of contributorsForm?.controls | slice:1; let i = index">
+                <app-contributor-new [index]="i+1" [contributorForm]="contributor" (deleteContributor)="deleteContributor(i+1)" [options]="{hiddenFullName: true}"></app-contributor-new>
+              </div>
+            </div>
+            -->
+            <button (click)="nextStep()" class="btn btn-primary">Next</button>
           </div>
-        </div>
-        -->
-        <button (click)="onSubmit()" [disabled]="!paperForm.valid" class="btn btn-primary">Submit</button>
-      </form>          
+          <div id="test-l-3" class="content">
+            <p>Submit...</p>
+            <button (click)="onSubmit()" [disabled]="!paperForm.valid" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>

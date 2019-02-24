@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core'
 import { AppComponent } from './app.component'
 import { AppRoutingModule } from './app-routing.module'
 import { BrowserModule } from '@angular/platform-browser'
+import { HttpClientModule } from '@angular/common/http'
 import { CoreModule } from '@app/core/core.module'
 import { SharedModule } from '@app/shared/shared.module'
 import { HomeModule, PublicationModule, MyWorkModule} from '@app/modules'
@@ -13,7 +14,7 @@ import { HomeModule, PublicationModule, MyWorkModule} from '@app/modules'
   imports: [
     // Angular
     BrowserModule,
-
+    HttpClientModule,
     // 3ed party
 
     // core & shared

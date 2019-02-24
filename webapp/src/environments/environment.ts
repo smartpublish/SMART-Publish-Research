@@ -9,7 +9,10 @@ export const environment = {
     domain: 'smartpublish.eu.auth0.com',
     responseType: 'token id_token',
     redirectUri: 'http://localhost:4200/#/home',
-    scope: 'openid profile'
+    scope: 'openid email profile'
+  },
+  identities: {
+    uri: 'http://localhost:8080/'
   }
 }
 

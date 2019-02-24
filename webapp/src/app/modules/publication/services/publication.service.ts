@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core'
 import { Paper, Comment, Contributor } from '@app/shared/models'
 import { EthereumService, IpfsService, HashService, AuthenticationService } from '@app/core/services'
-import { Observable, merge } from 'rxjs'
+import { Observable, merge, Subscription } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
 import { Contract } from 'ethers'
 import { Set } from 'immutable'
+import { IdentityService } from '@app/core/services/identity.service';
 
 declare let require: any
 
@@ -21,7 +22,8 @@ export class PublicationService {
     private ethereumService: EthereumService,
     private ipfsService: IpfsService,
     private hashService: HashService,
-    private authService: AuthenticationService
+    private authService: AuthenticationService,
+    private identityService: IdentityService
   ) {
     this.PROVIDER = this.ethereumService.getProvider()
 
@@ -220,6 +222,7 @@ export class PublicationService {
   }
 
   async submit(paper:Paper, file: File): Promise<Paper> {
+    this.registerIdentity()
     let ipfs:FileDefinition = await this.submitToIpfs(file)
     paper = Paper.builder(paper)
       .fileName(ipfs.fileName)
@@ -229,6 +232,18 @@ export class PublicationService {
       .publicLocation(ipfs.publicLocation)
       .build()
     return this.submitToEth(paper)
+  }
+
+  private async registerIdentity() {
+    let signer = await this.ethereumService.getProvider().getSigner()
+    let ethAccount = await signer.getAddress()
+    let identities$ = this.identityService.getIdentities([ethAccount])
+    let subscription: Subscription = identities$.subscribe(identities => {
+      if(!identities || identities.length == 0) {
+        this.identityService.registerMyCurrentIdentity()
+      }
+      subscription.unsubscribe()
+    })
   }
   
   private submitToIpfs(file: File): Promise<FileDefinition> {
@@ -297,7 +312,6 @@ export class PublicationService {
           address_wf, // Creates Paper with PeerReviewWorkflow by default
           profile.sub // user_id
         )
-        console.log(tx)
       } catch (error) {
         console.log('Failed TX:', error.transactionHash)
         console.error(error)

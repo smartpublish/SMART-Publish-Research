@@ -2,12 +2,14 @@ export interface IContributor {
 
 }
 
+export enum ContributorType {
+  AUTHOR = 'Author', COAUTHOR = 'Co-Author', CONTRIBUTOR = 'Contributor'
+}
 export class Contributor implements IContributor {
-  public readonly ethAddress: string
-  public readonly email: string
-
-  constructor(ethAddress: string, email?: string) {
-    this.email = email
-    this.ethAddress = ethAddress
+  constructor(
+    readonly ethAddress: string,
+    readonly fullName: string,
+    readonly type: ContributorType,
+    readonly email?: string) {
   }
 }
