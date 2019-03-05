@@ -89,7 +89,9 @@ describe('IdentityService', () => {
 
     let jwt = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9'
     let signature = 'TCYt5XsITJX1CxPCT8yAV-TVkIEq_PbChOMqsLfRoPsnsgw5WEuts01mq-pQy7UJiN5mgRxD-WUcX16dUEMGlv50aqzpqh4Qktb3rk-BuQy72IFLOqV0G_zS245-kronKb78cPN25DGlcTwLtjPAYuNzVBAh4vGHSrQyHUdBBPM'
-    identityService.registerIdentity(jwt, signature).subscribe(
+    let account = '0x1DE95E0653F8c8CF7679a316389B7eA11DC0Dd7D'
+    let fullname = 'Octavio Esparza'
+    identityService.registerIdentity(jwt, signature, account, fullname).subscribe(
       res => expect(res.status).toEqual(201, 'should return created status code 201'),
       fail
     )

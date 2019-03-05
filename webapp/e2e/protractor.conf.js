@@ -16,8 +16,9 @@ exports.config = {
       binary: 'C:\Program Files (x86)\Google\Chrome'
     }
   },
-  directConnect: true,
+  directConnect: false,
   baseUrl: 'http://localhost:4200/',
+  seleniumAddress: 'http://localhost:4444/wd/hub',
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,

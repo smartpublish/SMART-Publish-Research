@@ -4,7 +4,7 @@
     <div class="col-lg-8">
         <section *ngIf="!authService.isAuthenticated(); else submit">
             <p>In order to be able to submit a new manuscript you must login first</p>
-            <button class="btn btn-sucess" (click)="authService.login()">Log In / Register</button>
+            <button id="loginButton" class="btn btn-sucess" (click)="authService.login()">Log In / Register</button>
         </section>
         <ng-template #submit>
             <app-paper-new></app-paper-new>                

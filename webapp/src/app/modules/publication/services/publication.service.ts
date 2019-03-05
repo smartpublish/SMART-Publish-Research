@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { Paper, Comment, Contributor } from '@app/shared/models'
+import { Paper, Comment, Contributor, ContributorType } from '@app/shared/models'
 import { EthereumService, IpfsService, HashService, AuthenticationService } from '@app/core/services'
 import { Observable, merge, Subscription } from 'rxjs'
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators'
@@ -221,8 +221,8 @@ export class PublicationService {
     return approval.approver === "0x0000000000000000000000000000000000000000"? null : approval;
   }
 
-  async submit(paper:Paper, file: File): Promise<Paper> {
-    this.registerIdentity()
+  async submit(paper: Paper, file: File): Promise<Paper> {
+    await this.registerIdentity(paper.contributors.filter(c => c.type == ContributorType.AUTHOR)[0].fullName)
     let ipfs:FileDefinition = await this.submitToIpfs(file)
     paper = Paper.builder(paper)
       .fileName(ipfs.fileName)
@@ -234,15 +234,27 @@ export class PublicationService {
     return this.submitToEth(paper)
   }
 
-  private async registerIdentity() {
+  private async registerIdentity(author:string) {
     let signer = await this.ethereumService.getProvider().getSigner()
     let ethAccount = await signer.getAddress()
     let identities$ = this.identityService.getIdentities([ethAccount])
-    let subscription: Subscription = identities$.subscribe(identities => {
-      if(!identities || identities.length == 0) {
-        this.identityService.registerMyCurrentIdentity()
+    identities$.subscribe(async resp => {
+      if(resp['status'] != 200) {
+        throw new Error(resp) // TODO Refactor
+      } else
+      // If identity does not exist then we register it
+      if(!resp['result'] || resp['result'].length == 0) {
+        const jwt = this.authService.accessToken
+        const provider = await this.ethereumService.getProvider()
+        const signer = await provider.getSigner()
+        const signature = await signer.signMessage(jwt)
+        const account = await signer.getAddress()
+        const fullName = author
+        const postResp = await this.identityService.registerIdentity(jwt, signature, account, fullName).toPromise()
+        if(postResp['status'] != 200) {
+          throw new Error("Error registering identity!") // TODO Refactor
+        }
       }
-      subscription.unsubscribe()
     })
   }
   

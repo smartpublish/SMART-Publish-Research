@@ -10,7 +10,6 @@ export class AuthenticationService {
   private _expiresAt: number
 
   userProfile: any
-
   auth0 = new auth0.WebAuth(environment.auth0_config)
 
   constructor(public router: Router) {
@@ -34,7 +33,6 @@ export class AuthenticationService {
   public handleAuthentication(): void {
     this.auth0.parseHash((err, authResult) => {
       if (authResult && authResult.accessToken && authResult.idToken) {
-        window.location.hash = ''
         this.setSession(authResult)
         this.router.navigate(['/home'])
       } else if (err) {

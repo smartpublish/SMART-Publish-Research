@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
-import { HttpClientModule  } from '@angular/common/http'
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http'
 import { CoreRoutingModule } from './core-routing.module'
 import { AlertComponent } from './components/alert/alert.component'
 import { NotFoundComponent } from './components/not-found/not-found.component'
 import { ProfileComponent } from './components/profile/profile.component'
 import { AlertModule } from 'ngx-bootstrap/alert'
+import { JwtInterceptor } from './interceptors/jwt.interceptor'
 import {
   AlertService,
   AuthenticationService,
@@ -37,7 +38,8 @@ import {
     IpfsService,
     ContributorService,
     HashService,
-    FileService
+    FileService,
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true }
   ],
   exports: [
     AlertComponent,
