@@ -1,5 +1,4 @@
 pragma solidity ^0.5.0;
-pragma experimental ABIEncoderV2;
 
 import "./Paper.sol";
 import "./Work.sol";
@@ -17,15 +16,4 @@ contract PaperFactory {
         return paper;
     }
 
-    function createWithInfo(Info _paperInfo) public returns(Paper){
-        Paper paper = create();
-        paper.setPaperInfo(_paperInfo);
-        return paper;
-    }
-
-    function createWithInfoAndAsset(Info _paperInfo, Asset[] assets)) public returns(Paper){
-        Paper paper = createWithInfo(_paperInfo);
-        paper.addWork(new Work(paper, assets));
-        return paper;
-    }
 }

@@ -1,7 +1,6 @@
 pragma solidity ^0.5.0;
-pragma experimental ABIEncoderV2;
 
-import "./PaperRegistry.sol"
+import "./PaperRegistry.sol";
 import "./Paper.sol";
 
 contract ReviewRegistry {
@@ -19,7 +18,7 @@ contract ReviewRegistry {
     mapping(address => address[]) private paperRejectedBy;
 
     constructor() public {
-        this.owner = msg.sender;
+        owner = msg.sender;
     }
 
     function allowCallsFrom(address _address) external {
@@ -28,7 +27,7 @@ contract ReviewRegistry {
     }
 
     function contabilize(address _reviewer, address _paper, string calldata _identifier, bool _isAccepted) external returns(int) {
-        bool calledFromPaper = (msg.sender == _paper && paperRegistry.contains(msg.sender));
+        bool calledFromPaper = (msg.sender == _paper && paperRegistry.containsPaper(Paper(msg.sender)));
         require(calledFromPaper || allowedCalls[msg.sender], "Contabilize must be called from allowed address or registered Paper");
         
         int factor = calculeFactor(_reviewer, _paper);
@@ -50,21 +49,21 @@ contract ReviewRegistry {
             }
         }
         if(_isAccepted) {
-            paperAcceptedBy[_paper].push(_reviewer)
+            paperAcceptedBy[_paper].push(_reviewer);
         } else {
-            paperRejectedBy[_paper].push(_reviewer)
+            paperRejectedBy[_paper].push(_reviewer);
         }
 
         return factor;
     }
 
     //calcule factor between 0 - 100 depending on number of reviews and number of rights and wrongs
-    function calculeFactor(address _reviewer, address _paper) private returns(int) {
+    function calculeFactor(address _reviewer, address _paper) private view returns(int) {
         int r = timesRevisorRight[_reviewer];
         int w = timesRevisorWrong[_reviewer];
         int n = revisionCount[_reviewer];
 
-        int factor = 0
+        int factor = 0;
         if(n > 0) {
             factor = (r * 100) / (r + w);
         }

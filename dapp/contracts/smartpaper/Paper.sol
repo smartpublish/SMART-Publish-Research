@@ -1,5 +1,4 @@
 pragma solidity ^0.5.0;
-pragma experimental ABIEncoderV2;
 
 import "./Work.sol";
 import "./PaperRegistry.sol";
@@ -13,7 +12,7 @@ contract Paper {
         string _abstract;
         string _topic;
         string _type;
-        string[] _keywords;
+        string _keywords;
     }
 
     struct Cite {
@@ -30,7 +29,7 @@ contract Paper {
 
     PaperRegistry private paperRegistry;
     ReviewRegistry private reviewRegistry;
-    address private owner;
+    address public owner;
     Authorship private authorship;
     Info private paperInfo;
     Work[] private liveWork;
@@ -45,13 +44,32 @@ contract Paper {
         reviewRegistry = _reviewRegistry;
     }
 
-    function setPaperInfo(Info calldata _paperInfo) external {
+    function setPaperInfo(
+            string calldata _title,
+            string calldata _summary,
+            string calldata _abstract,
+            string calldata _topic,
+            string calldata _type,
+            string calldata _keywords
+    ) external {
         require(msg.sender == owner, "Only owner can perform this action");
-        paperInfo = _paperInfo;
+        paperInfo = Info(_title, _summary, _abstract, _topic, _type, _keywords);
     }
 
-    function getPaperInfo() public returns(Info memory) {
-        return paperInfo;
+    function getPaperInfo() public view returns(
+            string memory _title,
+            string memory _summary,
+            string memory _abstract,
+            string memory _topic,
+            string memory _type,
+            string memory _keywords
+    ) {
+        return (paperInfo._title, 
+                paperInfo._summary,
+                paperInfo._abstract,
+                paperInfo._topic,
+                paperInfo._type,
+                paperInfo._keywords);
     }
 
     function addWork(Work _work) external {
@@ -60,29 +78,40 @@ contract Paper {
         currentWork = _work;
     }
 
-    function getLiveWork() public returns(Work[] memory) {
+    function getLiveWork() public view returns(Work[] memory) {
         return liveWork;
     }
 
-    function getCurrentWork() public returns(Work) {
+    function getCurrentWork() public view returns(Work) {
         return currentWork;
     }
 
-    function setAuthorship(Authorship calldata _authorship) external {
+    function setAuthorship(
+            address _author,
+            address[] calldata _coAuthors,
+            address[] calldata _contributors
+    ) external {
         require(msg.sender == owner, "Only owner can perform this action");
-        authorship = _authorship;
+        authorship = Authorship(_author, _coAuthors, _contributors);
+    }
+
+    function getAuthorship() public view returns(
+            address _author,
+            address[] memory _coAuthors,
+            address[] memory _contributors
+    ) {
+        return (authorship._author, authorship._coAuthors, authorship._contributors);
     }
     
     function cite(string calldata _citeType, Paper _to) external {
         require(msg.sender == owner, "Only owner can perform this action");
-        cites[address(_to)] = _to.receiveCite(_citeType);
+        _to.receiveCite(_citeType);
+        cites[address(_to)] = Cite(_to, this, _citeType);
     }
 
-    function receiveCite(string calldata _citeType) external returns(Cite memory) {
+    function receiveCite(string calldata _citeType) external {
         require(paperRegistry.containsPaper(Paper(msg.sender)), "Paper is not registered");
-        Cite memory _cite = Cite(this, Paper(msg.sender), _citeType);
-        citedBy[msg.sender] = _cite;
-        return _cite;
+        citedBy[msg.sender] = Cite(this, Paper(msg.sender), _citeType);
     }
 
     function contabilizeReview(address _from, string calldata _reviewIdentifier, bool _isAccepted) external {

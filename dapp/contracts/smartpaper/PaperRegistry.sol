@@ -1,5 +1,4 @@
 pragma solidity ^0.5.0;
-pragma experimental ABIEncoderV2;
 
 import "./Paper.sol";
 
@@ -21,10 +20,10 @@ contract PaperRegistry {
 
     function setPaper(Paper _paper) external {
         require(allowedCalls[msg.sender], "Only allowed address can call setPaper");
-        papers[address(_paper)] = paper;
+        papers[address(_paper)] = _paper;
     }
-    function containsPaper(Paper _paper) public returns(bool) {
-        return papers[address(_paper)] != address(0);
+    function containsPaper(Paper _paper) public view returns(bool) {
+        return address(papers[address(_paper)]) != address(0);
     }
 
 }
