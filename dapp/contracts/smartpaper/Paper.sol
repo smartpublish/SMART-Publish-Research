@@ -87,7 +87,7 @@ contract Paper {
 
     function contabilizeReview(address _from, string calldata _reviewIdentifier, bool _isAccepted) external {
         require(msg.sender == address(currentWork), "Only currentWork in paper can contabilize a Review");
-        reviewRegistry.contabilize(_from, msg.sender, _reviewIdentifier, _isAccepted);
+        reviewRegistry.contabilize(_from, address(this), _reviewIdentifier, _isAccepted);
     }
 
 
