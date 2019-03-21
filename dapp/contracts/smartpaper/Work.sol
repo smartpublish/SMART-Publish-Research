@@ -26,8 +26,13 @@ contract Work {
     Asset[] private assets;
     Review[] private reviews;
     
+    constructor(Paper _parent, Asset[] _assets) public {
+        parent = _parent;
+        assets = _assets;
+    }
+
     function addReview(Review calldata _review) external {
-        parent.contabilizeReview(msg.sender, _review._identifier);
+        parent.contabilizeReview(msg.sender, _review._identifier, _review._isAccepted);
         reviews.push(_review);
     }
 
