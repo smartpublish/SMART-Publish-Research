@@ -17,7 +17,8 @@ contract ReviewRegistry {
     mapping(address => address[]) private paperAcceptedBy;
     mapping(address => address[]) private paperRejectedBy;
 
-    constructor() public {
+    constructor(PaperRegistry _paperRegistry) public {
+        paperRegistry = paperRegistry;
         owner = msg.sender;
     }
 

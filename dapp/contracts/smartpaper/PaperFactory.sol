@@ -10,7 +10,12 @@ contract PaperFactory {
     PaperRegistry private paperRegistry;
     ReviewRegistry private reviewRegistry;
 
-    function create() public returns(Paper){
+    constructor(PaperRegistry _paperRegistry, ReviewRegistry _reviewRegistry) public {
+        paperRegistry = _paperRegistry;
+        reviewRegistry = _reviewRegistry;
+    }
+
+    function createPaper() external returns(Paper){
         Paper paper = new Paper(msg.sender, paperRegistry, reviewRegistry);
         paperRegistry.setPaper(paper);
         return paper;
