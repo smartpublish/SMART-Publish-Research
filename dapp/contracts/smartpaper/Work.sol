@@ -73,14 +73,13 @@ contract Work {
     }
 
     function addReview(
-                address _reviewer,
+                address payable _reviewer,
                 bool _isAccepted,
                 string calldata _identifier,
                 string calldata _comments,
                 string calldata _signature
     ) external {
         require(isClosed, "This work is still open and can not be reviewed");
-        parent.contabilizeReview(msg.sender, _identifier, _isAccepted);
         reviews.push(
             Review(_reviewer,
                 _isAccepted,
@@ -88,6 +87,7 @@ contract Work {
                 _comments,
                 _signature)
         );
+        parent.onReviewed(_reviewer, _identifier, _isAccepted);
     }
 
     function reviewCount() public view returns(uint) {

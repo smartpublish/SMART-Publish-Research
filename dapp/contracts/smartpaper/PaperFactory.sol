@@ -2,8 +2,8 @@ pragma solidity ^0.5.0;
 
 import "./Paper.sol";
 import "./Work.sol";
-import "./PaperRegistry.sol";
-import "./ReviewRegistry.sol";
+import "./registry/PaperRegistry.sol";
+import "./registry/ReviewRegistry.sol";
 
 contract PaperFactory {
 

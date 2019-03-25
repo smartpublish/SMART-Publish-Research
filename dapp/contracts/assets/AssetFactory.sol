@@ -3,7 +3,7 @@ pragma experimental ABIEncoderV2;
 
 import "./IAsset.sol";
 import "./AssetWorkflow.sol";
-import "../papers/Paper.sol";
+import "../papers/Paper2.sol";
 import "../contributors/Contributors.sol";
 
 contract AssetFactory {
@@ -46,10 +46,10 @@ contract AssetFactory {
         string memory _topic,
         string[] memory _keywords,
         AssetWorkflow _workflow,
-        string memory _contributorId) public returns(Paper) {
+        string memory _contributorId) public returns(Paper2) {
         
         Contributor contributor = contributors.getOrCreateContributor(msg.sender, _contributorId);
-        Paper paper = new Paper(contributors, contributor, _title, _summary, _abstract, _topic);
+        Paper2 paper = new Paper2(contributors, contributor, _title, _summary, _abstract, _topic);
         paper.addFile(_fileSystemName, _publicLocation, _summaryHashAlgorithm, _summaryHash);
         paper.addWorkflow(_workflow);
         _workflow.start(paper);

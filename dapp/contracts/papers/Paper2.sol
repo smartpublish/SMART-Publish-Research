@@ -5,7 +5,7 @@ import "../support/Invitable.sol";
 import "../contributors/Contributor.sol";
 import "../contributors/Contributors.sol";
 
-contract Paper is Asset {
+contract Paper2 is Asset {
 
     // @dev abstract is a Solidity reserved keyword
     string public abstrakt;

@@ -1,8 +1,8 @@
 pragma solidity ^0.5.0;
 
 import "./Work.sol";
-import "./PaperRegistry.sol";
-import "./ReviewRegistry.sol";
+import "./registry/PaperRegistry.sol";
+import "./registry/ReviewRegistry.sol";
 
 contract Paper {
 
@@ -35,6 +35,9 @@ contract Paper {
     Work[] private liveWork;
     Work private currentWork;
 
+    uint256 public deposit;
+    uint256 public ethPerReview;
+
     mapping (address => Cite) private citedBy;
     mapping (address => Cite) private cites;
 
@@ -42,6 +45,15 @@ contract Paper {
         owner = _owner;
         paperRegistry = _paperRegistry;
         reviewRegistry = _reviewRegistry;
+    }
+
+    function () payable external {
+        deposit += msg.value;
+    }
+
+    function setEthPerReview(uint256 _ethPerReview) public {
+        require(msg.sender == owner, "Only owner can perform this action");
+        ethPerReview = _ethPerReview;
     }
 
     function setPaperInfo(
@@ -54,6 +66,7 @@ contract Paper {
     ) external {
         require(msg.sender == owner, "Only owner can perform this action");
         paperInfo = Info(_title, _summary, _abstract, _topic, _type, _keywords);
+        paperRegistry.onUpdated(_topic, authorship._author, authorship._coAuthors);
     }
 
     function getPaperInfo() public view returns(
@@ -86,6 +99,10 @@ contract Paper {
         return currentWork;
     }
 
+    function getTopic() public view returns(string memory) {
+        return paperInfo._topic;
+    }
+
     function setAuthorship(
             address _author,
             address[] calldata _coAuthors,
@@ -93,6 +110,7 @@ contract Paper {
     ) external {
         require(msg.sender == owner, "Only owner can perform this action");
         authorship = Authorship(_author, _coAuthors, _contributors);
+        paperRegistry.onUpdated(paperInfo._topic, _author, _coAuthors);
     }
 
     function getAuthorship() public view returns(
@@ -114,9 +132,16 @@ contract Paper {
         citedBy[msg.sender] = Cite(this, Paper(msg.sender), _citeType);
     }
 
-    function contabilizeReview(address _from, string calldata _reviewIdentifier, bool _isAccepted) external {
+    function onReviewed(address payable _reviewer, string calldata _reviewIdentifier, bool _isAccepted) external {
         require(msg.sender == address(currentWork), "Only currentWork in paper can contabilize a Review");
-        reviewRegistry.contabilize(_from, address(this), _reviewIdentifier, _isAccepted);
+        uint factor = reviewRegistry.calculeFactor(_reviewer, paperInfo._topic);
+
+        reviewRegistry.contabilize(_reviewer, msg.sender, paperInfo._topic, _reviewIdentifier, _isAccepted);
+
+        uint256 amount = ((factor * ethPerReview) / 100);
+        if(amount <= deposit) {
+            _reviewer.transfer(amount);
+        }
     }
 
 
