@@ -6,7 +6,7 @@ contract Work {
 
     struct Review {
         address _reviewer;
-        bool _isAccepted;
+        uint _reviewResult;
         string _identifier;
         string _comments;
         string _signature;
@@ -74,7 +74,7 @@ contract Work {
 
     function addReview(
                 address payable _reviewer,
-                bool _isAccepted,
+                uint _reviewResult,
                 string calldata _identifier,
                 string calldata _comments,
                 string calldata _signature
@@ -82,12 +82,12 @@ contract Work {
         require(isClosed, "This work is still open and can not be reviewed");
         reviews.push(
             Review(_reviewer,
-                _isAccepted,
+                _reviewResult,
                 _identifier,
                 _comments,
                 _signature)
         );
-        parent.onReviewed(_reviewer, _identifier, _isAccepted);
+        parent.onReviewed(_reviewer, _identifier, _reviewResult);
     }
 
     function reviewCount() public view returns(uint) {
@@ -96,12 +96,12 @@ contract Work {
 
     function getReview(uint index) public view returns(
             address _reviewer,
-            bool _isAccepted,
+            uint _reviewResult,
             string memory _identifier,
             string memory _comments,
             string memory _signature
     ) {
         Review memory review = reviews[index];
-        return (review._reviewer, review._isAccepted, review._identifier, review._comments, review._signature);
+        return (review._reviewer, review._reviewResult, review._identifier, review._comments, review._signature);
     }
 }

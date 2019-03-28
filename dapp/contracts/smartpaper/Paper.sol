@@ -132,17 +132,16 @@ contract Paper {
         citedBy[msg.sender] = Cite(this, Paper(msg.sender), _citeType);
     }
 
-    function onReviewed(address payable _reviewer, string calldata _reviewIdentifier, bool _isAccepted) external {
+    function onReviewed(address payable _reviewer, string calldata _reviewIdentifier, uint _reviewResult) external {
         require(msg.sender == address(currentWork), "Only currentWork in paper can contabilize a Review");
-        uint factor = reviewRegistry.calculeFactor(_reviewer, paperInfo._topic);
+        uint reviewFactor = reviewRegistry.calculeFactor(_reviewer, address(this), msg.sender);
 
-        reviewRegistry.contabilize(_reviewer, msg.sender, paperInfo._topic, _reviewIdentifier, _isAccepted);
+        reviewRegistry.contabilize(_reviewer, address(this), msg.sender, _reviewIdentifier, _reviewResult);
 
-        uint256 amount = ((factor * ethPerReview) / 100);
+        uint256 amount = ((reviewFactor * ethPerReview) / 100);
         if(amount <= deposit) {
             _reviewer.transfer(amount);
         }
     }
-
 
 }

@@ -69,90 +69,101 @@ contract ReviewRegistryCentral {
                         uint _reviewResult) isAllowed(_paper) external {
         
         string memory topic = Paper(_paper).getTopic();
-        ReviewerInfo storage reviewerInfo = reviewerInfo[getReviewerInfoIndex(_reviewer)];
+        ReviewerInfo storage info = reviewerInfo[getReviewerInfoIndex(_reviewer)];
 
 
         
-        ReviewerInfo storage reviewerInfoOnTopic = reviewerInfo[getReviewerInfoIndexOnTopic(_reviewer, topic)];
+        ReviewerInfo storage infoOnTopic = reviewerInfo[getReviewerInfoIndexOnTopic(_reviewer, topic)];
 
         WorkInfo storage workInfo = workInfo[getWorkInfoIndex(_workInPaper)];
         require(!workInfo._reviewers[_reviewer], "Reviewer has reviewed this work previously");
-        reviewerInfo._reviews ++;
-        reviewerInfoOnTopic._reviews ++;
+        info._reviews ++;
+        infoOnTopic._reviews ++;
         updateOldReviewers(_workInPaper, _reviewResult, topic);
         workInfo._reviewers[_reviewer] = true;
         workInfo._reviews.push(ReviewInfo(_reviewer, _reviewResult));
     }
 
-    function getReviewerInfoIndex(address _reviewer) private view returns (uint index) {
+    function getReviewerInfoIndex(address _reviewer) private returns (uint index) {
         return ensureIndex(reviews[_reviewer], _reviewer);
     }
 
-    function getReviewerInfoIndexOnTopic(address _reviewer, string memory _topic) private view returns (uint index) {
+    function getReviewerInfoIndexOnTopic(address _reviewer, string memory _topic) private returns (uint index) {
         return ensureIndex(topicInfo[topics[_topic]]._reviewsOnTopic[_reviewer], _reviewer);
     }
 
-    function ensureIndex(uint _index, address _reviewer) private view returns (uint index) {
+    function ensureIndex(uint _index, address _reviewer) private returns (uint index) {
         ReviewerInfo storage info = reviewerInfo[_index];
         if(info._reviewer != _reviewer) {
-            info = ReviewerInfo(_reviewer, 0, 0, 0);
-            reviewerInfo.push(reviewerInfo);
-            reviews[_reviewer] = reviewerInfo.length;
+            uint256 pos = reviewerInfo.length + 1;
+            info = reviewerInfo[pos];
+            info._reviewer = _reviewer;
+            reviews[_reviewer] = pos;
         }
         return index;
     }
 
-    function updateOldReviewers(address _workInPaper, uint _reviewResult, string memory _topic) private view {
+    function updateOldReviewers(address _workInPaper, uint _reviewResult, string memory _topic) private {
         WorkInfo storage workInfo = workInfo[getWorkInfoIndex(_workInPaper)];
         for (uint i=0; i < workInfo._reviews.length; i++) {
             ReviewInfo storage reviewInfo = workInfo._reviews[i];
-            ReviewerInfo storage reviewerInfo = reviewerInfo[getReviewerInfoIndex(reviewInfo._reviewer)];
-            ReviewerInfo storage reviewerInfoOnTopic = reviewerInfo[getReviewerInfoIndexOnTopic(reviewInfo._reviewer, _topic)];
+            ReviewerInfo storage info = reviewerInfo[getReviewerInfoIndex(reviewInfo._reviewer)];
+            ReviewerInfo storage infoOnTopic = reviewerInfo[getReviewerInfoIndexOnTopic(reviewInfo._reviewer, _topic)];
             if(reviewInfo._review != _reviewResult) {
-                reviewerInfo._wrong ++;
-                reviewerInfoOnTopic._right ++;
+                info._wrong ++;
+                infoOnTopic._right ++;
             } else {
-                reviewerInfo._right ++;
-                reviewerInfoOnTopic._right ++;
+                info._right ++;
+                infoOnTopic._right ++;
             }
          }
     }
 
-    function getWorkInfoIndex(address _workInPaper) private view returns(uint index) {
+    function getWorkInfoIndex(address _workInPaper) private returns(uint index) {
         uint _index = works[_workInPaper];
         WorkInfo storage info = workInfo[_index];
         if(info._work != _workInPaper) {
-            info = WorkInfo(_workInPaper);
-            workInfo.push(info);
-            works[_workInPaper] = workInfo.length;
+            uint256 pos = workInfo.length + 1;
+            info = workInfo[pos];
+            info._work = _workInPaper;
+            works[_workInPaper] = pos;
         }
         return index;
 
     }
 
-
-
     //calcule factor between 0 - 100 depending on number of reviews and number of rights and wrongs
-    function calculeFactor(address _reviewer, address _paper, address _work) public view 
-                                returns(uint papers,
-                                        uint papersOnTopic,
-                                        uint reviews,
-                                        uint reviewsOnTopic,
-                                        uint reviewFactor, 
-                                        uint reviewFactorOnTopic){
-        
-        string memory topic = Paper(_paper).getTopic();
-        (uint papers, uint papersOnTopic) = paperRegistryCentral.getPapersByAuthorAndTopic(_reviewer, topic);
-        
-        ReviewerInfo memory reviewerInfo = reviewerInfo[reviews[_reviewer]];
-        ReviewerInfo memory topicReviewerInfo = reviewerInfo[topicInfo[topics[topic]]._reviewsOnTopic[_reviewer]];
-        uint reviews = reviewerInfo._reviews;
-        uint reviewsOnTopic = topicReviewerInfo._reviews;
-        uint reviewsFactor = ((reviewerInfo._right * 100) / (reviewerInfo._right + reviewerInfo._wrong));
-        uint reviewsFactorOnTopic = ((topicReviewerInfo._right * 100) / (topicReviewerInfo._right + topicReviewerInfo._wrong));
 
-        return (papers, papersOnTopic, reviews, reviewsOnTopic, reviewsFactor, reviewsFactorOnTopic);
+    function calculeFactor(address _reviewer, address payable _paper, address _work) public view returns(uint _reviewFactor) {
+        (uint _papers, uint _reviews, uint _reviewFactor) = calculeFactorOnPapers(_reviewer, _paper, _work);
+        return _reviewFactor;
     }
 
+    function calculeFactorOnPapers(address _reviewer, address payable _paper, address _work) public view 
+                                returns(uint _papers,
+                                        uint _reviews,
+                                        uint _reviewFactor){
+        
+        uint papers = paperRegistryCentral.getPapersByAuthor(_reviewer);
+        ReviewerInfo memory info = reviewerInfo[reviews[_reviewer]];
+        uint reviews = info._reviews;
+        uint reviewsFactor = ((info._right * 100) / (info._right + info._wrong));
+        return (papers, reviews, reviewsFactor);
+    }
+
+    function calculeFactorOnTopic(address _reviewer, address payable _paper, address _work) public view 
+                                returns(uint _papersOnTopic,
+                                        uint _reviewsOnTopic,
+                                        uint _reviewFactorOnTopic){
+        
+        string memory topic = Paper(_paper).getTopic();
+        uint papersOnTopic = paperRegistryCentral.getPapersByAuthorAndTopic(_reviewer, topic);
+        
+        ReviewerInfo memory infoOnTopic = reviewerInfo[topicInfo[topics[topic]]._reviewsOnTopic[_reviewer]];
+        uint reviewsOnTopic = infoOnTopic._reviews;
+        uint reviewsFactorOnTopic = ((infoOnTopic._right * 100) / (infoOnTopic._right + infoOnTopic._wrong));
+
+        return (papersOnTopic, reviewsOnTopic, reviewsFactorOnTopic);
+    }
 
 }

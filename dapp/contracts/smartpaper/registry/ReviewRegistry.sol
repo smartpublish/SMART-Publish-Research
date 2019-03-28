@@ -7,15 +7,9 @@ interface ReviewRegistry {
                         address _paper,
                         address _workInPaper, 
                         string calldata _identifier, 
-                        bool _isAccepted) external;
+                        uint _reviewResult) external;
 
     //calcule factor between 0 - 100 depending on number of reviews and number of rights and wrongs
-    function calculeFactor(address _reviewer, address _paper, address _work) public view 
-                                returns(uint papers,
-                                        uint papersOnTopic,
-                                        uint reviews,
-                                        uint reviewsOnTopic,
-                                        uint reviewFactor, 
-                                        uint reviewFactorOnTopic);
+    function calculeFactor(address _reviewer, address _paper, address _work) external returns(uint reviewFactor);
 
 }
