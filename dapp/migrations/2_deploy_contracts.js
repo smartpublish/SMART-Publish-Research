@@ -1,6 +1,6 @@
 
-var PaperRegistry = artifacts.require('PaperRegistry');
-var ReviewRegistry = artifacts.require('ReviewRegistry');
+var PaperRegistry = artifacts.require('PaperRegistryCentral');
+var ReviewRegistry = artifacts.require('ReviewRegistryCentral');
 var PaperFactory = artifacts.require('PaperFactory');
 
 module.exports = async function(deployer) {

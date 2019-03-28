@@ -1,9 +1,9 @@
 var truffleAssert = require('truffle-assertions');
 
 var Paper = artifacts.require('Paper');
-var PaperRegistry = artifacts.require('PaperRegistry');
+var PaperRegistry = artifacts.require('PaperRegistryCentral');
 var PaperFactory = artifacts.require('PaperFactory');
-var ReviewRegistry = artifacts.require('ReviewRegistry');
+var ReviewRegistry = artifacts.require('ReviewRegistryCentral');
 
 contract('PaperFactoryTest', function(accounts) {
     
