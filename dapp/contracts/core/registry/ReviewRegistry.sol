@@ -1,6 +1,8 @@
 pragma solidity ^0.5.0;
 
-interface ReviewRegistry {
+import "./Registry.sol";
+
+contract ReviewRegistry is Registry {
 
     //Update reviewer state depending on paper/work and review
     function contabilize(address _reviewer, 

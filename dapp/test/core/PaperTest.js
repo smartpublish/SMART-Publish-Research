@@ -17,7 +17,7 @@ contract('PaperTest', function(accounts) {
         await paperRegistry.allowCallsFrom(paperFactory.address)
         await paperRegistry.allowCallsFrom(accounts[0])
         paper = await Paper.new(accounts[0], paperRegistry.address, reviewRegistry.address)
-        await paperRegistry.setPaper(paper.address)
+        await paperRegistry.addPaper(paper.address)
     });
 
     it("Should set Paper Info", async function() {
@@ -36,5 +36,10 @@ contract('PaperTest', function(accounts) {
             paper.setPaperInfo("Title", "Summary", "Abstract", "Topic", "Type", "Keywords", { from: accounts[1] }),
             'Only owner can perform this action'
             )
+    });
+
+    if("Should set Paper Work", async function() {
+        let work = new Work(paper);
+        await paper.addWork(work);
     });
 })

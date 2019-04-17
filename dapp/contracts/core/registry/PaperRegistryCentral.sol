@@ -31,8 +31,8 @@ contract PaperRegistryCentral is PaperRegistry {
         allowedCalls[_address] = true;
     }
 
-    function setPaper(Paper _paper) external {
-        require(allowedCalls[msg.sender], "Only allowed address can call setPaper");
+    function addPaper(Paper _paper) external {
+        require(allowedCalls[msg.sender], "Only allowed address can call addPaper");
         papers[address(_paper)] = PaperInfo(true, "", address(0), new address[](0));
     }
     function containsPaper(Paper _paper) public view returns(bool) {

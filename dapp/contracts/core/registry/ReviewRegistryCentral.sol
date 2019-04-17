@@ -61,7 +61,7 @@ contract ReviewRegistryCentral {
         _;
     }
 
-  //Update reviewer state depending on paper/work and review
+    //Update reviewer state depending on paper/work and review
     function contabilize(address _reviewer, 
                         address payable _paper,
                         address _workInPaper, 

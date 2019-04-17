@@ -1,35 +1,11 @@
-
-var PaperRegistry = artifacts.require('PaperRegistryCentral');
-var ReviewRegistry = artifacts.require('ReviewRegistryCentral');
-var PaperFactory = artifacts.require('PaperFactory');
+const PaperRegistry = artifacts.require('PaperRegistryCentral');
+const ReviewRegistry = artifacts.require('ReviewRegistryCentral');
+const PaperFactory = artifacts.require('PaperFactory');
+const PaperAPI = artifacts.require('PaperAPI');
 
 module.exports = async function(deployer) {
-
     await deployer.deploy(PaperRegistry)
     await deployer.deploy(ReviewRegistry, PaperRegistry.address)
     await deployer.deploy(PaperFactory, PaperRegistry.address, ReviewRegistry.address)
-
-    // Libraries
- //   deployer.deploy(ArrayAddress);
- //   deployer.link(ArrayAddress, HashSet);
- //   deployer.deploy(HashSet);
- //   deployer.deploy(SetAddress);
-    
-    // Application
-//    deployer.link(SetAddress, PeerReviewWorkflow);
-//    deployer.link(HashSet, Contributable);
-//    deployer.link(HashSet, Paper);
-//    deployer.link(HashSet, AssetFactory);
-//    deployer.deploy(PeerReviewWorkflow);
-
- //   deployer.deploy(Contributors).then(function() {
- //       return deployer.deploy(AssetFactory, Contributors.address)
- //   });
-    
-     // Assets
-    // deployer.deploy(AssetFactory).then(function (factory) {
-        // return deployer.deploy(Paper).then(function () {
-            // Init Factory
-        //    factory.register("paper", Paper.address);
-        // });
+    await deployer.deploy(PaperAPI, PaperFactory.address)
 };

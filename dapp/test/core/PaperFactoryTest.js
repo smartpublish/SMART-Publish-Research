@@ -21,7 +21,7 @@ contract('PaperFactoryTest', function(accounts) {
     });
 
     it("Should not be allowed to create new Paper", async function() {
-        await truffleAssert.reverts(paperFactory.createPaper(),'Only allowed address can call setPaper')
+        await truffleAssert.reverts(paperFactory.createPaper(),'Only allowed address can call addPaper')
     });
 
 })
