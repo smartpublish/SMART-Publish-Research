@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 import "./Paper.sol";
 
@@ -29,21 +29,27 @@ contract Work {
         parent = _parent;
     }
 
-    function close() external {
+    /**
+     * @dev Throws if called by any account other than the parent owner.
+     */
+    modifier onlyParentOwner() {
+        require(msg.sender == parent.owner(), "Only parent Owner can perform this action");
+        _;
+    }
+
+    function close() external onlyParentOwner {
         require(!isClosed, "Work is already closed");
-        require(msg.sender == address(parent.owner), "Only parent Owner can perform this action");
         isClosed = true;
     }
 
     function addAsset(
-            string calldata _fileName,
-            string calldata _fileSystemName,
-            string calldata _publicLocation,
-            string calldata _summaryHashAlgorithm,
-            string calldata _summaryHash
-    ) external {
+            string memory _fileName,
+            string memory _fileSystemName,
+            string memory _publicLocation,
+            string memory _summaryHashAlgorithm,
+            string memory _summaryHash
+    ) public onlyParentOwner {
         require(!isClosed, "This work is closed");
-        require(msg.sender == address(parent.owner), "Only parent Owner can perform this action");
         assets.push(
             Asset(_fileName, 
                 _fileSystemName, 

@@ -15,4 +15,36 @@
 module.exports = {
   // See <http://truffleframework.com/docs/advanced/configuration>
   // to customize your Truffle configuration!
+  networks: {
+    development: {
+      host: "127.0.0.1",
+      port: 8545,
+      network_id: "*", // Match any network id
+      gas: 6721975
+    },
+    ropsten: {
+      provider: function() {
+        return new HDWalletProvider([
+          process.env.ACCOUNT_PRIVATE_KEY_0,
+          process.env.ACCOUNT_PRIVATE_KEY_1,
+          process.env.ACCOUNT_PRIVATE_KEY_2,
+          process.env.ACCOUNT_PRIVATE_KEY_3,
+          process.env.ACCOUNT_PRIVATE_KEY_4,
+          process.env.ACCOUNT_PRIVATE_KEY_5,
+          process.env.ACCOUNT_PRIVATE_KEY_6,
+          process.env.ACCOUNT_PRIVATE_KEY_7,
+          process.env.ACCOUNT_PRIVATE_KEY_8,
+          process.env.ACCOUNT_PRIVATE_KEY_9,
+        ], process.env.INFURA_API_ROPSTEN_ENDPOINT, 0, 10)
+      },
+      network_id: 3,
+      gas: 8000000
+    }
+  },
+
+  compilers: {
+    solc: {
+      version: '0.5.2',
+    },
+  },
 };

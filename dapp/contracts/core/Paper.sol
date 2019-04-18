@@ -1,10 +1,11 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./Work.sol";
 import "./registry/PaperRegistry.sol";
 import "./registry/ReviewRegistry.sol";
 
-contract Paper {
+contract Paper is Ownable {
 
     struct Info {
         string _title;
@@ -29,7 +30,6 @@ contract Paper {
 
     PaperRegistry private paperRegistry;
     ReviewRegistry private reviewRegistry;
-    address public owner;
     Authorship private authorship;
     Info private paperInfo;
     Work[] private liveWork;
@@ -41,8 +41,8 @@ contract Paper {
     mapping (address => Cite) private citedBy;
     mapping (address => Cite) private cites;
 
-    constructor(address _owner, PaperRegistry _paperRegistry, ReviewRegistry _reviewRegistry) public {
-        owner = _owner;
+    constructor(PaperRegistry _paperRegistry, ReviewRegistry _reviewRegistry) public {
+        transferOwnership(msg.sender);
         paperRegistry = _paperRegistry;
         reviewRegistry = _reviewRegistry;
     }
@@ -51,8 +51,7 @@ contract Paper {
         deposit += msg.value;
     }
 
-    function setEthPerReview(uint256 _ethPerReview) public {
-        require(msg.sender == owner, "Only owner can perform this action");
+    function setEthPerReview(uint256 _ethPerReview) public onlyOwner {
         ethPerReview = _ethPerReview;
     }
 
@@ -63,8 +62,7 @@ contract Paper {
             string calldata _topic,
             string calldata _type,
             string calldata _keywords
-    ) external {
-        require(msg.sender == owner, "Only owner can perform this action");
+    ) external onlyOwner {
         paperInfo = Info(_title, _summary, _abstract, _topic, _type, _keywords);
         paperRegistry.onUpdated(_topic, authorship._author, authorship._coAuthors);
     }
@@ -85,8 +83,7 @@ contract Paper {
                 paperInfo._keywords);
     }
 
-    function addWork(Work _work) external {
-        require(msg.sender == owner, "Only owner can perform this action");
+    function addWork(Work _work) external onlyOwner {
         liveWork.push(_work);
         currentWork = _work;
     }
@@ -107,8 +104,7 @@ contract Paper {
             address _author,
             address[] calldata _coAuthors,
             address[] calldata _contributors
-    ) external {
-        require(msg.sender == owner, "Only owner can perform this action");
+    ) external onlyOwner {
         authorship = Authorship(_author, _coAuthors, _contributors);
         paperRegistry.onUpdated(paperInfo._topic, _author, _coAuthors);
     }
@@ -121,8 +117,7 @@ contract Paper {
         return (authorship._author, authorship._coAuthors, authorship._contributors);
     }
     
-    function cite(string calldata _citeType, Paper _to) external {
-        require(msg.sender == owner, "Only owner can perform this action");
+    function cite(string calldata _citeType, Paper _to) external onlyOwner {
         _to.receiveCite(_citeType);
         cites[address(_to)] = Cite(_to, this, _citeType);
     }

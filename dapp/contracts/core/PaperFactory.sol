@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 
 import "./Paper.sol";
 import "./Work.sol";
@@ -17,7 +17,8 @@ contract PaperFactory {
     }
 
     function createPaper() external returns(Paper){
-        Paper paper = new Paper(msg.sender, paperRegistry, reviewRegistry);
+        Paper paper = new Paper(paperRegistry, reviewRegistry);
+        paper.transferOwnership(msg.sender);
         paperRegistry.addPaper(paper);
         return paper;
     }

@@ -1,4 +1,4 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.2;
 pragma experimental ABIEncoderV2;
 
 import "../core/PaperFactory.sol";
@@ -40,6 +40,7 @@ contract PaperAPI {
         Work work = new Work(paper_);
         paper_.addWork(work);
         work.addAsset(_fileName, _fileSystemName, _publicLocation, _summaryHashAlgorithm, _summaryHash);
+        paper_.transferOwnership(msg.sender);
         return paper_;
     }
     

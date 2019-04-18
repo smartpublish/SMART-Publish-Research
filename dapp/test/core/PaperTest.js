@@ -16,7 +16,7 @@ contract('PaperTest', function(accounts) {
         paperFactory = await PaperFactory.new(paperRegistry.address, reviewRegistry.address)
         await paperRegistry.allowCallsFrom(paperFactory.address)
         await paperRegistry.allowCallsFrom(accounts[0])
-        paper = await Paper.new(accounts[0], paperRegistry.address, reviewRegistry.address)
+        paper = await Paper.new(paperRegistry.address, reviewRegistry.address)
         await paperRegistry.addPaper(paper.address)
     });
 
@@ -33,8 +33,7 @@ contract('PaperTest', function(accounts) {
 
     it("Should Fail set Paper Info (call from not owner)", async function() {
         await truffleAssert.reverts(
-            paper.setPaperInfo("Title", "Summary", "Abstract", "Topic", "Type", "Keywords", { from: accounts[1] }),
-            'Only owner can perform this action'
+            paper.setPaperInfo("Title", "Summary", "Abstract", "Topic", "Type", "Keywords", { from: accounts[1] })
             )
     });
 
