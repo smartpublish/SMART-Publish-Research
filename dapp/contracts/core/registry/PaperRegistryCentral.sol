@@ -1,11 +1,12 @@
 pragma solidity ^0.5.2;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 import "../Paper.sol";
 import "./PaperRegistry.sol";
 
-contract PaperRegistryCentral is PaperRegistry {
+contract PaperRegistryCentral is PaperRegistry, Ownable  {
 
-    address private owner;
     mapping(address => bool) private allowedCalls;
 
     struct PaperInfo {
@@ -22,12 +23,7 @@ contract PaperRegistryCentral is PaperRegistry {
     mapping(address => uint) private authorPublicationSize;
     mapping(string => TopicInfo) private topics;
 
-    constructor() public {
-        owner = msg.sender;
-    }
-
-    function allowCallsFrom(address _address) external {
-        require(msg.sender == owner, "Only owner can call this function");
+    function allowCallsFrom(address _address) external onlyOwner {
         allowedCalls[_address] = true;
     }
 

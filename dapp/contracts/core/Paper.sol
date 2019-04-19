@@ -1,6 +1,7 @@
 pragma solidity ^0.5.2;
 
 import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 import "./Work.sol";
 import "./registry/PaperRegistry.sol";
 import "./registry/ReviewRegistry.sol";

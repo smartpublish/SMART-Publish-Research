@@ -1,12 +1,14 @@
 pragma solidity ^0.5.2;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
 import "./Paper.sol";
 import "./Work.sol";
 import "./registry/Registry.sol";
 import "./registry/PaperRegistry.sol";
 import "./registry/ReviewRegistry.sol";
 
-contract PaperFactory {
+contract PaperFactory is Ownable {
 
     PaperRegistry private paperRegistry;
     ReviewRegistry private reviewRegistry;
@@ -16,11 +18,11 @@ contract PaperFactory {
         reviewRegistry = _reviewRegistry;
     }
 
-    function createPaper() external returns(Paper){
-        Paper paper = new Paper(paperRegistry, reviewRegistry);
-        paper.transferOwnership(msg.sender);
-        paperRegistry.addPaper(paper);
-        return paper;
+    function createPaper() external returns(Paper paper){
+        Paper paper_ = new Paper(paperRegistry, reviewRegistry);
+        paper_.transferOwnership(msg.sender);
+        paperRegistry.addPaper(paper_);
+        return paper_;
     }
 
     enum RegistryType { PaperRegistry, ReviewRegistry }
@@ -32,6 +34,14 @@ contract PaperFactory {
             registry_ = reviewRegistry;
         }
         return registry_;
+    }
+
+    function setRegistry(RegistryType _type, Registry _registry) public onlyOwner{
+        if(_type == RegistryType.PaperRegistry) {
+            paperRegistry = PaperRegistry(address(_registry));
+        } else if(_type == RegistryType.ReviewRegistry) {
+            reviewRegistry = ReviewRegistry(address(_registry));
+        }
     }
 
 }

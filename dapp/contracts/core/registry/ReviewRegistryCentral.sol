@@ -1,11 +1,13 @@
 pragma solidity ^0.5.2;
 
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+
+import "./ReviewRegistry.sol";
 import "./PaperRegistryCentral.sol";
 import "../Paper.sol";
 
-contract ReviewRegistryCentral {
+contract ReviewRegistryCentral is ReviewRegistry, Ownable {
 
-    address private owner;
     mapping(address => bool) private allowedCalls;
     PaperRegistryCentral private paperRegistryCentral;
 
@@ -46,11 +48,9 @@ contract ReviewRegistryCentral {
 
     constructor(PaperRegistryCentral _paperRegistryCentral) public {
         paperRegistryCentral = _paperRegistryCentral;
-        owner = msg.sender;
     }
 
-    function allowCallsFrom(address _address) external {
-        require(msg.sender == owner, "Only owner can call this function");
+    function allowCallsFrom(address _address) external onlyOwner {
         allowedCalls[_address] = true;
     }
 
@@ -133,7 +133,6 @@ contract ReviewRegistryCentral {
     }
 
     //calcule factor between 0 - 100 depending on number of reviews and number of rights and wrongs
-
     function calculeFactor(address _reviewer, address payable _paper, address _work) public view returns(uint _reviewFactor) {
         (uint _papers, uint _reviews, uint _reviewFactor) = calculeFactorOnPapers(_reviewer, _paper, _work);
         return _reviewFactor;
