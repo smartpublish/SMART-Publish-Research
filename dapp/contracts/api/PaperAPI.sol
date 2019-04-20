@@ -106,13 +106,4 @@ contract PaperAPI is Ownable {
         return p;
     }
 
-    /*
-    function update() {
-
-    }
-
-    function remove() {
-
-    }
-    */
 }

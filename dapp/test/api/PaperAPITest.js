@@ -8,24 +8,57 @@ var PaperAPI = artifacts.require('PaperAPI');
 
 contract('PaperAPITest', function(accounts) {
     
-    var paperAPI;
-    var paperFactory;
-    var paperRegistry;
+    var paperAPI, paperFactory, paperRegistry, reviewRegistry;
     beforeEach(async function() {
         paperRegistry = await PaperRegistry.new()
-        const reviewRegistry = await ReviewRegistry.new(paperRegistry.address)
+        reviewRegistry = await ReviewRegistry.new(paperRegistry.address)
         paperFactory = await PaperFactory.new(paperRegistry.address, reviewRegistry.address)
         await paperRegistry.allowCallsFrom(paperFactory.address)
         paperAPI = await PaperAPI.new(paperFactory.address)
     });
 
-    it("Should create new Paper", async function() {
-        let tx = await createDefaultPaper();
-        truffleAssert.eventEmitted(tx, 'PaperCreated');
+    it("Should change the Paper Factory with owner", async function() {
+        let paperFactory2 = await PaperFactory.new(paperRegistry.address, reviewRegistry.address)
+        await paperAPI.setPaperFactory(paperFactory2.address)
     });
 
-    it("Should create read Paper", async function() {
-        let tx = await createDefaultPaper()
+    it("Should not allow change the Paper Factory from a not owner", async function() {
+        let paperFactory2 = await PaperFactory.new(paperRegistry.address, reviewRegistry.address)
+        truffleAssert.reverts(paperAPI.setPaperFactory(paperFactory2.address, { from: accounts[1] }))
+    });
+
+    let paperData = {
+        _title: 'Title',
+        _summary: 'Summary',
+        _abstract: 'Abstract',
+        _topic: 'Topic',
+        _type: 'Type',
+        _keywords: 'Keywords',
+        _files: [{
+            _fileName: 'MyfileName',
+            _fileSystemName: 'IPFS',
+            _publicLocation: 'https://ipfs.io/test',
+            _summaryHashAlgorithm: 'blake2b',
+            _summaryHash: 'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+        },{
+            _fileName: 'MyfileName2',
+            _fileSystemName: 'IPFS',
+            _publicLocation: 'https://ipfs.io/test2',
+            _summaryHashAlgorithm: 'blake2b',
+            _summaryHash: 'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
+        }],
+        _author: accounts[0],
+        _coAuthors: [accounts[1], accounts[2]],
+        _contributors: [accounts[3], accounts[4], accounts[5]]
+    }
+
+    it("Should create a new Paper", async function() {
+        let tx = await paperAPI.create(paperData)
+        truffleAssert.eventEmitted(tx, 'PaperCreated')
+    });
+
+    it("Should read a paper", async function() {
+        let tx = await paperAPI.create(paperData)
         let paperAddr
         truffleAssert.eventEmitted(tx, 'PaperCreated', (e)=>{ paperAddr = e.paper; return true; })
         let data = await paperAPI.read.call(paperAddr)
@@ -62,34 +95,4 @@ contract('PaperAPITest', function(accounts) {
         assert.strictEqual(data._contributors[2], accounts[5], 'Contributor does not match')
     });
 
-    async function createDefaultPaper() {
-        let author = accounts[0]
-        let coAuthors = [accounts[1], accounts[2]]
-        let contributors = [accounts[3], accounts[4], accounts[5]]
-        let files = [{
-            _fileName: 'MyfileName',
-            _fileSystemName: 'IPFS',
-            _publicLocation: 'https://ipfs.io/test',
-            _summaryHashAlgorithm: 'blake2b',
-            _summaryHash: 'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
-        },{
-            _fileName: 'MyfileName2',
-            _fileSystemName: 'IPFS',
-            _publicLocation: 'https://ipfs.io/test2',
-            _summaryHashAlgorithm: 'blake2b',
-            _summaryHash: 'A8CFBBD73726062DF0C6864DDA65DEFE58EF0CC52A5625090FA17601E1EECD1B',
-        }]
-        return paperAPI.create({
-            _title: 'Title',
-            _summary: 'Summary',
-            _abstract: 'Abstract',
-            _topic: 'Topic',
-            _type: 'Type',
-            _keywords: 'Keywords',
-            _files: files,
-            _author: author,
-            _coAuthors: coAuthors,
-            _contributors: contributors
-        });
-    };
 })
