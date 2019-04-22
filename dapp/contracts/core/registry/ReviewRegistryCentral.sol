@@ -55,9 +55,7 @@ contract ReviewRegistryCentral is ReviewRegistry, Ownable {
     }
 
     modifier isAllowed(address _paper) {
-        bool isAllowedPaper = (_paper == msg.sender && paperRegistryCentral.containsPaper(Paper(msg.sender)));
-        bool isAllowedCaller = allowedCalls[msg.sender];
-        require(isAllowedPaper || isAllowedCaller, "Contabilize must be called from allowed address or registered Paper");
+        require(allowedCalls[msg.sender] || (_paper == msg.sender && paperRegistryCentral.containsPaper(Paper(msg.sender)), "Contabilize must be called from allowed address or registered Paper"); 
         _;
     }
 
