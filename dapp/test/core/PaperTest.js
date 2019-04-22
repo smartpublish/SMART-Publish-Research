@@ -4,15 +4,17 @@ var Paper = artifacts.require('Paper');
 var PaperRegistry = artifacts.require('PaperRegistryCentral');
 var PaperFactory = artifacts.require('PaperFactory');
 var ReviewRegistry = artifacts.require('ReviewRegistryCentral');
+var Work = artifacts.require('Work');
 
 contract('PaperTest', function(accounts) {
     
     var paperFactory;
     var paperRegistry;
+    var reviewRegistry;
     var paper;
     beforeEach(async function() {
         paperRegistry = await PaperRegistry.new()
-        const reviewRegistry = await ReviewRegistry.new(paperRegistry.address)
+        reviewRegistry = await ReviewRegistry.new(paperRegistry.address)
         paperFactory = await PaperFactory.new(paperRegistry.address, reviewRegistry.address)
         await paperRegistry.allowCallsFrom(paperFactory.address)
         await paperRegistry.allowCallsFrom(accounts[0])
@@ -37,8 +39,37 @@ contract('PaperTest', function(accounts) {
             )
     });
 
-    if("Should set Paper Work", async function() {
-        let work = new Work(paper);
-        await paper.addWork(work);
+    it("Should set Paper Work", async function() {
+        let work = await Work.new(paper.address);
+        await paper.addWork(work.address);
+        let workAddress = await paper.getCurrentWork.call()
+        assert.strictEqual(work.address, workAddress, 'Address does not match');
+    });
+
+    it("Should get Live Work", async function() {
+        let work = await Work.new(paper.address);
+        await paper.addWork(work.address);
+        let work2 = await Work.new(paper.address);
+        await paper.addWork(work2.address);
+
+        let liveWork = await paper.getLiveWork.call();
+        let expectedLiveWork = [work.address, work2.address]
+        assert.strictEqual(expectedLiveWork.length, liveWork.length, 'Expected same length')
+        var i;
+        for(i = 0; i < expectedLiveWork.length; i++) {
+            assert.strictEqual(expectedLiveWork[i], liveWork[i],'Live Work does not match');
+        }
+    });
+
+    it("Should cite another Paper", async function() {
+        let otherPaper = await Paper.new(paperRegistry.address, reviewRegistry.address)
+        await paperRegistry.addPaper(otherPaper.address)
+        await otherPaper.cite("refutation", paper.address)
+    });
+
+
+    it("Cite should fail if paper is not registered", async function() {
+        let otherPaper = await Paper.new(paperRegistry.address, reviewRegistry.address)
+        await truffleAssert.reverts(otherPaper.cite("refutation", paper.address),"Paper is not registered")
     });
 })
