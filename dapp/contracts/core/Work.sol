@@ -22,6 +22,7 @@ contract Work {
 
     bool public isClosed;
     Paper public parent;
+    mapping(string => uint) assetsIndex;
     Asset[] private assets;
     Review[] private reviews;
 
@@ -50,13 +51,24 @@ contract Work {
             string memory _summaryHash
     ) public onlyParentOwner {
         require(!isClosed, "This work is closed");
-        assets.push(
-            Asset(_fileName, 
-                _fileSystemName, 
-                _publicLocation, 
-                _summaryHashAlgorithm, 
-                _summaryHash)
-            );
+        if(assetsIndex[_fileName] > 0) {
+            // Update asset
+            Asset storage asset = assets[assetsIndex[_fileName]-1];
+            asset._fileSystemName = _fileSystemName;
+            asset._publicLocation = _publicLocation;
+            asset._summaryHashAlgorithm = _summaryHashAlgorithm;
+            asset._summaryHash = _summaryHash;
+        } else {
+            // Create new asset
+            uint length = assets.push(
+                Asset(_fileName, 
+                    _fileSystemName, 
+                    _publicLocation, 
+                    _summaryHashAlgorithm, 
+                    _summaryHash)
+                );
+            assetsIndex[_fileName] = length;
+        }
     }
 
     function assetCount() public view returns(uint) {
