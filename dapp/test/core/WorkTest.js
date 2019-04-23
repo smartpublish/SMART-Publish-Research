@@ -23,13 +23,13 @@ contract('WorkTest', function(accounts) {
         work = await Work.new(paper.address)
     });
 
-    it("Should add an Asset", async function() {
+    it("Add an Asset", async function() {
         await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash');
         let count = parseInt(await work.assetCount.call(),10)
         assert.strictEqual(count, 1, 'Work assets count not match')
     });
 
-    it("Should update an Asset if you tried add the same filename", async function() {
+    it("Update an Asset if you tried add the same filename", async function() {
         for(let count, i = 0; i < 3; i++) {
             await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash');
             count = parseInt(await work.assetCount.call(),10)
@@ -37,7 +37,7 @@ contract('WorkTest', function(accounts) {
         }
     });
 
-    it("Should get an Asset", async function() {
+    it("Get an Asset", async function() {
         for(let i = 0; i < 2; i++) {
             await work.addAsset('fileName' + i, 'fileSystemName' + i, 'publicLocation' + i, 'summaryHashAlgorithm' + i, 'summaryHash' + i)
         }
@@ -50,6 +50,27 @@ contract('WorkTest', function(accounts) {
             assert.strictEqual(asset._summaryHashAlgorithm, 'summaryHashAlgorithm' + i, 'Summary Hash Algorithm does not match')
             assert.strictEqual(asset._summaryHash, 'summaryHash' + i, 'Summary Hash does not match')
         }
-
     });
+
+    it("Only an owner can add an asset", async function() {
+        await truffleAssert.reverts(work.addAsset('fileName', 'fileSystemName', 'publicLocation', 'summaryHashAlgorithm', 'summaryHash', { from: accounts[1] }), "Only parent Owner can perform this action")
+    });
+
+    it("Close a work", async function() {
+        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash');
+        await work.close()
+        let isClosed = await work.isClosed.call()
+        assert.strictEqual(isClosed, true, 'Work should be closed and it is still open')
+    });
+
+    it("Work closed can not be closed again", async function() {
+        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash');
+        await work.close()
+        await truffleAssert.reverts(work.close(), "Work is already closed")
+    });
+
+    it("Only an owner can close a work", async function() {
+        await truffleAssert.reverts(work.close( { from: accounts[1] }), "Only parent Owner can perform this action")
+    });
+
 });

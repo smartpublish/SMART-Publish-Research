@@ -63,6 +63,7 @@ contract PaperAPI is Ownable {
         for(uint i=0; i < _data._files.length; i++) {
             work.addAsset(_data._files[i]._fileName, _data._files[i]._fileSystemName, _data._files[i]._publicLocation, _data._files[i]._summaryHashAlgorithm, _data._files[i]._summaryHash);
         }
+        work.close();
         paper_.setAuthorship(_data._author, _data._coAuthors, _data._contributors);
         paper_.transferOwnership(msg.sender);
         emit PaperCreated(paper_);
