@@ -73,7 +73,7 @@ contract PaperAPI is Ownable {
      * @dev Allows read all paper data.
      * @param _address paper
      */
-    function read(address payable _address) public returns(PaperData memory paper) {
+    function read(address payable _address) public view returns(PaperData memory paper) {
         Paper paper_ = Paper(_address);
         (   
             string memory _title,
