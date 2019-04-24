@@ -38,8 +38,26 @@ contract Work {
         _;
     }
 
+    /**
+     * @dev Throws if called by someone whom has paper authorship.
+     */
+    modifier onlyNotAuthorship() {
+        (address author, address[] memory coAuthors, address[] memory contributors) = parent.getAuthorship();
+        require(msg.sender != author, "Author can not perform this action");
+        
+        for(uint i = 0; i < coAuthors.length; i++) {
+            require(msg.sender != coAuthors[i], "Co-authors can not perform this action");
+        }
+        
+        for(uint i = 0; i < contributors.length; i++) {
+            require(msg.sender != contributors[i], "Contributors can not perform this action");
+        }
+        _;
+    }
+
     function close() external onlyParentOwner {
         require(!isClosed, "Work is already closed");
+        require(assets.length > 0, "Work must contains at least one asset");
         isClosed = true;
     }
 
@@ -91,21 +109,22 @@ contract Work {
     }
 
     function addReview(
-                address payable _reviewer,
                 uint _reviewResult,
-                string calldata _identifier,
-                string calldata _comments,
-                string calldata _signature
-    ) external {
+                string memory _identifier,
+                string memory _comments,
+                string memory _signature
+    ) public onlyNotAuthorship {
         require(isClosed, "This work is still open and can not be reviewed");
+        (address author, address[] memory coAuthors, address[] memory contributors) = parent.getAuthorship();
+        require(author != address(0), "This paper need an author before it could be reviewed");
         reviews.push(
-            Review(_reviewer,
+            Review(msg.sender,
                 _reviewResult,
                 _identifier,
                 _comments,
                 _signature)
         );
-        parent.onReviewed(_reviewer, _identifier, _reviewResult);
+        parent.onReviewed(msg.sender, _identifier, _reviewResult);
     }
 
     function reviewCount() public view returns(uint) {

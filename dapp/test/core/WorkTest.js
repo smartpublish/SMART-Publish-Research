@@ -57,14 +57,18 @@ contract('WorkTest', function(accounts) {
     });
 
     it("Close a work", async function() {
-        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash');
+        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash')
         await work.close()
         let isClosed = await work.isClosed.call()
         assert.strictEqual(isClosed, true, 'Work should be closed and it is still open')
     });
 
+    it("Only close a work if contains at least one asset", async function() {
+        await truffleAssert.reverts(work.close(), "Work must contains at least one asset")
+    });
+
     it("Work closed can not be closed again", async function() {
-        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash');
+        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash')
         await work.close()
         await truffleAssert.reverts(work.close(), "Work is already closed")
     });
@@ -73,4 +77,44 @@ contract('WorkTest', function(accounts) {
         await truffleAssert.reverts(work.close( { from: accounts[1] }), "Only parent Owner can perform this action")
     });
 
+    it("Add a review", async function() {
+        await paper.setAuthorship(accounts[0],[accounts[1],accounts[2]],[accounts[3]])
+        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash')
+        await work.close()
+        await paper.addWork(work.address)
+        await work.addReview(0,'https://orcid.org/0000-0003-2380-1698','comment','signature', { from: accounts[5] })
+    });
+
+    it("Only close work can be reviewed", async function() {
+        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash')
+        await truffleAssert.reverts(
+            work.addReview(0,'https://orcid.org/0000-0003-2380-1698','comment','signature', { from: accounts[2] }),
+            "This work is still open and can not be reviewed"
+        )
+    });
+
+    it("Paper must have an Author in order to add a review on a work", async function() {
+        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash')
+        await truffleAssert.reverts(
+            work.addReview(0,'https://orcid.org/0000-0003-2380-1698','comment','signature', { from: accounts[2] }),
+            "This work is still open and can not be reviewed"
+        )
+    });
+
+    it("Authors, co-authors and contributors can not review their works", async function() {
+        await paper.setAuthorship(accounts[0],[accounts[1],accounts[2]],[accounts[3]])
+        await work.addAsset('fileName.pdf','fileSystemName','publicLocation','summaryHashAlgorithm','summaryHash')
+        await truffleAssert.reverts(
+            work.addReview(0,'https://orcid.org/0000-0003-2380-1698','comment','signature'),
+            "Author can not perform this action"
+        )
+        await truffleAssert.reverts(
+            work.addReview(0,'https://orcid.org/0000-0003-2380-1698','comment','signature', { from: accounts[2] }),
+            "Co-authors can not perform this action"
+        )
+        await truffleAssert.reverts(
+            work.addReview(0,'https://orcid.org/0000-0003-2380-1698','comment','signature', { from: accounts[3] }),
+            "Contributors can not perform this action"
+        )
+    });
 });
