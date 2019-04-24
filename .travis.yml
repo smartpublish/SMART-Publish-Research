@@ -36,19 +36,19 @@ jobs:
       - sleep 5;
       - truffle test;
 
-    - stage: deploy demo
-      name: "Deploy demo on Ropsten"
-      provider: script
-      install:
-      - npm i --silent --no-optional -g truffle @angular/cli
-      - npm i --prefix dapp/
-      - npm i --prefix webapp/
-      script:
-      - cd dapp/ || exit;
-      - truffle migrate --network ropsten;
-      - truffle exec seed.js --network ropsten;
-      - cd ../webapp/ || exit;
-      - npm run ng-high-memory -- build --prod --base-href /SMART-Publish-Research-demo/ --deploy-url /SMART-Publish-Research-demo/ --source-map=false;
-      - npx angular-cli-ghpages --dir=dist/webapp --repo="$GH_REPO_DEMO" --name="$GH_USER" --email="$GH_EMAIL" --branch=master;
-      on:
-        branch: dev
+#    - stage: deploy demo
+#      name: "Deploy demo on Ropsten"
+#      provider: script
+#      install:
+#      - npm i --silent --no-optional -g truffle @angular/cli
+#      - npm i --prefix dapp/
+#      - npm i --prefix webapp/
+#      script:
+#      - cd dapp/ || exit;
+#      - truffle migrate --network ropsten;
+#      - truffle exec seed.js --network ropsten;
+#      - cd ../webapp/ || exit;
+#      - npm run ng-high-memory -- build --prod --base-href /SMART-Publish-Research-demo/ --deploy-url /SMART-Publish-Research-demo/ --source-map=false;
+#      - npx angular-cli-ghpages --dir=dist/webapp --repo="$GH_REPO_DEMO" --name="$GH_USER" --email="$GH_EMAIL" --branch=master;
+#      on:
+#        branch: dev
